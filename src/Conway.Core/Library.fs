@@ -1,4 +1,11 @@
 ﻿namespace Conway.Core
 
-module Say =
-    let hello name = printfn "Hello %s" name
+type CellStatus =
+    | Alive
+    | Dead
+
+type Cell = {
+    Status: CellStatus
+} with
+
+    static member createLivingCell = { Status = Alive }
