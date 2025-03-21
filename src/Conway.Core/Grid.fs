@@ -8,6 +8,7 @@ type Grid = {
     Board: GridCellType[,]
 } with
 
+    [<CompiledName("CreateDead")>]
     static member createDead width height = {
         Board =
             Array2D.init (height + 2) (width + 2) (fun i j ->
@@ -17,6 +18,7 @@ type Grid = {
                     PlayerCell Cell.createDeadCell)
     }
 
+    [<CompiledName("CreateLiving")>]
     static member createLiving width height = {
         Board =
             Array2D.init (height + 2) (width + 2) (fun i j ->
@@ -26,6 +28,7 @@ type Grid = {
                     PlayerCell Cell.createLivingCell)
     }
 
+    [<CompiledName("Init")>]
     static member init width height initializer = {
         Board =
             Array2D.init (height + 2) (width + 2) (fun i j ->
