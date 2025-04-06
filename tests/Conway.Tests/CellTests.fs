@@ -110,3 +110,39 @@ module ``Grid tests`` =
         let actual = Grid.init 3 3 initializer
 
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
+
+    [<Test>]
+    let ``All-dead grid remains dead after one iteration`` () =
+        let expectedBoard = Grid.createDead 3 3
+
+        let actual = Grid.createDead 3 3 |> Grid.next
+
+        Assert.That(actual, Is.EqualTo expectedBoard)
+
+    [<Test>]
+    let ``A cell dies with no living neighbors`` () =
+        let initializer i j =
+            if i = 1 && j = 1 then
+                Cell.createLivingCell
+            else
+                Cell.createDeadCell
+
+        let expectedBoard = Grid.createDead 3 3
+
+        let actual = Grid.init 3 3 initializer |> Grid.next
+
+        Assert.That(actual, Is.EqualTo expectedBoard)
+
+    [<Test>]
+    let ``A cell dies with one living neighbors`` () =
+        let initializer i j =
+            if i = 1 && j = 1 || i = 2 && j = 2 then
+                Cell.createLivingCell
+            else
+                Cell.createDeadCell
+
+        let expectedBoard = Grid.createDead 3 3
+
+        let actual = Grid.init 3 3 initializer |> Grid.next
+
+        Assert.That(actual, Is.EqualTo expectedBoard)
