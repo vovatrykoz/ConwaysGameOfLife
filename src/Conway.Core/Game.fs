@@ -4,16 +4,15 @@ type GameMode =
     | Infinite
     | Limited of int
 
-type Game =
-    static member run mode startingGrid =
-        let mutable grid = startingGrid
+type Game(initialState: Grid) =
+    member val State = initialState with get, set
 
+    [<CompiledName("Run")>]
+    member this.run mode =
         match mode with
         | Infinite ->
             while true do
-                grid <- Grid.next grid
+                this.State <- Grid.next this.State
         | Limited steps ->
             for _ = 1 to steps do
-                grid <- Grid.next grid
-
-        grid
+                this.State <- Grid.next this.State
