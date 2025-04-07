@@ -38,41 +38,47 @@ type Grid = {
                     PlayerCell(initializer (i - 1) (j - 1)))
     }
 
+    static member private collectNeighbors row col (board: GridCellType array2d) = [
+        board.[row - 1, col - 1]
+        board.[row - 1, col]
+        board.[row - 1, col + 1]
+        board.[row, col - 1]
+        board.[row, col + 1]
+        board.[row + 1, col - 1]
+        board.[row + 1, col]
+        board.[row + 1, col + 1]
+    ]
+
+    static member private countLivingNeighbors row col (board: GridCellType array2d) =
+        board
+        |> Grid.collectNeighbors row col
+        |> List.choose (fun neighbor ->
+            match neighbor with
+            | BorderCell -> None
+            | PlayerCell cell ->
+                match cell.Status with
+                | Dead -> None
+                | Alive -> Some())
+        |> List.length
+
+    static member private processPlayerCell row col cell (board: GridCellType array2d) =
+        let livingNeighborsCount = Grid.countLivingNeighbors row col board
+
+        match livingNeighborsCount with
+        | x when x < 2 -> PlayerCell Cell.dead
+        | x when x = 2 ->
+            match cell.Status with
+            | Dead -> PlayerCell Cell.dead
+            | Alive -> PlayerCell Cell.living
+        | x when x = 3 -> PlayerCell Cell.living
+        | _ -> PlayerCell Cell.dead
+
     static member next grid =
         let newBoard =
             grid.Board
-            |> Array2D.mapi (fun i j cell ->
+            |> Array2D.mapi (fun row col cell ->
                 match cell with
                 | BorderCell -> BorderCell
-                | PlayerCell currentCell ->
-                    let neighbors = [
-                        grid.Board.[i - 1, j - 1]
-                        grid.Board[i - 1, j]
-                        grid.Board[i - 1, j + 1]
-                        grid.Board.[i, j - 1]
-                        grid.Board[i, j + 1]
-                        grid.Board.[i + 1, j - 1]
-                        grid.Board[i + 1, j]
-                        grid.Board[i + 1, j + 1]
-                    ]
-
-                    let livingNeighbors =
-                        neighbors
-                        |> List.choose (fun neighbor ->
-                            match neighbor with
-                            | BorderCell -> None
-                            | PlayerCell cell ->
-                                match cell.Status with
-                                | Dead -> None
-                                | Alive -> Some Alive)
-
-                    match List.length livingNeighbors with
-                    | x when x < 2 -> PlayerCell Cell.dead
-                    | x when x = 2 ->
-                        match currentCell.Status with
-                        | Dead -> PlayerCell Cell.dead
-                        | Alive -> PlayerCell Cell.living
-                    | x when x = 3 -> PlayerCell Cell.living
-                    | _ -> PlayerCell Cell.dead)
+                | PlayerCell playerCell -> Grid.processPlayerCell row col playerCell grid.Board)
 
         { grid with Board = newBoard }
