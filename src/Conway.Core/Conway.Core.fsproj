@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Cell.fs" /><Compile Include="Grid.fs" /><Compile Include="IInputReader.fs" /><Compile Include="IRenderer.fs" />
+    <Compile Include="Cell.fs" /><Compile Include="Grid.fs" /><Compile Include="IInputReader.fs" /><Compile Include="IRenderer.fs" /><Compile Include="Game.fs" />
   </ItemGroup>
 
 </Project>
