@@ -15,3 +15,5 @@ type Game =
         | Limited steps ->
             for _ = 1 to steps do
                 grid <- Grid.next grid
+
+        grid
