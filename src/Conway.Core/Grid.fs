@@ -15,7 +15,7 @@ type Grid = {
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
-                    PlayerCell Cell.createDeadCell)
+                    PlayerCell Cell.dead)
     }
 
     [<CompiledName("CreateLiving")>]
@@ -25,7 +25,7 @@ type Grid = {
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
-                    PlayerCell Cell.createLivingCell)
+                    PlayerCell Cell.living)
     }
 
     [<CompiledName("Init")>]
@@ -35,7 +35,7 @@ type Grid = {
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
-                    PlayerCell(initializer (i + 1) (j + 1)))
+                    PlayerCell(initializer (i - 1) (j - 1)))
     }
 
     static member next grid =
@@ -67,12 +67,12 @@ type Grid = {
                                 | Alive -> Some Alive)
 
                     match List.length livingNeighbors with
-                    | x when x < 2 -> PlayerCell Cell.createDeadCell
+                    | x when x < 2 -> PlayerCell Cell.dead
                     | x when x = 2 ->
                         match currentCell.Status with
-                        | Dead -> PlayerCell Cell.createDeadCell
-                        | Alive -> PlayerCell Cell.createLivingCell
-                    | x when x = 3 -> PlayerCell Cell.createLivingCell
-                    | _ -> PlayerCell Cell.createDeadCell)
+                        | Dead -> PlayerCell Cell.dead
+                        | Alive -> PlayerCell Cell.living
+                    | x when x = 3 -> PlayerCell Cell.living
+                    | _ -> PlayerCell Cell.dead)
 
         { grid with Board = newBoard }

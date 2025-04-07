@@ -9,7 +9,7 @@ type Cell = {
 } with
 
     [<CompiledName("CreateLivingCell")>]
-    static member createLivingCell = { Status = Alive }
+    static member living = { Status = Alive }
 
     [<CompiledName("CreateDeadCell")>]
-    static member createDeadCell = { Status = Dead }
+    static member dead = { Status = Dead }
