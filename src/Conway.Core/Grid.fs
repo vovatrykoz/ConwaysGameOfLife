@@ -54,13 +54,13 @@ type Grid = {
     static member private countLivingNeighbors row col (board: GridCellType array2d) =
         board
         |> Grid.collectNeighbors row col
-        |> List.choose (fun neighbor ->
+        |> List.filter (fun neighbor ->
             match neighbor with
-            | BorderCell -> None
+            | BorderCell -> false
             | PlayerCell cell ->
                 match cell.Status with
-                | Dead -> None
-                | Alive -> Some())
+                | Dead -> false
+                | Alive -> true)
         |> List.length
 
     [<CompiledName("ProcessPlayerCell")>]
