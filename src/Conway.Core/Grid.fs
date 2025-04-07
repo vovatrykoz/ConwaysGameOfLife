@@ -38,6 +38,7 @@ type Grid = {
                     PlayerCell(initializer (i - 1) (j - 1)))
     }
 
+    [<CompiledName("CollectNeighbors")>]
     static member private collectNeighbors row col (board: GridCellType array2d) = [
         board.[row - 1, col - 1]
         board.[row - 1, col]
@@ -49,6 +50,7 @@ type Grid = {
         board.[row + 1, col + 1]
     ]
 
+    [<CompiledName("CountLivingNeighbors")>]
     static member private countLivingNeighbors row col (board: GridCellType array2d) =
         board
         |> Grid.collectNeighbors row col
@@ -61,6 +63,7 @@ type Grid = {
                 | Alive -> Some())
         |> List.length
 
+    [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col cell (board: GridCellType array2d) =
         let livingNeighborsCount = Grid.countLivingNeighbors row col board
 
@@ -73,6 +76,7 @@ type Grid = {
         | x when x = 3 -> PlayerCell Cell.living
         | _ -> PlayerCell Cell.dead
 
+    [<CompiledName("Next")>]
     static member next grid =
         let newBoard =
             grid.Board
