@@ -136,6 +136,7 @@ module ``Grid tests`` =
 
     [<Test>]
     let ``A living cell with three living neighbors keeps on living`` () =
+        // each individual cell has three living neighbors
         let setup = [| [| Cell.living; Cell.living |]; [| Cell.living; Cell.living |] |]
         let expectedArray = [| [| Cell.living; Cell.living |]; [| Cell.living; Cell.living |] |]
 
@@ -154,6 +155,8 @@ module ``Grid tests`` =
             [| Cell.living; Cell.living; Cell.dead |]
         |]
 
+        // the two middle cells both have 4 living neighbors, therefore both are expected to die
+        // The cell in the bottom right should become alive, as it had three living neighbors
         let expectedArray = [|
             [| Cell.living; Cell.dead; Cell.living |]
             [| Cell.living; Cell.dead; Cell.living |]
