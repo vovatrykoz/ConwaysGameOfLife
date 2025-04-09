@@ -1,4 +1,5 @@
 ﻿open Conway.Core
+open Conway.App.Raylib
 open Raylib_cs
 open System.Threading
 
@@ -7,18 +8,8 @@ let convertCBoolToFsBool (cbool: CBool) =
     | 0y -> false
     | _ -> true
 
-let startingArray = [|
-    [| Cell.dead; Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
-    [| Cell.dead; Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
-    [| Cell.dead; Cell.living; Cell.living; Cell.living; Cell.dead |]
-    [| Cell.dead; Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
-    [| Cell.dead; Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
-|]
-
-let initializer i j = startingArray[i][j]
-
-let startingState = Grid.init 5 5 initializer
-let squareSize = 100
+let startingState = Preset.presetOne |||> Grid.init
+let squareSize = 25
 
 let game = new Game(startingState)
 
@@ -57,8 +48,15 @@ Raylib.InitWindow(800, 600, "Conway's game of life")
 
 render game.State.Board
 
+let mutable hasRunOnce = false
+
 while not (convertCBoolToFsBool (Raylib.WindowShouldClose())) do
-    Thread.Sleep 500
+    if not hasRunOnce then
+        Thread.Sleep 1000
+        hasRunOnce <- true
+    else
+        Thread.Sleep 250
+
     game.run (Limited 1)
     render game.State.Board
 
