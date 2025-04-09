@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Preset.fs" />
+    <Compile Include="Draw.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

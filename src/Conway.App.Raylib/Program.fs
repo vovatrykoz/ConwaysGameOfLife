@@ -22,25 +22,9 @@ let render board =
         match cell with
         | BorderCell -> ()
         | PlayerCell playerCell ->
-            Raylib.DrawRectangleLines(col * squareSize, row * squareSize, squareSize, squareSize, Color.Black)
-
             match playerCell.Status with
-            | Dead ->
-                Raylib.DrawRectangle(
-                    col * squareSize + 5,
-                    row * squareSize + 5,
-                    squareSize - 10,
-                    squareSize - 10,
-                    Color.Black
-                )
-            | Alive ->
-                Raylib.DrawRectangle(
-                    col * squareSize + 5,
-                    row * squareSize + 5,
-                    squareSize - 10,
-                    squareSize - 10,
-                    Color.Red
-                ))
+            | Dead -> Draw.deadCell col row
+            | Alive -> Draw.livingCell col row)
 
     Raylib.EndDrawing()
 
@@ -55,7 +39,7 @@ while not (convertCBoolToFsBool (Raylib.WindowShouldClose())) do
         Thread.Sleep 1000
         hasRunOnce <- true
     else
-        Thread.Sleep 250
+        Thread.Sleep 500
 
     game.run (Limited 1)
     render game.State.Board
