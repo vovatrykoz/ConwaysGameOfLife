@@ -19,7 +19,7 @@ while not (Raylib.WindowShouldClose() |> Convert.CBoolToFsBool) do
     else
         Thread.Sleep 500
 
-    game.run (Limited 1)
+    game.runOneStep ()
     Display.render game.State.Board
 
 Display.close ()

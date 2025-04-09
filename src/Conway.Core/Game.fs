@@ -16,3 +16,5 @@ type Game(initialState: Grid) =
         | Limited steps ->
             for _ = 1 to steps do
                 this.State <- Grid.next this.State
+
+    member this.runOneStep() = this.run (Limited 1)
