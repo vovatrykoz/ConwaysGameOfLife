@@ -81,8 +81,11 @@ type Grid = {
         let newBoard =
             grid.Board
             |> Array2D.mapi (fun row col cell ->
-                match cell with
-                | BorderCell -> BorderCell
-                | PlayerCell playerCell -> Grid.processPlayerCell row col playerCell grid.Board)
+                task {
+                    match cell with
+                    | BorderCell -> return BorderCell
+                    | PlayerCell playerCell -> return Grid.processPlayerCell row col playerCell grid.Board
+                })
+            |> Array2D.map (fun task -> task.Result)
 
         { grid with Board = newBoard }
