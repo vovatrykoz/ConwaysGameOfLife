@@ -38,7 +38,7 @@ type Grid = {
                     PlayerCell(initializer (i - 1) (j - 1)))
     }
 
-    [<CompiledName("Init")>]
+    [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> Grid.init
 
     [<CompiledName("CollectNeighbors")>]
