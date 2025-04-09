@@ -38,6 +38,9 @@ type Grid = {
                     PlayerCell(initializer (i - 1) (j - 1)))
     }
 
+    [<CompiledName("Init")>]
+    static member initFromPreset preset = preset |||> Grid.init
+
     [<CompiledName("CollectNeighbors")>]
     static member private collectNeighbors row col (board: GridCellType array2d) = [
         board.[row - 1, col - 1]

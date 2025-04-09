@@ -6,6 +6,8 @@
   <ItemGroup>
     <Compile Include="Preset.fs" />
     <Compile Include="Draw.fs" />
+    <Compile Include="RaylibTypeConverter.fs" />
+    <Compile Include="Display.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
