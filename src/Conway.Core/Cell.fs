@@ -13,3 +13,9 @@ type Cell = {
 
     [<CompiledName("CreateDeadCell")>]
     static member dead = { Status = Dead }
+
+    [<CompiledName("IsAlive")>]
+    static member isAlive cell = cell.Status = Alive
+
+    [<CompiledName("IsDead")>]
+    static member isDead cell = cell.Status = Dead

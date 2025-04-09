@@ -64,15 +64,12 @@ type Grid = {
         |> List.length
 
     [<CompiledName("ProcessPlayerCell")>]
-    static member private processPlayerCell row col cell (board: GridCellType array2d) =
+    static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
         let livingNeighborsCount = Grid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
         | x when x < 2 -> PlayerCell Cell.dead
-        | x when x = 2 ->
-            match cell.Status with
-            | Dead -> PlayerCell Cell.dead
-            | Alive -> PlayerCell Cell.living
+        | x when x = 2 -> PlayerCell currentCell
         | x when x = 3 -> PlayerCell Cell.living
         | _ -> PlayerCell Cell.dead
 
