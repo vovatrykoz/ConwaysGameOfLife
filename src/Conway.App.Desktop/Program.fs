@@ -2,41 +2,50 @@
 
 open Avalonia
 open Avalonia.Controls.ApplicationLifetimes
-open Avalonia.Themes.Fluent
-open Avalonia.FuncUI.Hosts
-open Avalonia.Controls
 open Avalonia.FuncUI
 open Avalonia.FuncUI.DSL
+open Avalonia.FuncUI.Hosts
+open Avalonia.Controls
 open Avalonia.Layout
+open Conway.Core
+
+module Model =
+    let gridButton row col (content: string) =
+        Button.create [
+            Grid.row row
+            Grid.column col
+            Button.content content
+            Button.horizontalAlignment HorizontalAlignment.Stretch
+            Button.verticalAlignment VerticalAlignment.Stretch
+            Button.verticalContentAlignment VerticalAlignment.Center
+            Button.horizontalContentAlignment HorizontalAlignment.Center
+        ]
 
 module Main =
 
     let view () =
         Component(fun ctx ->
-            let state = ctx.useState 0
+
+            let state = ctx.useState (ConwayGrid.createDead 3 3)
 
             DockPanel.create [
                 DockPanel.children [
-                    Button.create [
-                        Button.dock Dock.Bottom
-                        Button.onClick (fun _ -> state.Set(state.Current - 1))
-                        Button.content "-"
-                        Button.horizontalAlignment HorizontalAlignment.Stretch
-                        Button.horizontalContentAlignment HorizontalAlignment.Center
-                    ]
-                    Button.create [
-                        Button.dock Dock.Bottom
-                        Button.onClick (fun _ -> state.Set(state.Current + 1))
-                        Button.content "+"
-                        Button.horizontalAlignment HorizontalAlignment.Stretch
-                        Button.horizontalContentAlignment HorizontalAlignment.Center
-                    ]
-                    TextBlock.create [
-                        TextBlock.dock Dock.Top
-                        TextBlock.fontSize 48.0
-                        TextBlock.verticalAlignment VerticalAlignment.Center
-                        TextBlock.horizontalAlignment HorizontalAlignment.Center
-                        TextBlock.text (string state.Current)
+                    Grid.create [
+                        Grid.dock Dock.Bottom
+                        Grid.columnDefinitions "*,*,*"
+                        Grid.rowDefinitions "*,*,*"
+                        Grid.showGridLines true
+                        Grid.children [
+                            Model.gridButton 0 0 "1"
+                            Model.gridButton 0 1 "2"
+                            Model.gridButton 0 2 "3"
+                            Model.gridButton 1 0 "4"
+                            Model.gridButton 1 1 "5"
+                            Model.gridButton 1 2 "6"
+                            Model.gridButton 2 0 "7"
+                            Model.gridButton 2 1 "8"
+                            Model.gridButton 2 2 "9"
+                        ]
                     ]
                 ]
             ])

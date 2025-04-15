@@ -2,4 +2,4 @@ namespace Conway.Core
 
 [<Interface>]
 type IRenderer =
-    abstract member RenderGrid: Grid -> unit
+    abstract member RenderGrid: ConwayGrid -> unit

@@ -32,7 +32,7 @@ module ``Grid tests`` =
 
         let expectedBoard = Array2D.init 4 4 (fun i j -> expectedArray[i][j])
 
-        let actual = Grid.createDead 2 2
+        let actual = ConwayGrid.createDead 2 2
 
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
@@ -47,7 +47,7 @@ module ``Grid tests`` =
 
         let expectedBoard = Array2D.init 4 4 (fun i j -> expectedArray[i][j])
 
-        let actual = Grid.createLiving 2 2
+        let actual = ConwayGrid.createLiving 2 2
 
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
@@ -84,15 +84,15 @@ module ``Grid tests`` =
 
         let expectedBoard = Array2D.init 5 5 (fun i j -> expectedArray[i][j])
 
-        let actual = Grid.init 3 3 initializer
+        let actual = ConwayGrid.init 3 3 initializer
 
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``All-dead grid remains dead after one iteration`` () =
-        let expectedBoard = Grid.createDead 3 3
+        let expectedBoard = ConwayGrid.createDead 3 3
 
-        let actual = Grid.createDead 3 3 |> Grid.next
+        let actual = ConwayGrid.createDead 3 3 |> ConwayGrid.next
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -101,9 +101,9 @@ module ``Grid tests`` =
         let initializer i j =
             if i = 1 && j = 1 then Cell.living else Cell.dead
 
-        let expectedBoard = Grid.createDead 3 3
+        let expectedBoard = ConwayGrid.createDead 3 3
 
-        let actual = Grid.init 3 3 initializer |> Grid.next
+        let actual = ConwayGrid.init 3 3 initializer |> ConwayGrid.next
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -115,9 +115,9 @@ module ``Grid tests`` =
             else
                 Cell.dead
 
-        let expectedBoard = Grid.createDead 3 3
+        let expectedBoard = ConwayGrid.createDead 3 3
 
-        let actual = Grid.init 3 3 initializer |> Grid.next
+        let actual = ConwayGrid.init 3 3 initializer |> ConwayGrid.next
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -129,8 +129,8 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = Grid.init 2 2 setupInitializer |> Grid.next
-        let expectedBoard = Grid.init 2 2 expectedInitializer
+        let actual = ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next
+        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -143,8 +143,8 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = Grid.init 2 2 setupInitializer |> Grid.next
-        let expectedBoard = Grid.init 2 2 expectedInitializer
+        let actual = ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next
+        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -165,8 +165,8 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = Grid.init 3 2 setupInitializer |> Grid.next
-        let expectedBoard = Grid.init 3 2 expectedInitializer
+        let actual = ConwayGrid.init 3 2 setupInitializer |> ConwayGrid.next
+        let expectedBoard = ConwayGrid.init 3 2 expectedInitializer
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -198,12 +198,12 @@ module ``Grid tests`` =
         let expectedInitializerTwo i j =
             ``expected array after the second iteration``[i][j]
 
-        let actual = Grid.init 3 3 setupInitializer |> Grid.next
-        let expectedBoardOne = Grid.init 3 3 expectedInitializerOne
+        let actual = ConwayGrid.init 3 3 setupInitializer |> ConwayGrid.next
+        let expectedBoardOne = ConwayGrid.init 3 3 expectedInitializerOne
 
         Assert.That(actual, Is.EqualTo expectedBoardOne)
 
-        let actual = actual |> Grid.next
-        let expectedBoardTwo = Grid.init 3 3 expectedInitializerTwo
+        let actual = actual |> ConwayGrid.next
+        let expectedBoardTwo = ConwayGrid.init 3 3 expectedInitializerTwo
 
         Assert.That(actual, Is.EqualTo expectedBoardTwo)

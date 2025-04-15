@@ -4,7 +4,7 @@ type GridCellType =
     | BorderCell
     | PlayerCell of Cell
 
-type Grid = {
+type ConwayGrid = {
     Board: GridCellType[,]
 } with
 
@@ -39,7 +39,7 @@ type Grid = {
     }
 
     [<CompiledName("InitFromPreset")>]
-    static member initFromPreset preset = preset |||> Grid.init
+    static member initFromPreset preset = preset |||> ConwayGrid.init
 
     [<CompiledName("CollectNeighbors")>]
     static member private collectNeighbors row col (board: GridCellType array2d) = [
@@ -56,7 +56,7 @@ type Grid = {
     [<CompiledName("CountLivingNeighbors")>]
     static member private countLivingNeighbors row col (board: GridCellType array2d) =
         board
-        |> Grid.collectNeighbors row col
+        |> ConwayGrid.collectNeighbors row col
         |> List.filter (fun neighbor ->
             match neighbor with
             | BorderCell -> false
@@ -68,7 +68,7 @@ type Grid = {
 
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
-        let livingNeighborsCount = Grid.countLivingNeighbors row col board
+        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
         | x when x < 2 -> PlayerCell Cell.dead
@@ -84,7 +84,7 @@ type Grid = {
                 task {
                     match cell with
                     | BorderCell -> return BorderCell
-                    | PlayerCell playerCell -> return Grid.processPlayerCell row col playerCell grid.Board
+                    | PlayerCell playerCell -> return ConwayGrid.processPlayerCell row col playerCell grid.Board
                 })
             |> Array2D.map (fun task -> task.Result)
 

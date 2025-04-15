@@ -3,7 +3,7 @@ open Conway.App.Raylib
 open Raylib_cs
 open System.Threading
 
-let startingState = Preset.presetOne |> Grid.initFromPreset
+let startingState = Preset.presetOne |> ConwayGrid.initFromPreset
 
 let game = new Game(startingState)
 
