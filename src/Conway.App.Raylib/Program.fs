@@ -2,40 +2,35 @@
 open Conway.App.Raylib
 open Raylib_cs
 
-type GameState =
-    | Running
-    | Paused
-
 let startingState = Preset.presetOne |> ConwayGrid.initFromPreset
 
 let game = new Game(startingState)
 
 Display.init ()
-Display.render game.State.Board
 
-let mutable hasRunOnce = false
+let mutable gameRunningState = Infinite
 
-let mutable currentState = Running
-
-let rec gameUpdateLoop () =
+let rec gameUpdateLoop state =
 
     async {
-        if not hasRunOnce then
-            do! Async.Sleep 1000
-            hasRunOnce <- true
-        else
-            do! Async.Sleep 500
+        do! Async.Sleep 500
 
-        match currentState with
-        | Running -> game.runOneStep ()
+        match gameRunningState with
+        | Infinite -> game.runOneStep ()
+        | Limited x when x > 1 ->
+            game.runOneStep ()
+            gameRunningState <- Limited(x - 1)
+        | Limited _ ->
+            game.runOneStep ()
+            gameRunningState <- Paused
         | Paused -> ()
 
-        return! gameUpdateLoop ()
+        return! gameUpdateLoop state
     }
 
-gameUpdateLoop () |> Async.Start
+gameRunningState |> gameUpdateLoop |> Async.Start
 
 while not (Raylib.WindowShouldClose() |> Convert.CBoolToFsBool) do
-    Display.render game.State.Board
+    Display.render game.State.Board gameRunningState
 
 Display.close ()

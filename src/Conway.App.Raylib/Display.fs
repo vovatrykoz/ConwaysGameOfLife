@@ -7,7 +7,7 @@ module Display =
     let init () =
         Raylib.InitWindow(800, 600, "Conway's game of life")
 
-    let render board =
+    let render board state =
         Raylib.BeginDrawing()
         Raylib.ClearBackground Color.White
 
@@ -19,6 +19,8 @@ module Display =
                 match playerCell.Status with
                 | Dead -> Draw.deadCell col row
                 | Alive -> Draw.livingCell col row)
+
+        Draw.runButton 700 500 state
 
         Raylib.EndDrawing()
 

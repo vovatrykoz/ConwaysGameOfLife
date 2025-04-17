@@ -1,5 +1,6 @@
 namespace Conway.App.Raylib
 
+open Conway.Core
 open Raylib_cs
 
 module Draw =
@@ -15,3 +16,13 @@ module Draw =
     let livingCell x y = cell x y Color.Red
 
     let deadCell x y = cell x y Color.Black
+
+    let runButton x y state =
+        let buttonText =
+            match state with
+            | Infinite
+            | Limited _ -> "Pause"
+            | Paused -> "Run"
+
+        Raylib.DrawRectangle(x, y, size * 2, size * 2, Color.Black)
+        Raylib.DrawText(buttonText, x + 5, y + 5, 15, Color.White)

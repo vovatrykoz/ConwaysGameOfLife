@@ -5,6 +5,7 @@ open System.Threading
 type GameMode =
     | Infinite
     | Limited of int
+    | Paused
 
 type Game(initialState: ConwayGrid) =
     let mutable internalState = initialState
@@ -34,5 +35,6 @@ type Game(initialState: ConwayGrid) =
         | Limited steps ->
             for _ = 1 to steps do
                 this.State <- ConwayGrid.next this.State
+        | Paused -> ()
 
     member this.runOneStep() = this.run (Limited 1)
