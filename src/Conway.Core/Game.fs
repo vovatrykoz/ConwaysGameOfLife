@@ -1,11 +1,29 @@
 namespace Conway.Core
 
+open System.Threading
+
 type GameMode =
     | Infinite
     | Limited of int
 
 type Game(initialState: ConwayGrid) =
-    member val State = initialState with get, set
+    let mutable internalState = initialState
+
+    member val private mutex = new Mutex()
+
+    member this.State
+        with get () =
+            try
+                this.mutex.WaitOne() |> ignore
+                internalState
+            finally
+                this.mutex.ReleaseMutex()
+        and set newState =
+            try
+                this.mutex.WaitOne() |> ignore
+                internalState <- newState
+            finally
+                this.mutex.ReleaseMutex()
 
     [<CompiledName("Run")>]
     member this.run mode =
