@@ -1,27 +1,23 @@
 namespace Conway.App.Raylib
 
-type Button = {
-    X: int
-    Y: int
-    Size: int
-    Text: string
-    OnClick: unit -> unit
-    Update: Button -> Button
-} with
+type Button(x: int, y: int, size: int, text: string, onClick: option<unit -> unit>, update: option<Button -> unit>) =
 
-    static member create x y size text onClick update = {
-        X = x
-        Y = y
-        Size = size
-        Text = text
-        OnClick = onClick
-        Update = update
-    }
+    member val X = x with get, set
+
+    member val Y = y with get, set
+
+    member val Size = size with get, set
+
+    member val Text = text with get, set
+
+    member val OnClick = onClick with get, set
+
+    member val Update = update with get, set
 
 module private Utils =
     open System.Numerics
 
-    let isPressed button leftMouseButtonIsPressed (getMousePosition: unit -> Vector2) =
+    let isPressed (button: Button) leftMouseButtonIsPressed (getMousePosition: unit -> Vector2) =
         if leftMouseButtonIsPressed () then
             let mousePos = getMousePosition ()
             let minX = button.X
@@ -41,24 +37,24 @@ module private Utils =
         else
             false
 
-type ControlManager = {
-    Buttons: seq<Button>
-} with
+type ControlManager() =
 
-    static member createEmpty = { Buttons = Seq.empty }
+    member val Buttons = seq<Button> Seq.empty with get, set
 
-    static member create buttons = { Buttons = buttons }
+    member this.AddButton(button: Button) =
+        this.Buttons <- seq { button } |> Seq.append this.Buttons
 
-    static member addButton (button: Button) controlManager = {
-        controlManager with
-            Buttons = seq { button } |> Seq.append controlManager.Buttons
-    }
-
-    static member checkMouseInput leftMouseButtonIsPressed getMousePosition controlManager =
-        controlManager.Buttons
+    member this.ReadInput leftMouseButtonIsPressed getMousePosition =
+        this.Buttons
         |> Seq.iter (fun button ->
             if Utils.isPressed button leftMouseButtonIsPressed getMousePosition then
-                button.OnClick())
+                match button.OnClick with
+                | Some callback -> callback ()
+                | None -> ())
 
-    static member update controlManager =
-        ControlManager.create (controlManager.Buttons |> Seq.map (fun button -> button.Update button))
+    member this.Update() =
+        this.Buttons
+        |> Seq.iter (fun button ->
+            match button.Update with
+            | Some updateCallback -> updateCallback button
+            | None -> ())

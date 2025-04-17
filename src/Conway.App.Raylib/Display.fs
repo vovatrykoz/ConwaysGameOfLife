@@ -17,7 +17,7 @@ module Display =
                 | Dead -> Draw.deadCell col row
                 | Alive -> Draw.livingCell col row)
 
-    let private renderControls controls =
+    let private renderControls (controls: ControlManager) =
         controls.Buttons |> Seq.iter (fun button -> Draw.button button)
 
     let render board controls =

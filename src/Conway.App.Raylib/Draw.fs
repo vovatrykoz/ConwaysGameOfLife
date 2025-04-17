@@ -1,6 +1,5 @@
 namespace Conway.App.Raylib
 
-open Conway.Core
 open Raylib_cs
 
 module Draw =
@@ -17,6 +16,6 @@ module Draw =
 
     let deadCell x y = cell x y Color.Black
 
-    let button button =
+    let button (button: Button) =
         Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Black)
         Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)

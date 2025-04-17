@@ -62,26 +62,25 @@ let readKeyPresses () =
         finally
             mutex.ReleaseMutex()
 
-let update button =
+let update (button: Button) =
     try
         mutex.WaitOne() |> ignore
 
         match gameRunningState with
-        | Paused -> { button with Text = "Run" }
-        | _ -> { button with Text = "Pause" }
+        | Paused -> button.Text <- "Run"
+        | _ -> button.Text <- "Pause"
     finally
         mutex.ReleaseMutex()
 
-let toggleButton = Button.create 700 500 50 "" toggleGame update
+let toggleButton = new Button(700, 500, 50, "", Some toggleGame, Some update)
 
-let mutable controls =
-    ControlManager.createEmpty |> ControlManager.addButton toggleButton
+let controls = new ControlManager()
+controls.AddButton toggleButton
 
 let readUserInput () =
     readKeyPresses ()
 
-    controls
-    |> ControlManager.checkMouseInput (fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)) (fun _ ->
+    controls.ReadInput (fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)) (fun _ ->
         Raylib.GetMousePosition())
 
 gameRunningState |> gameUpdateLoop |> Async.Start
@@ -90,7 +89,7 @@ Display.init ()
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     readUserInput ()
-    controls <- ControlManager.update controls
+    controls.Update()
     Display.render game.State.Board controls
 
 Display.close ()
