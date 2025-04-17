@@ -13,7 +13,7 @@ Display.init ()
 
 let mutex = new Mutex()
 
-let mutable gameRunningState = Infinite
+let mutable gameRunningState = Paused
 
 let rec gameUpdateLoop state =
     async {
@@ -46,6 +46,18 @@ let readUserInput () =
                 match gameRunningState with
                 | Paused -> Infinite
                 | _ -> Paused
+        finally
+            mutex.ReleaseMutex()
+
+    if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Right) then
+        try
+            mutex.WaitOne() |> ignore
+
+            match gameRunningState with
+            | Infinite
+            | Limited _ -> ()
+            | Paused -> game.runOneStep ()
+
         finally
             mutex.ReleaseMutex()
 
