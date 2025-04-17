@@ -1,6 +1,15 @@
 namespace Conway.App.Raylib
 
-type Button(x: int, y: int, size: int, text: string, onClick: option<unit -> unit>, update: option<Button -> unit>) =
+type Button
+    (
+        x: int,
+        y: int,
+        size: int,
+        text: string,
+        isActive: bool,
+        onClick: option<unit -> unit>,
+        update: option<Button -> unit>
+    ) =
 
     member val X = x with get, set
 
@@ -10,6 +19,7 @@ type Button(x: int, y: int, size: int, text: string, onClick: option<unit -> uni
 
     member val Text = text with get, set
 
+    member val IsActive = isActive with get, set
     member val OnClick = onClick with get, set
 
     member val Update = update with get, set
@@ -47,10 +57,13 @@ type ControlManager() =
     member this.ReadInput leftMouseButtonIsPressed getMousePosition =
         this.Buttons
         |> Seq.iter (fun button ->
-            if Utils.isPressed button leftMouseButtonIsPressed getMousePosition then
-                match button.OnClick with
-                | Some callback -> callback ()
-                | None -> ())
+            match button.IsActive with
+            | false -> ()
+            | true ->
+                if Utils.isPressed button leftMouseButtonIsPressed getMousePosition then
+                    match button.OnClick with
+                    | Some callback -> callback ()
+                    | None -> ())
 
     member this.Update() =
         this.Buttons

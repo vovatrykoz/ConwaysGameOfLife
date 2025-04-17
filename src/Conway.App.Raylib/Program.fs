@@ -1,11 +1,10 @@
 ﻿open Conway.Core
 open Conway.App.Raylib
+open Conway.App.Raylib.Aliases
 open Raylib_cs
 open System.Threading
 
 let startingState = Preset.presetOne |> ConwayGrid.initFromPreset
-
-let raylibTrue expr = expr |> Convert.CBoolToFsBool
 
 let game = new Game(startingState)
 
@@ -46,21 +45,19 @@ let toggleGame () =
     finally
         mutex.ReleaseMutex()
 
-let readKeyPresses () =
-    if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Space) then
-        toggleGame ()
+let advanceOnce () =
+    try
+        mutex.WaitOne() |> ignore
 
-    if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Right) then
-        try
-            mutex.WaitOne() |> ignore
+        match gameRunningState with
+        | Infinite
+        | Limited _ -> ()
+        | Paused -> game.runOneStep ()
 
-            match gameRunningState with
-            | Infinite
-            | Limited _ -> ()
-            | Paused -> game.runOneStep ()
+    finally
+        mutex.ReleaseMutex()
 
-        finally
-            mutex.ReleaseMutex()
+let keysToProcess = [ Keyboard.readSpacePress, toggleGame; Keyboard.readRightArrowKey, advanceOnce ]
 
 let update (button: Button) =
     try
@@ -72,16 +69,17 @@ let update (button: Button) =
     finally
         mutex.ReleaseMutex()
 
-let toggleButton = new Button(700, 500, 50, "", Some toggleGame, Some update)
+let toggleButton = new Button(700, 500, 50, "", true, Some toggleGame, Some update)
 
 let controls = new ControlManager()
 controls.AddButton toggleButton
 
-let readUserInput () =
-    readKeyPresses ()
+let lmbFunc = fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)
+let mousePosFunc = fun _ -> Raylib.GetMousePosition()
 
-    controls.ReadInput (fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)) (fun _ ->
-        Raylib.GetMousePosition())
+let readUserInput () =
+    Keyboard.readKeyPresses keysToProcess
+    controls.ReadInput lmbFunc mousePosFunc
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
