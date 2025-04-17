@@ -65,9 +65,13 @@ type ControlManager() =
                     | Some callback -> callback ()
                     | None -> ())
 
-    member this.Update() =
+    member this.UpdateControls() =
         this.Buttons
         |> Seq.iter (fun button ->
             match button.Update with
             | Some updateCallback -> updateCallback button
             | None -> ())
+
+    member this.ReadUserInput keysToProcess lmbFunc mousePosFunc =
+        Keyboard.readKeyPresses keysToProcess
+        this.ReadInput lmbFunc mousePosFunc

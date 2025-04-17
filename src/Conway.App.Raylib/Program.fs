@@ -71,23 +71,19 @@ let update (button: Button) =
 
 let toggleButton = new Button(700, 500, 50, "", true, Some toggleGame, Some update)
 
-let controls = new ControlManager()
-controls.AddButton toggleButton
+let controlManager = new ControlManager()
+controlManager.AddButton toggleButton
 
 let lmbFunc = fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)
 let mousePosFunc = fun _ -> Raylib.GetMousePosition()
-
-let readUserInput () =
-    Keyboard.readKeyPresses keysToProcess
-    controls.ReadInput lmbFunc mousePosFunc
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
 Display.init ()
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
-    readUserInput ()
-    controls.Update()
-    Display.render game.State.Board controls
+    controlManager.ReadUserInput keysToProcess lmbFunc mousePosFunc
+    controlManager.UpdateControls()
+    Display.render game.State.Board controlManager
 
 Display.close ()
