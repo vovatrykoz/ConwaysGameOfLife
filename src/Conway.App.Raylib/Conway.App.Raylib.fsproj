@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Preset.fs" />
+    <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="RaylibTypeConverter.fs" />
     <Compile Include="Display.fs" />

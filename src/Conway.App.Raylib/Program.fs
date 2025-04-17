@@ -62,21 +62,27 @@ let readKeyPresses () =
         finally
             mutex.ReleaseMutex()
 
-let readMouseClicks () =
-    if raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left) then
-        let mousePos = Raylib.GetMousePosition()
+let update button =
+    try
+        mutex.WaitOne() |> ignore
 
-        if
-            mousePos.X >= 700.0f
-            && mousePos.X <= 750.0f
-            && mousePos.Y >= 500.0f
-            && mousePos.Y <= 550.0f
-        then
-            toggleGame ()
+        match gameRunningState with
+        | Paused -> { button with Text = "Run" }
+        | _ -> { button with Text = "Pause" }
+    finally
+        mutex.ReleaseMutex()
+
+let toggleButton = Button.create 700 500 50 "" toggleGame update
+
+let mutable controls =
+    ControlManager.createEmpty |> ControlManager.addButton toggleButton
 
 let readUserInput () =
     readKeyPresses ()
-    readMouseClicks ()
+
+    controls
+    |> ControlManager.checkMouseInput (fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)) (fun _ ->
+        Raylib.GetMousePosition())
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
@@ -84,6 +90,7 @@ Display.init ()
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     readUserInput ()
-    Display.render game.State.Board gameRunningState
+    controls <- ControlManager.update controls
+    Display.render game.State.Board controls
 
 Display.close ()

@@ -7,10 +7,7 @@ module Display =
     let init () =
         Raylib.InitWindow(800, 600, "Conway's game of life")
 
-    let render board state =
-        Raylib.BeginDrawing()
-        Raylib.ClearBackground Color.White
-
+    let private renderBoard board =
         board
         |> Array2D.iteri (fun row col cell ->
             match cell with
@@ -20,7 +17,15 @@ module Display =
                 | Dead -> Draw.deadCell col row
                 | Alive -> Draw.livingCell col row)
 
-        Draw.runButton 700 500 state
+    let private renderControls controls =
+        controls.Buttons |> Seq.iter (fun button -> Draw.button button)
+
+    let render board controls =
+        Raylib.BeginDrawing()
+        Raylib.ClearBackground Color.White
+
+        renderBoard board
+        renderControls controls
 
         Raylib.EndDrawing()
 

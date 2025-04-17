@@ -17,12 +17,6 @@ module Draw =
 
     let deadCell x y = cell x y Color.Black
 
-    let runButton x y state =
-        let buttonText =
-            match state with
-            | Infinite
-            | Limited _ -> "Pause"
-            | Paused -> "Run"
-
-        Raylib.DrawRectangle(x, y, size * 2, size * 2, Color.Black)
-        Raylib.DrawText(buttonText, x + 5, y + 5, 15, Color.White)
+    let button button =
+        Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Black)
+        Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)
