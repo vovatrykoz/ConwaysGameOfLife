@@ -86,8 +86,6 @@ type ControlManager() =
                     if not (this.ActivatedButtons |> List.contains button) then
                         this.ActivatedButtons <- button :: this.ActivatedButtons
 
-                        printfn $"Here, len {List.length this.ActivatedButtons} button {button.X} {button.Y}"
-
                         match button.OnPressAndHold with
                         | Some callback -> callback ()
                         | None -> ()
