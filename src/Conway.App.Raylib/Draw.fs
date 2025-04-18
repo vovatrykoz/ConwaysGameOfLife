@@ -23,9 +23,10 @@ module Draw =
 
         Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)
 
-        match button.IsPressed with
-        | false -> ()
-        | true ->
+        match button.IsPressed, button.IsActive with
+        | false, _
+        | _, false -> ()
+        | true, true ->
             Raylib.DrawRectangleLinesEx(
                 new Rectangle(
                     float32 (button.X - 2),

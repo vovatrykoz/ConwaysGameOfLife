@@ -71,10 +71,26 @@ type ConwayGrid = {
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
-        | x when x < 2 -> PlayerCell Cell.dead
-        | x when x = 2 -> PlayerCell currentCell
-        | x when x = 3 -> PlayerCell Cell.living
-        | _ -> PlayerCell Cell.dead
+        | x when x < 2 ->
+            PlayerCell {
+                Status = Dead
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
+        | x when x = 2 ->
+            PlayerCell {
+                Status = currentCell.Status
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
+        | x when x = 3 ->
+            PlayerCell {
+                Status = Alive
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
+        | _ ->
+            PlayerCell {
+                Status = Dead
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
 
     [<CompiledName("Next")>]
     static member next grid =
@@ -85,6 +101,30 @@ type ConwayGrid = {
                     match cell with
                     | BorderCell -> return BorderCell
                     | PlayerCell playerCell -> return ConwayGrid.processPlayerCell row col playerCell grid.Board
+                })
+            |> Array2D.map (fun task -> task.Result)
+
+        { grid with Board = newBoard }
+
+    [<CompiledName("Previous")>]
+    static member previous grid =
+        let newBoard =
+            grid.Board
+            |> Array2D.map (fun cell ->
+                task {
+                    match cell with
+                    | BorderCell -> return BorderCell
+                    | PlayerCell playerCell ->
+                        let previousState, otherMemories = Stack.tryPop playerCell.Memory
+
+                        match previousState with
+                        | None -> return PlayerCell playerCell
+                        | Some state ->
+                            return
+                                PlayerCell {
+                                    Status = state
+                                    Memory = otherMemories
+                                }
                 })
             |> Array2D.map (fun task -> task.Result)
 

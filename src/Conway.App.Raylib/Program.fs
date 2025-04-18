@@ -57,7 +57,23 @@ let advanceOnce () =
     finally
         mutex.ReleaseMutex()
 
-let keysToProcess = [ Keyboard.readSpacePress, toggleGame; Keyboard.readRightArrowKey, advanceOnce ]
+let advanceBackOnce () =
+    try
+        mutex.WaitOne() |> ignore
+
+        match gameRunningState with
+        | Infinite
+        | Limited _ -> ()
+        | Paused -> game.stepBack ()
+
+    finally
+        mutex.ReleaseMutex()
+
+let keysToProcess = [
+    Keyboard.readSpacePress, toggleGame
+    Keyboard.readRightArrowKey, advanceOnce
+    Keyboard.readLeftArrowKey, advanceBackOnce
+]
 
 let update (button: Button) =
     try
@@ -69,7 +85,7 @@ let update (button: Button) =
     finally
         mutex.ReleaseMutex()
 
-let updateAdvance (button: Button) =
+let updateOnRun (button: Button) =
     try
         mutex.WaitOne() |> ignore
 
@@ -79,15 +95,25 @@ let updateAdvance (button: Button) =
     finally
         mutex.ReleaseMutex()
 
+let updateOnRunBack (button: Button) =
+    updateOnRun button
+
+    if button.IsActive && game.hasMemoryLoss () then
+        button.IsActive <- false
+
 let toggleButton =
     new Button(700, 400, 50, "", true, true, Some toggleGame, Some update)
 
 let advanceButton =
-    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, Some updateAdvance)
+    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, Some updateOnRun)
+
+let advanceBackButton =
+    new Button(600, 500, 50, "Previous", true, true, Some advanceBackOnce, Some updateOnRunBack)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
 controlManager.AddButton advanceButton
+controlManager.AddButton advanceBackButton
 
 game.State.Board
 |> Array2D.iteri (fun row col cellType ->
@@ -96,17 +122,15 @@ game.State.Board
     | PlayerCell _ ->
         let pressCallback =
             fun _ ->
-                try
-                    mutex.WaitOne() |> ignore
+                match game.State.Board[row, col] with
+                | BorderCell -> ()
+                | PlayerCell cell ->
+                    match cell.Status with
+                    | Dead -> game.State.Board[row, col] <- (PlayerCell Cell.living)
+                    | Alive -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
 
-                    match game.State.Board[row, col] with
-                    | BorderCell -> ()
-                    | PlayerCell cell ->
-                        match cell.Status with
-                        | Dead -> game.State.Board[row, col] <- (PlayerCell Cell.living)
-                        | Alive -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
-                finally
-                    mutex.ReleaseMutex()
+                // erase the history since the player has altered the board
+                game.clearHistory ()
 
         let updateCallback (button: Button) =
             try

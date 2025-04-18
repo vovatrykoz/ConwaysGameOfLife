@@ -12,6 +12,10 @@ module Keyboard =
         if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Right) then
             callback ()
 
+    let readLeftArrowKey callback =
+        if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Left) then
+            callback ()
+
     let readKeyPresses keyCallbackPairs =
         keyCallbackPairs
         |> Seq.iter (fun (keyPressFunc, callback) -> keyPressFunc callback)
