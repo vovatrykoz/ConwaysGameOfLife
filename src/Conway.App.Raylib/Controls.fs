@@ -10,7 +10,7 @@ type Button
         text: string,
         isActive: bool,
         isVisible: bool,
-        onClick: option<unit -> unit>,
+        onPressAndHold: option<unit -> unit>,
         update: option<Button -> unit>
     ) =
 
@@ -32,7 +32,7 @@ type Button
 
     member val IsVisible = isVisible with get, set
 
-    member val OnClick = onClick with get, set
+    member val OnPressAndHold = onPressAndHold with get, set
 
     member val Update = update with get, set
 
@@ -80,7 +80,7 @@ type ControlManager() =
 
                         printfn $"Here, len {List.length this.ActivatedButtons} button {button.X} {button.Y}"
 
-                        match button.OnClick with
+                        match button.OnPressAndHold with
                         | Some callback -> callback ()
                         | None -> ()
                     else
