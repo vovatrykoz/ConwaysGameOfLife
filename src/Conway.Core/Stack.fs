@@ -4,8 +4,14 @@ type Stack<'T> = private {
     Contents: list<'T>
 } with
 
-    [<CompiledName("Create")>]
-    static member create: Stack<'T> = { Contents = List.empty }
+    [<CompiledName("Empty")>]
+    static member empty: Stack<'T> = { Contents = List.empty }
+
+    [<CompiledName("IsEmpty")>]
+    static member isEmpty stack =
+        match stack.Contents with
+        | [] -> true
+        | _ -> false
 
     [<CompiledName("Push")>]
     static member push value stack = {

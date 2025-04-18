@@ -6,13 +6,14 @@ type CellStatus =
 
 type Cell = {
     Status: CellStatus
+    Memory: Stack<CellStatus>
 } with
 
     [<CompiledName("CreateLivingCell")>]
-    static member living = { Status = Alive }
+    static member living = { Status = Alive; Memory = Stack.empty }
 
     [<CompiledName("CreateDeadCell")>]
-    static member dead = { Status = Dead }
+    static member dead = { Status = Dead; Memory = Stack.empty }
 
     [<CompiledName("IsAlive")>]
     static member isAlive cell = cell.Status = Alive

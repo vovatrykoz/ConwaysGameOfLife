@@ -7,14 +7,14 @@ module ``Cell Tests`` =
 
     [<Test>]
     let ``Can create a living cell using the dedicated method on the Cell type`` () =
-        let expected = { Status = Alive }
+        let expected = { Status = Alive; Memory = Stack.empty }
         let actual = Cell.living
 
         Assert.That(actual, Is.EqualTo expected)
 
     [<Test>]
     let ``Can create a dead cell using the dedicated method on the Cell type`` () =
-        let expected = { Status = Dead }
+        let expected = { Status = Dead; Memory = Stack.empty }
         let actual = Cell.dead
 
         Assert.That(actual, Is.EqualTo expected)
