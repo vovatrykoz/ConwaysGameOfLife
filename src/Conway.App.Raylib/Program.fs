@@ -70,10 +70,14 @@ let update (button: Button) =
         mutex.ReleaseMutex()
 
 let toggleButton =
-    new Button(700, 500, 50, "", true, true, Some toggleGame, Some update)
+    new Button(700, 400, 50, "", true, true, Some toggleGame, Some update)
+
+let advanceButton =
+    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, None)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
+controlManager.AddButton advanceButton
 
 game.State.Board
 |> Array2D.iteri (fun row col cellType ->

@@ -1,5 +1,7 @@
 namespace Conway.App.Raylib
 
+open System.Numerics
+
 type Button
     (
         x: int,
@@ -11,6 +13,12 @@ type Button
         onClick: option<unit -> unit>,
         update: option<Button -> unit>
     ) =
+
+    let mutable isCurrentlyPressed = false
+
+    member _.IsPressed
+        with get () = isCurrentlyPressed
+        and private set value = isCurrentlyPressed <- value
 
     member val X = x with get, set
 
@@ -28,10 +36,7 @@ type Button
 
     member val Update = update with get, set
 
-module private Utils =
-    open System.Numerics
-
-    let isPressed (button: Button) leftMouseButtonIsPressed (getMousePosition: unit -> Vector2) =
+    static member internal isPressed (button: Button) leftMouseButtonIsPressed (getMousePosition: unit -> Vector2) =
         if leftMouseButtonIsPressed () then
             let mousePos = getMousePosition ()
             let minX = button.X
@@ -45,10 +50,13 @@ module private Utils =
                 && mousePos.Y >= float32 minY
                 && mousePos.Y <= float32 maxY
             then
+                button.IsPressed <- true
                 true
             else
+                button.IsPressed <- false
                 false
         else
+            button.IsPressed <- false
             false
 
 type ControlManager() =
@@ -66,7 +74,7 @@ type ControlManager() =
             match button.IsActive with
             | false -> ()
             | true ->
-                if Utils.isPressed button leftMouseButtonIsPressed getMousePosition then
+                if Button.isPressed button leftMouseButtonIsPressed getMousePosition then
                     if not (this.ActivatedButtons |> List.contains button) then
                         this.ActivatedButtons <- button :: this.ActivatedButtons
 

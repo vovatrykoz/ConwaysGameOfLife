@@ -19,3 +19,17 @@ module Draw =
     let button (button: Button) =
         Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Black)
         Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)
+
+        match button.IsPressed with
+        | false -> ()
+        | true ->
+            Raylib.DrawRectangleLinesEx(
+                new Rectangle(
+                    float32 (button.X - 2),
+                    float32 (button.Y - 2),
+                    float32 (button.Size + 4),
+                    float32 (button.Size + 4)
+                ),
+                2.0f,
+                Color.Black
+            )
