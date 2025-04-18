@@ -16,6 +16,8 @@ type Button
 
     let mutable isCurrentlyPressed = false
 
+    let mutable isActive = isActive
+
     member _.IsPressed
         with get () = isCurrentlyPressed
         and private set value = isCurrentlyPressed <- value
@@ -28,7 +30,13 @@ type Button
 
     member val Text = text with get, set
 
-    member val IsActive = isActive with get, set
+    member _.IsActive
+        with get () = isActive
+        and set value =
+            if not value then
+                isCurrentlyPressed <- false
+
+            isActive <- value
 
     member val IsVisible = isVisible with get, set
 
