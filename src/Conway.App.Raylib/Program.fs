@@ -69,11 +69,21 @@ let update (button: Button) =
     finally
         mutex.ReleaseMutex()
 
+let updateAdvance (button: Button) =
+    try
+        mutex.WaitOne() |> ignore
+
+        match gameRunningState with
+        | Paused -> button.IsActive <- true
+        | _ -> button.IsActive <- false
+    finally
+        mutex.ReleaseMutex()
+
 let toggleButton =
     new Button(700, 400, 50, "", true, true, Some toggleGame, Some update)
 
 let advanceButton =
-    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, None)
+    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, Some updateAdvance)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton

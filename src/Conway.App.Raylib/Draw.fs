@@ -17,7 +17,10 @@ module Draw =
     let deadCell x y = cell x y Color.Black
 
     let button (button: Button) =
-        Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Black)
+        match button.IsActive with
+        | true -> Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Black)
+        | false -> Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Gray)
+
         Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)
 
         match button.IsPressed with
