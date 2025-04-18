@@ -53,21 +53,33 @@ module private Utils =
 
 type ControlManager() =
 
+    member val private ActivatedButtons: list<Button> = List.empty with get, set
+
     member val Buttons = seq<Button> Seq.empty with get, set
 
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons
 
-    member this.ReadInput leftMouseButtonIsPressed getMousePosition =
+    member this.ReadInput leftMouseButtonIsPressed leftMouseButtonIsUp getMousePosition =
         this.Buttons
         |> Seq.iter (fun button ->
             match button.IsActive with
             | false -> ()
             | true ->
                 if Utils.isPressed button leftMouseButtonIsPressed getMousePosition then
-                    match button.OnClick with
-                    | Some callback -> callback ()
-                    | None -> ())
+                    if not (this.ActivatedButtons |> List.contains button) then
+                        this.ActivatedButtons <- button :: this.ActivatedButtons
+
+                        printfn $"Here, len {List.length this.ActivatedButtons} button {button.X} {button.Y}"
+
+                        match button.OnClick with
+                        | Some callback -> callback ()
+                        | None -> ()
+                    else
+                        ()
+
+                if leftMouseButtonIsUp () then
+                    this.ActivatedButtons <- List.empty)
 
     member this.UpdateControls() =
         this.Buttons
