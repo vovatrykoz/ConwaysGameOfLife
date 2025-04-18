@@ -25,4 +25,9 @@
     <ProjectReference Include="..\..\src\Conway.Core\Conway.Core.fsproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <WarningLevel>5</WarningLevel>
+    <AnalysisLevel>5</AnalysisLevel>
+  </PropertyGroup>
+
 </Project>

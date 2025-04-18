@@ -18,4 +18,9 @@
   <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="7.0.1" />
   </ItemGroup>
+  
+  <PropertyGroup>
+    <WarningLevel>5</WarningLevel>
+    <AnalysisLevel>5</AnalysisLevel>
+  </PropertyGroup>
 </Project>
