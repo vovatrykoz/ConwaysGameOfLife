@@ -18,7 +18,11 @@ module Display =
                 | Alive -> Draw.livingCell col row)
 
     let private renderControls (controls: ControlManager) =
-        controls.Buttons |> Seq.iter (fun button -> Draw.button button)
+        controls.Buttons
+        |> Seq.iter (fun button ->
+            match button.IsVisible with
+            | true -> Draw.button button
+            | false -> ())
 
     let render board controls =
         Raylib.BeginDrawing()

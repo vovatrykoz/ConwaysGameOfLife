@@ -7,6 +7,7 @@ type Button
         size: int,
         text: string,
         isActive: bool,
+        isVisible: bool,
         onClick: option<unit -> unit>,
         update: option<Button -> unit>
     ) =
@@ -20,6 +21,9 @@ type Button
     member val Text = text with get, set
 
     member val IsActive = isActive with get, set
+
+    member val IsVisible = isVisible with get, set
+
     member val OnClick = onClick with get, set
 
     member val Update = update with get, set

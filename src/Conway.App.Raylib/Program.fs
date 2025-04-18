@@ -69,10 +69,44 @@ let update (button: Button) =
     finally
         mutex.ReleaseMutex()
 
-let toggleButton = new Button(700, 500, 50, "", true, Some toggleGame, Some update)
+let toggleButton =
+    new Button(700, 500, 50, "", true, true, Some toggleGame, Some update)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
+
+game.State.Board
+|> Array2D.iteri (fun row col cellType ->
+    match cellType with
+    | BorderCell -> ()
+    | PlayerCell _ ->
+        let pressCallback =
+            fun _ ->
+                try
+                    mutex.WaitOne() |> ignore
+
+                    match game.State.Board[row, col] with
+                    | BorderCell -> ()
+                    | PlayerCell cell ->
+                        match cell.Status with
+                        | Dead -> game.State.Board[row, col] <- (PlayerCell Cell.living)
+                        | Alive -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
+                finally
+                    mutex.ReleaseMutex()
+
+        let updateCallback (button: Button) =
+            try
+                mutex.WaitOne() |> ignore
+
+                match gameRunningState with
+                | Paused -> button.IsActive <- true
+                | _ -> button.IsActive <- false
+            finally
+                mutex.ReleaseMutex()
+
+        controlManager.AddButton(
+            new Button(col * 25, row * 25, 25, "", true, false, Some pressCallback, Some updateCallback)
+        ))
 
 let lmbFunc = fun _ -> raylibTrue (Raylib.IsMouseButtonPressed MouseButton.Left)
 let mousePosFunc = fun _ -> Raylib.GetMousePosition()
