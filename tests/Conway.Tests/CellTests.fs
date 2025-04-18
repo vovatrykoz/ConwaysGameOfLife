@@ -87,7 +87,7 @@ module ``Grid tests`` =
         let actual = ConwayGrid.init 3 3 initializer
 
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
-(*
+
     [<Test>]
     let ``All-dead grid remains dead after one iteration`` () =
         let expectedBoard = ConwayGrid.createDead 3 3
@@ -207,4 +207,3 @@ module ``Grid tests`` =
         let expectedBoardTwo = ConwayGrid.init 3 3 expectedInitializerTwo
 
         Assert.That(actual, Is.EqualTo expectedBoardTwo)
-        *)
