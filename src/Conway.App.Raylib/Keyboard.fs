@@ -4,6 +4,10 @@ open Conway.App.Raylib.Aliases
 open Raylib_cs
 
 module Keyboard =
+    let readKeyPress key callback =
+        if raylibTrue (Raylib.IsKeyPressed key) then
+            callback ()
+
     let readSpacePress callback =
         if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Space) then
             callback ()

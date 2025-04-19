@@ -1,5 +1,6 @@
 namespace Conway.App.Raylib
 
+open Raylib_cs
 open System.Numerics
 
 type Button
@@ -44,9 +45,9 @@ type Button
 
     member val Update = update with get, set
 
-    static member internal isPressed (button: Button) leftMouseButtonIsPressed (getMousePosition: unit -> Vector2) =
-        if leftMouseButtonIsPressed () then
-            let mousePos = getMousePosition ()
+    static member internal isPressed(button: Button) =
+        if Mouse.readButtonPress MouseButton.Left then
+            let mousePos = Mouse.getPosition ()
             let minX = button.X
             let maxX = button.X + button.Size
             let minY = button.Y
@@ -76,13 +77,13 @@ type ControlManager() =
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons
 
-    member this.ReadInput leftMouseButtonIsPressed leftMouseButtonIsUp getMousePosition =
+    member this.ReadInput() =
         this.Buttons
         |> Seq.iter (fun button ->
             match button.IsActive with
             | false -> ()
             | true ->
-                if Button.isPressed button leftMouseButtonIsPressed getMousePosition then
+                if Button.isPressed button then
                     if not (this.ActivatedButtons |> List.contains button) then
                         this.ActivatedButtons <- button :: this.ActivatedButtons
 
@@ -92,7 +93,7 @@ type ControlManager() =
                     else
                         ()
 
-                if leftMouseButtonIsUp () then
+                if Mouse.buttonIsUp MouseButton.Left then
                     this.ActivatedButtons <- List.empty)
 
     member this.UpdateControls() =
@@ -102,6 +103,6 @@ type ControlManager() =
             | Some updateCallback -> updateCallback button
             | None -> ())
 
-    member this.ReadUserInput keysToProcess lmbFunc mousePosFunc =
+    member this.ReadUserInput keysToProcess =
         Keyboard.readKeyPresses keysToProcess
-        this.ReadInput lmbFunc mousePosFunc
+        this.ReadInput()

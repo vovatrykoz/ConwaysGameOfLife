@@ -5,10 +5,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Preset.fs" />
-    <Compile Include="RaylibTypeConverter.fs" /><Compile Include="Keyboard.fs" />
+    <Compile Include="RaylibTypeConverter.fs" />
+    <Compile Include="Keyboard.fs" />
+    <Compile Include="Mouse.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
-    
     <Compile Include="Display.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -18,7 +19,6 @@
   <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="7.0.1" />
   </ItemGroup>
-  
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>5</AnalysisLevel>

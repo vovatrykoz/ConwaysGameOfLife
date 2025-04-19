@@ -146,18 +146,12 @@ game.State.Board
             new Button(col * 25, row * 25, 25, "", true, false, Some pressCallback, Some updateCallback)
         ))
 
-let lmbFunc = fun _ -> raylibTrue (Raylib.IsMouseButtonDown MouseButton.Left)
-
-let lmbUp = fun _ -> raylibTrue (Raylib.IsMouseButtonReleased MouseButton.Left)
-
-let mousePosFunc = fun _ -> Raylib.GetMousePosition()
-
 gameRunningState |> gameUpdateLoop |> Async.Start
 
 Display.init ()
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
-    controlManager.ReadUserInput keysToProcess lmbFunc lmbUp mousePosFunc
+    controlManager.ReadUserInput keysToProcess
     controlManager.UpdateControls()
     Display.render game controlManager
 
