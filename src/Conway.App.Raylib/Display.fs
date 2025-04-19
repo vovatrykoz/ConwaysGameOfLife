@@ -24,12 +24,15 @@ module Display =
             | true -> Draw.button button
             | false -> ())
 
-    let render board controls =
+    let private renderGenerationCounter generation = Draw.textBox $"Generation {generation}"
+
+    let render (game: Game) controls =
         Raylib.BeginDrawing()
         Raylib.ClearBackground Color.White
 
-        renderBoard board
+        renderBoard game.State.Board
         renderControls controls
+        renderGenerationCounter game.Generation
 
         Raylib.EndDrawing()
 

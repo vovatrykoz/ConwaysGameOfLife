@@ -159,6 +159,6 @@ Display.init ()
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     controlManager.ReadUserInput keysToProcess lmbFunc lmbUp mousePosFunc
     controlManager.UpdateControls()
-    Display.render game.State.Board controlManager
+    Display.render game controlManager
 
 Display.close ()

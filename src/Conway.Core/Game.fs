@@ -10,6 +10,8 @@ type GameMode =
 type Game(initialState: ConwayGrid) =
     let mutable internalState = initialState
 
+    let mutable generation = 1
+
     member val private mutex = new Mutex()
 
     member this.State
@@ -26,15 +28,21 @@ type Game(initialState: ConwayGrid) =
             finally
                 this.mutex.ReleaseMutex()
 
+    member _.Generation
+        with get () = generation
+        and private set newValue = generation <- newValue
+
     [<CompiledName("Run")>]
     member this.run mode =
         match mode with
         | Infinite ->
             while true do
                 this.State <- ConwayGrid.next this.State
+                this.Generation <- this.Generation + 1
         | Limited steps ->
             for _ = 1 to steps do
                 this.State <- ConwayGrid.next this.State
+                this.Generation <- this.Generation + 1
         | Paused -> ()
 
     [<CompiledName("RunOneStep")>]
@@ -43,6 +51,9 @@ type Game(initialState: ConwayGrid) =
     [<CompiledName("StepBack")>]
     member this.stepBack() =
         this.State <- ConwayGrid.previous this.State
+
+        if this.Generation > 1 then
+            this.Generation <- this.Generation - 1
 
     [<CompiledName("ClearHistory")>]
     member this.clearHistory() =
@@ -54,6 +65,7 @@ type Game(initialState: ConwayGrid) =
                 | PlayerCell playerCell -> PlayerCell { playerCell with Memory = Stack.empty })
 
         this.State <- { this.State with Board = newBoard }
+        this.Generation <- 1
 
     [<CompiledName("HasMemoryLoss")>]
     member this.hasMemoryLoss() =
