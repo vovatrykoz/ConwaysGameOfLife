@@ -102,13 +102,13 @@ let updateOnRunBack (button: Button) =
         button.IsActive <- false
 
 let toggleButton =
-    new Button(700, 400, 50, "", true, true, Some toggleGame, Some update)
+    new Button(700, 400, 50, "", true, true, Some toggleGame, None, Some update)
 
 let advanceButton =
-    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, Some updateOnRun)
+    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, None, Some updateOnRun)
 
 let advanceBackButton =
-    new Button(600, 500, 50, "Previous", true, true, Some advanceBackOnce, Some updateOnRunBack)
+    new Button(600, 500, 50, "Previous", true, true, Some advanceBackOnce, None, Some updateOnRunBack)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
@@ -143,7 +143,7 @@ game.State.Board
                 mutex.ReleaseMutex()
 
         controlManager.AddButton(
-            new Button(col * 25, row * 25, 25, "", true, false, Some pressCallback, Some updateCallback)
+            new Button(col * 25, row * 25, 25, "", true, false, None, Some pressCallback, Some updateCallback)
         ))
 
 gameRunningState |> gameUpdateLoop |> Async.Start
