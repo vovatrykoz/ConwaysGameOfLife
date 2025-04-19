@@ -8,6 +8,7 @@
     <Compile Include="RaylibTypeConverter.fs" />
     <Compile Include="Keyboard.fs" />
     <Compile Include="Mouse.fs" />
+    <Compile Include="Button.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="Display.fs" />
