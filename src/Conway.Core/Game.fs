@@ -37,11 +37,11 @@ type Game(initialState: ConwayGrid) =
         match mode with
         | Infinite ->
             while true do
-                this.State <- ConwayGrid.next this.State
+                ConwayGrid.next this.State |> ignore
                 this.Generation <- this.Generation + 1
         | Limited steps ->
             for _ = 1 to steps do
-                this.State <- ConwayGrid.next this.State
+                ConwayGrid.next this.State |> ignore
                 this.Generation <- this.Generation + 1
         | Paused -> ()
 
@@ -57,14 +57,12 @@ type Game(initialState: ConwayGrid) =
 
     [<CompiledName("ClearHistory")>]
     member this.clearHistory() =
-        let newBoard =
-            this.State.Board
-            |> Array2D.map (fun cell ->
-                match cell with
-                | BorderCell -> BorderCell
-                | PlayerCell playerCell -> PlayerCell { playerCell with Memory = Stack.empty })
+        this.State.Board
+        |> Array2D.iteri (fun row col cell ->
+            match cell with
+            | BorderCell -> this.State.Board[row, col] <- BorderCell
+            | PlayerCell playerCell -> this.State.Board[row, col] <- PlayerCell { playerCell with Memory = Stack.empty })
 
-        this.State <- { this.State with Board = newBoard }
         this.Generation <- 1
 
     [<CompiledName("HasMemoryLoss")>]
