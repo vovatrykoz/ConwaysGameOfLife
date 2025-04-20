@@ -3,18 +3,20 @@ namespace Conway.App.Raylib
 open Raylib_cs
 
 module Draw =
-    let private size = 25
+    let private width = 25
 
-    let border x y color =
-        Raylib.DrawRectangleLines(x * size, y * size, size, size, color)
+    let private height = 25
 
-    let cell x y color =
-        border x y Color.Black
-        Raylib.DrawRectangle(x * size + 1, y * size + 1, size - 2, size - 2, color)
+    let border x y width height color =
+        Raylib.DrawRectangleLines(x * width, y * height, width, height, color)
 
-    let livingCell x y = cell x y Color.Red
+    let cell x y width height color =
+        border x y width height Color.Black
+        Raylib.DrawRectangle(x * width + 1, y * height + 1, width - 2, height - 2, color)
 
-    let deadCell x y = cell x y Color.Black
+    let livingCell x y width height = cell x y width height Color.Red
+
+    let deadCell x y width height = cell x y width height Color.Black
 
     let button (button: Button) =
         match button.IsActive with

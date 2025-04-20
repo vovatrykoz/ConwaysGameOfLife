@@ -194,7 +194,8 @@ game.State.Board
 
         GridControl.create
         |> GridControl.position (col * 25) (row * 25)
-        |> GridControl.size 25
+        |> GridControl.width 25
+        |> GridControl.height 25
         |> GridControl.onLeftClickCallback makeAliveCallback
         |> GridControl.onRightClickCallback makeDeadCallback
         |> controlManager.AddGridControl)

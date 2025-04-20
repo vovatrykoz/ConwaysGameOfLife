@@ -14,8 +14,8 @@ module Display =
             | BorderCell -> ()
             | PlayerCell playerCell ->
                 match playerCell.Status with
-                | Dead -> Draw.deadCell col row
-                | Alive -> Draw.livingCell col row)
+                | Dead -> Draw.deadCell col row 25 25
+                | Alive -> Draw.livingCell col row 25 25)
 
     let private renderControls (controls: ControlManager) =
         controls.Buttons

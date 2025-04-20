@@ -2,12 +2,15 @@ namespace Conway.App.Raylib
 
 open Raylib_cs
 
-type GridControl(x: int, y: int, size: int, onLeftClick: option<unit -> unit>, onRightClick: option<unit -> unit>) =
+type GridControl
+    (x: int, y: int, width: int, height: int, onLeftClick: option<unit -> unit>, onRightClick: option<unit -> unit>) =
     member val X = x with get, set
 
     member val Y = y with get, set
 
-    member val Size = size with get, set
+    member val Width = width with get, set
+
+    member val Height = height with get, set
 
     member val OnLeftClick = onLeftClick with get, set
 
@@ -17,9 +20,9 @@ type GridControl(x: int, y: int, size: int, onLeftClick: option<unit -> unit>, o
         if Mouse.readButtonPress mouseButton then
             let mousePos = Mouse.getPosition ()
             let minX = gridControl.X
-            let maxX = gridControl.X + gridControl.Size
+            let maxX = gridControl.X + gridControl.Width
             let minY = gridControl.Y
-            let maxY = gridControl.Y + gridControl.Size
+            let maxY = gridControl.Y + gridControl.Height
 
             if
                 mousePos.X >= float32 minX
@@ -43,15 +46,19 @@ type GridControl(x: int, y: int, size: int, onLeftClick: option<unit -> unit>, o
     static member IsRightPressed(gridControl: GridControl) =
         GridControl.IsPressedWith(gridControl, MouseButton.Right, gridControl.OnRightClick)
 
-    static member create = new GridControl(0, 0, 0, None, None)
+    static member create = new GridControl(0, 0, 0, 0, None, None)
 
     static member position x y (gridControl: GridControl) =
         gridControl.X <- x
         gridControl.Y <- y
         gridControl
 
-    static member size size (gridControl: GridControl) =
-        gridControl.Size <- size
+    static member width width (gridControl: GridControl) =
+        gridControl.Width <- width
+        gridControl
+
+    static member height height (gridControl: GridControl) =
+        gridControl.Height <- height
         gridControl
 
     static member onLeftClickCallback callback (gridControl: GridControl) =
