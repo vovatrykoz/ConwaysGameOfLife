@@ -3,6 +3,24 @@ namespace Conway.App.Raylib
 open Conway.Core
 
 module private ControlsInitializer =
+    let makeAliveCallback row col (game: Game) =
+        fun _ ->
+            match game.State.Board[row, col] with
+            | BorderCell -> ()
+            | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
+
+            // erase the history since the player has altered the board
+            game.clearHistory ()
+
+    let makeDeadCallback row col (game: Game) =
+        fun _ ->
+            match game.State.Board[row, col] with
+            | BorderCell -> ()
+            | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
+
+            // erase the history since the player has altered the board
+            game.clearHistory ()
+
     let initFrom (game: Game) width height =
         let mutable controls: list<CanvasControl> = List.empty
 
@@ -11,31 +29,13 @@ module private ControlsInitializer =
             match cellType with
             | BorderCell -> ()
             | PlayerCell _ ->
-                let makeAliveCallback =
-                    fun _ ->
-                        match game.State.Board[row, col] with
-                        | BorderCell -> ()
-                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
-
-                        // erase the history since the player has altered the board
-                        game.clearHistory ()
-
-                let makeDeadCallback =
-                    fun _ ->
-                        match game.State.Board[row, col] with
-                        | BorderCell -> ()
-                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
-
-                        // erase the history since the player has altered the board
-                        game.clearHistory ()
-
                 controls <-
                     (CanvasControl.create
                      |> CanvasControl.position (col * width) (row * height)
                      |> CanvasControl.width width
                      |> CanvasControl.height height
-                     |> CanvasControl.onLeftClickCallback makeAliveCallback
-                     |> CanvasControl.onRightClickCallback makeDeadCallback)
+                     |> CanvasControl.onLeftClickCallback (makeAliveCallback row col game)
+                     |> CanvasControl.onRightClickCallback (makeDeadCallback row col game))
                     :: controls)
 
         controls |> List.toArray
