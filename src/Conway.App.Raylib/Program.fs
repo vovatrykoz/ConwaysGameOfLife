@@ -69,8 +69,6 @@ let advanceBackOnce () =
     finally
         mutex.ReleaseMutex()
 
-let keysToProcess = []
-
 let update (button: Button) =
     try
         mutex.WaitOne() |> ignore
@@ -196,16 +194,19 @@ game.State.Board
                 // erase the history since the player has altered the board
                 game.clearHistory ()
 
-        controlManager.AddGridControl(
-            new GridControl(col * 25, row * 25, 25, Some makeAliveCallback, Some makeDeadCallback)
-        ))
+        GridControl.create
+        |> GridControl.position (col * 25) (row * 25)
+        |> GridControl.size 25
+        |> GridControl.onLeftClickCallback makeAliveCallback
+        |> GridControl.onRightClickCallback makeDeadCallback
+        |> controlManager.AddGridControl)
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
 Display.init ()
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
-    controlManager.ReadUserInput keysToProcess
+    controlManager.ReadInput()
     controlManager.UpdateControls()
     Display.render game controlManager
 
