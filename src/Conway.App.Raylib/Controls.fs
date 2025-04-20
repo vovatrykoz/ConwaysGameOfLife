@@ -13,6 +13,36 @@ type GridControl(x: int, y: int, size: int, onLeftClick: option<unit -> unit>, o
 
     member val OnRightClick = onRightClick with get, set
 
+    static member IsPressedWith(gridControl: GridControl, mouseButton: MouseButton, callback: option<unit -> unit>) =
+        if Mouse.readButtonPress mouseButton then
+            let mousePos = Mouse.getPosition ()
+            let minX = gridControl.X
+            let maxX = gridControl.X + gridControl.Size
+            let minY = gridControl.Y
+            let maxY = gridControl.Y + gridControl.Size
+
+            if
+                mousePos.X >= float32 minX
+                && mousePos.X <= float32 maxX
+                && mousePos.Y >= float32 minY
+                && mousePos.Y <= float32 maxY
+            then
+                match callback with
+                | None -> ()
+                | Some func -> func ()
+
+                true
+            else
+                false
+        else
+            false
+
+    static member IsLeftPressed(gridControl: GridControl) =
+        GridControl.IsPressedWith(gridControl, MouseButton.Left, gridControl.OnLeftClick)
+
+    static member IsRightPressed(gridControl: GridControl) =
+        GridControl.IsPressedWith(gridControl, MouseButton.Right, gridControl.OnRightClick)
+
 type ControlManager() =
 
     member val private ActivatedButton: option<Button> = None with get, set
@@ -60,15 +90,8 @@ type ControlManager() =
     member private this.ProcessGridControls() =
         this.GridControls
         |> Seq.iter (fun gridControl ->
-            if Mouse.readButtonPress MouseButton.Left then
-                match gridControl.OnLeftClick with
-                | None -> ()
-                | Some callback -> callback ()
-
-            if Mouse.readButtonPress MouseButton.Right then
-                match gridControl.OnRightClick with
-                | None -> ()
-                | Some callback -> callback ())
+            GridControl.IsLeftPressed gridControl |> ignore
+            GridControl.IsRightPressed gridControl |> ignore)
 
     member this.ReadInput() =
         this.ProcessButtons()

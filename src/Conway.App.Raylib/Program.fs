@@ -120,30 +120,26 @@ game.State.Board
     match cellType with
     | BorderCell -> ()
     | PlayerCell _ ->
-        let pressCallback =
+        let makeAliveCallback =
             fun _ ->
                 match game.State.Board[row, col] with
                 | BorderCell -> ()
-                | PlayerCell cell ->
-                    match cell.Status with
-                    | Dead -> game.State.Board[row, col] <- (PlayerCell Cell.living)
-                    | Alive -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
+                | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
 
                 // erase the history since the player has altered the board
                 game.clearHistory ()
 
-        let updateCallback (button: Button) =
-            try
-                mutex.WaitOne() |> ignore
+        let makeDeadCallback =
+            fun _ ->
+                match game.State.Board[row, col] with
+                | BorderCell -> ()
+                | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
 
-                match gameRunningState with
-                | Paused -> button.IsActive <- true
-                | _ -> button.IsActive <- false
-            finally
-                mutex.ReleaseMutex()
+                // erase the history since the player has altered the board
+                game.clearHistory ()
 
-        controlManager.AddButton(
-            new Button(col * 25, row * 25, 25, "", true, false, None, Some pressCallback, Some updateCallback)
+        controlManager.AddGridControl(
+            new GridControl(col * 25, row * 25, 25, Some makeAliveCallback, Some makeDeadCallback)
         ))
 
 gameRunningState |> gameUpdateLoop |> Async.Start
