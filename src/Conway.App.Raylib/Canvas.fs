@@ -62,43 +62,20 @@ type Canvas(x: int, y: int, game: Game, baseCellSize: int, scale: int) =
 
     member val Controls = ControlsInitializer.initFrom game baseCellSize baseCellSize with get, set
 
-    member private this.AddControl(canvasControl: CanvasControl) =
-        this.Controls <- seq { canvasControl } |> Seq.append this.Controls
-
-    member private this.InitControlsFromGame(game: Game) =
-        game.State.Board
-        |> Array2D.iteri (fun row col cellType ->
-            match cellType with
-            | BorderCell -> ()
-            | PlayerCell _ ->
-                let makeAliveCallback =
-                    fun _ ->
-                        match game.State.Board[row, col] with
-                        | BorderCell -> ()
-                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
-
-                        // erase the history since the player has altered the board
-                        game.clearHistory ()
-
-                let makeDeadCallback =
-                    fun _ ->
-                        match game.State.Board[row, col] with
-                        | BorderCell -> ()
-                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
-
-                        // erase the history since the player has altered the board
-                        game.clearHistory ()
-
-                CanvasControl.create
-                |> CanvasControl.position (col * 25) (row * 25)
-                |> CanvasControl.width 25
-                |> CanvasControl.height 25
-                |> CanvasControl.onLeftClickCallback makeAliveCallback
-                |> CanvasControl.onRightClickCallback makeDeadCallback
-                |> this.AddControl)
-
     member this.ProcessControls() =
         this.Controls
         |> Seq.iter (fun canvasControl ->
             CanvasControl.IsLeftPressed canvasControl |> ignore
             CanvasControl.IsRightPressed canvasControl |> ignore)
+
+    member this.MoveCameraRight() =
+        this.DrawingAreaX <- this.DrawingAreaX - 1
+
+    member this.MoveCameraLeft() =
+        this.DrawingAreaX <- this.DrawingAreaX + 1
+
+    member this.MoveCameraUp() =
+        this.DrawingAreaY <- this.DrawingAreaY + 1
+
+    member this.MoveCameraDown() =
+        this.DrawingAreaY <- this.DrawingAreaY - 1

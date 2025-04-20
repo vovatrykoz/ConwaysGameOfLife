@@ -1,6 +1,7 @@
 namespace Conway.App.Raylib
 
 open Conway.Core
+open Raylib_cs
 
 type ControlManager(game: Game) =
 
@@ -10,11 +11,16 @@ type ControlManager(game: Game) =
 
     member val Canvas = new Canvas(0, 0, game, 25, 1) with get, set
 
+    member val KeyActions = seq<KeyboardKey * (unit -> unit)> Seq.empty with get, set
+
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons
 
     member this.AddButtons buttons =
         this.Buttons <- buttons |> Seq.append this.Buttons
+
+    member this.AddKeyAction (key: KeyboardKey) (action: unit -> unit) =
+        this.KeyActions <- seq { key, action } |> Seq.append this.KeyActions
 
     member private this.ProcessButtons() =
         this.Buttons
@@ -46,6 +52,12 @@ type ControlManager(game: Game) =
                     if Button.isReleased activatedButton then
                         this.ActivatedButton <- None)
 
+    member private this.ProcessKeyActions() =
+        this.KeyActions
+        |> Seq.iter (fun (key, action) ->
+            if Keyboard.readKeyPress key then
+                action ())
+
     member private this.ProcessGridControls() =
         this.Canvas.Controls
         |> Seq.iter (fun gridControl ->
@@ -54,6 +66,7 @@ type ControlManager(game: Game) =
 
     member this.ReadInput() =
         this.ProcessButtons()
+        this.ProcessKeyActions()
         this.ProcessGridControls()
 
     member this.UpdateControls() =

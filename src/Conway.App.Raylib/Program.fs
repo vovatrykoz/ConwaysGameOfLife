@@ -169,6 +169,15 @@ let buttons = [ toggleButton; advanceButton; advanceBackButton; resetButton; cle
 let controlManager = new ControlManager(game)
 controlManager.AddButtons buttons
 
+let keyboardActions = [|
+    KeyboardKey.W, controlManager.Canvas.MoveCameraUp
+    KeyboardKey.A, controlManager.Canvas.MoveCameraLeft
+    KeyboardKey.S, controlManager.Canvas.MoveCameraDown
+    KeyboardKey.D, controlManager.Canvas.MoveCameraRight
+|]
+
+controlManager.KeyActions <- keyboardActions
+
 gameRunningState |> gameUpdateLoop |> Async.Start
 
 Display.init ()
