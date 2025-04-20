@@ -93,18 +93,27 @@ type ConwayGrid = {
             }
 
     [<CompiledName("Next")>]
-    static member next grid =
-        let newBoard =
-            grid.Board
-            |> Array2D.mapi (fun row col cell ->
-                task {
-                    match cell with
-                    | BorderCell -> return BorderCell
-                    | PlayerCell playerCell -> return ConwayGrid.processPlayerCell row col playerCell grid.Board
-                })
-            |> Array2D.map (fun task -> task.Result)
+    static member next(grid: ConwayGrid) =
+        let rows = Array2D.length1 grid.Board
+        let cols = Array2D.length2 grid.Board
 
-        { grid with Board = newBoard }
+        let gridProcess = [
+            for row in 0 .. rows - 1 do
+                for col in 0 .. cols - 1 ->
+                    async {
+                        let cell = grid.Board[row, col]
+
+                        match cell with
+                        | BorderCell -> return (row, col, BorderCell)
+                        | PlayerCell playerCell ->
+                            return (row, col, ConwayGrid.processPlayerCell row col playerCell grid.Board)
+                    }
+        ]
+
+        gridProcess
+        |> Async.Parallel
+        |> Async.RunSynchronously
+        |> Array.iter (fun (row, col, result) -> grid.Board[row, col] <- result)
 
     [<CompiledName("Previous")>]
     static member previous grid =

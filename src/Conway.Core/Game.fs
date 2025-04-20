@@ -37,11 +37,11 @@ type Game(initialState: ConwayGrid) =
         match mode with
         | Infinite ->
             while true do
-                this.State <- ConwayGrid.next this.State
+                ConwayGrid.next this.State
                 this.Generation <- this.Generation + 1
         | Limited steps ->
             for _ = 1 to steps do
-                this.State <- ConwayGrid.next this.State
+                ConwayGrid.next this.State
                 this.Generation <- this.Generation + 1
         | Paused -> ()
 

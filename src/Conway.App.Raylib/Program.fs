@@ -4,7 +4,7 @@ open Conway.App.Raylib.Aliases
 open Raylib_cs
 open System.Threading
 
-let startingState = Preset.presetOne |> ConwayGrid.initFromPreset
+let startingState = ConwayGrid.createDead 101 101
 
 let game = new Game(startingState)
 
