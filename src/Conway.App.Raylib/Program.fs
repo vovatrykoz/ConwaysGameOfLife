@@ -164,12 +164,10 @@ let clearButton =
     |> Button.onClickCallback clearCallback
     |> Button.onUpdateCallback updateOnRun
 
+let buttons = [ toggleButton; advanceButton; advanceBackButton; resetButton; clearButton ]
+
 let controlManager = new ControlManager()
-controlManager.AddButton toggleButton
-controlManager.AddButton advanceButton
-controlManager.AddButton advanceBackButton
-controlManager.AddButton resetButton
-controlManager.AddButton clearButton
+controlManager.AddButtons buttons
 
 game.State.Board
 |> Array2D.iteri (fun row col cellType ->

@@ -11,6 +11,9 @@ type ControlManager() =
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons
 
+    member this.AddButtons buttons =
+        this.Buttons <- buttons |> Seq.append this.Buttons
+
     member this.AddGridControl(gridControl: GridControl) =
         this.GridControls <- seq { gridControl } |> Seq.append this.GridControls
 
