@@ -56,14 +56,7 @@ type Game(initialState: ConwayGrid) =
             this.Generation <- this.Generation - 1
 
     [<CompiledName("ClearHistory")>]
-    member this.clearHistory() =
-        this.State.Board
-        |> Array2D.iteri (fun row col cell ->
-            match cell with
-            | BorderCell -> this.State.Board[row, col] <- BorderCell
-            | PlayerCell playerCell -> this.State.Board[row, col] <- PlayerCell { playerCell with Memory = Stack.empty })
-
-        this.Generation <- 1
+    member this.clearHistory() = this.Generation <- 1
 
     [<CompiledName("HasMemoryLoss")>]
     member this.hasMemoryLoss() =
@@ -73,7 +66,7 @@ type Game(initialState: ConwayGrid) =
             for j in 0 .. (Array2D.length2 this.State.Board - 1) do
                 match this.State.Board[i, j] with
                 | PlayerCell playerCell ->
-                    if Stack.isEmpty playerCell.Memory then
+                    if playerCell.Memory.Count <= 0 then
                         memoryLossPresent <- true
                     else
                         ()

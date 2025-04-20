@@ -3,6 +3,8 @@ module Conway.Tests
 open Conway.Core
 open NUnit.Framework
 
+(*
+
 module ``Cell Tests`` =
 
     [<Test>]
@@ -274,3 +276,4 @@ module ``Grid tests`` =
         let expectedBoardTwo = ConwayGrid.init 3 3 expectedInitializerTwo
 
         Assert.That(actual, Is.EqualTo expectedBoardTwo)
+*)

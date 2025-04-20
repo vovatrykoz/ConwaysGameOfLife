@@ -1,11 +1,11 @@
 namespace Conway.Core
 
-[<Struct>]
+[<Struct; NoComparison>]
 type GridCellType =
     | BorderCell
     | PlayerCell of Cell
 
-[<Struct>]
+[<Struct; NoComparison>]
 type private CalculationResult = {
     Row: int
     Column: int
@@ -18,6 +18,7 @@ type private CalculationResult = {
         CellType = cellType
     }
 
+[<NoComparison>]
 type ConwayGrid = private {
     Board: GridCellType[,]
     Buffer: GridCellType[,]
@@ -89,28 +90,13 @@ type ConwayGrid = private {
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
+        currentCell.Memory.Push currentCell.Status
 
         match livingNeighborsCount with
-        | x when x < 2 ->
-            PlayerCell {
-                Status = Dead
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
-        | x when x = 2 ->
-            PlayerCell {
-                Status = currentCell.Status
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
-        | x when x = 3 ->
-            PlayerCell {
-                Status = Alive
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
-        | _ ->
-            PlayerCell {
-                Status = Dead
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
+        | x when x < 2 -> Cell.create Dead currentCell.Memory
+        | x when x = 2 -> Cell.create currentCell.Status currentCell.Memory
+        | x when x = 3 -> Cell.create Alive currentCell.Memory
+        | _ -> Cell.create Dead currentCell.Memory
 
     [<CompiledName("Next")>]
     static member next(grid: ConwayGrid) =
@@ -122,7 +108,7 @@ type ConwayGrid = private {
                 grid.Buffer[row, col] <-
                     match grid.Board[row, col] with
                     | BorderCell -> BorderCell
-                    | PlayerCell playerCell -> ConwayGrid.processPlayerCell row col playerCell grid.Board
+                    | PlayerCell playerCell -> PlayerCell (ConwayGrid.processPlayerCell row col playerCell grid.Board)
 
         grid.Buffer
         |> Array2D.iteri (fun row col value -> grid.Board[row, col] <- value)
@@ -143,7 +129,11 @@ type ConwayGrid = private {
                         match cell with
                         | BorderCell -> return CalculationResult.create row col BorderCell
                         | PlayerCell playerCell ->
-                            let previousState, otherMemories = Stack.tryPop playerCell.Memory
+                            let previousState =
+                                if playerCell.Memory.Count <= 0 then
+                                    None
+                                else
+                                    Some(playerCell.Memory.Pop())
 
                             match previousState with
                             | None -> return CalculationResult.create row col (PlayerCell playerCell)
@@ -154,7 +144,7 @@ type ConwayGrid = private {
                                         col
                                         (PlayerCell {
                                             Status = state
-                                            Memory = otherMemories
+                                            Memory = playerCell.Memory
                                         })
                     }
         ]

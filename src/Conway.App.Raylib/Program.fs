@@ -4,7 +4,7 @@ open Conway.App.Raylib.Aliases
 open Raylib_cs
 open System.Threading
 
-let startingState = ConwayGrid.createDead 101 101
+let startingState = ConwayGrid.createDead 1001 1001
 
 let game = new Game(startingState)
 
@@ -92,7 +92,7 @@ let updateOnRun (button: Button) =
 let updateOnRunBack (button: Button) =
     updateOnRun button
 
-    if button.IsActive && game.hasMemoryLoss () then
+    if button.IsActive && game.Generation <= 1 then
         button.IsActive <- false
 
 let resetCallback () =
