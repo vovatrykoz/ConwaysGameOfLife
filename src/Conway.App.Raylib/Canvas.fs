@@ -4,7 +4,7 @@ open Conway.Core
 
 module private ControlsInitializer =
     let initFrom (game: Game) width height =
-        let mutable controls = seq<CanvasControl> Seq.empty
+        let mutable controls: list<CanvasControl> = List.empty
 
         game.State.Board
         |> Array2D.iteri (fun row col cellType ->
@@ -29,18 +29,17 @@ module private ControlsInitializer =
                         // erase the history since the player has altered the board
                         game.clearHistory ()
 
-                controls <-
-                    seq {
+                controls <- 
+                    (
                         CanvasControl.create
                         |> CanvasControl.position (col * width) (row * height)
                         |> CanvasControl.width width
                         |> CanvasControl.height height
                         |> CanvasControl.onLeftClickCallback makeAliveCallback
                         |> CanvasControl.onRightClickCallback makeDeadCallback
-                    }
-                    |> Seq.append controls)
+                    ) :: controls)
 
-        controls
+        controls |> List.toArray
 
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, baseCellSize: int, scale: int) =

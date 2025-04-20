@@ -7,20 +7,20 @@ type ControlManager(game: Game) =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
-    member val Buttons = seq<Button> Seq.empty with get, set
+    member val Buttons: list<Button> = List.empty with get, set
 
     member val Canvas = new Canvas(25, 25, 525, 525, 0, 0, game, 25, 1) with get, set
 
-    member val KeyActions = seq<KeyboardKey * (unit -> unit)> Seq.empty with get, set
+    member val KeyActions: list<KeyboardKey * (unit -> unit)>  = List.empty with get, set
 
     member this.AddButton(button: Button) =
-        this.Buttons <- seq { button } |> Seq.append this.Buttons
+        this.Buttons <- button :: this.Buttons
 
     member this.AddButtons buttons =
-        this.Buttons <- buttons |> Seq.append this.Buttons
+        this.Buttons <- this.Buttons |> List.append buttons
 
     member this.AddKeyAction (key: KeyboardKey) (action: unit -> unit) =
-        this.KeyActions <- seq { key, action } |> Seq.append this.KeyActions
+        this.KeyActions <- (key, action) :: this.KeyActions
 
     member private this.ProcessButtons() =
         this.Buttons

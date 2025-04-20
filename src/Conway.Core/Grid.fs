@@ -1,8 +1,22 @@
 namespace Conway.Core
 
+[<Struct>]
 type GridCellType =
     | BorderCell
     | PlayerCell of Cell
+
+[<Struct>]
+type private CalculationResult = {
+    Row: int
+    Column: int
+    CellType: GridCellType
+} with
+
+    static member create row col cellType = {
+        Row = row
+        Column = col
+        CellType = cellType
+    }
 
 type ConwayGrid = {
     Board: GridCellType[,]
@@ -97,23 +111,21 @@ type ConwayGrid = {
         let rows = Array2D.length1 grid.Board
         let cols = Array2D.length2 grid.Board
 
-        let gridProcess = [
+        [
             for row in 0 .. rows - 1 do
                 for col in 0 .. cols - 1 ->
                     async {
                         let cell = grid.Board[row, col]
 
                         match cell with
-                        | BorderCell -> return (row, col, BorderCell)
+                        | BorderCell -> return CalculationResult.create row col BorderCell
                         | PlayerCell playerCell ->
-                            return (row, col, ConwayGrid.processPlayerCell row col playerCell grid.Board)
+                            return CalculationResult.create row col (ConwayGrid.processPlayerCell row col playerCell grid.Board)
                     }
         ]
-
-        gridProcess
         |> Async.Parallel
         |> Async.RunSynchronously
-        |> Array.iter (fun (row, col, result) -> grid.Board[row, col] <- result)
+        |> Array.iter (fun calculationResult -> grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
 
     [<CompiledName("Previous")>]
     static member previous grid =

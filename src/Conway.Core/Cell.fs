@@ -4,6 +4,7 @@ type CellStatus =
     | Alive
     | Dead
 
+[<Struct>]
 type Cell = {
     Status: CellStatus
     Memory: Stack<CellStatus>
