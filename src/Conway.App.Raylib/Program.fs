@@ -101,19 +101,54 @@ let updateOnRunBack (button: Button) =
     if button.IsActive && game.hasMemoryLoss () then
         button.IsActive <- false
 
+let resetCallback () =
+    try
+        mutex.WaitOne() |> ignore
+
+        match gameRunningState with
+        | Infinite
+        | Limited _ -> ()
+        | Paused -> game.State <- startingState
+
+        game.clearHistory ()
+
+    finally
+        mutex.ReleaseMutex()
+
+let clearCallback () =
+    try
+        mutex.WaitOne() |> ignore
+
+        match gameRunningState with
+        | Infinite
+        | Limited _ -> ()
+        | Paused -> game.State <- Preset.deadPreset |> ConwayGrid.initFromPreset
+
+        game.clearHistory ()
+    finally
+        mutex.ReleaseMutex()
+
 let toggleButton =
-    new Button(700, 400, 50, "", true, true, Some toggleGame, None, Some update)
+    new Button(600, 300, 50, "", true, true, Some toggleGame, None, Some update)
 
 let advanceButton =
-    new Button(700, 500, 50, "Next", true, true, Some advanceOnce, None, Some updateOnRun)
+    new Button(700, 400, 50, "Next", true, true, Some advanceOnce, None, Some updateOnRun)
 
 let advanceBackButton =
-    new Button(600, 500, 50, "Previous", true, true, Some advanceBackOnce, None, Some updateOnRunBack)
+    new Button(600, 400, 50, "Previous", true, true, Some advanceBackOnce, None, Some updateOnRunBack)
+
+let resetButton =
+    new Button(700, 500, 50, "Reset", true, true, Some resetCallback, None, None)
+
+let clearButton =
+    new Button(600, 500, 50, "Clear", true, true, Some clearCallback, None, None)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
 controlManager.AddButton advanceButton
 controlManager.AddButton advanceBackButton
+controlManager.AddButton resetButton
+controlManager.AddButton clearButton
 
 game.State.Board
 |> Array2D.iteri (fun row col cellType ->
