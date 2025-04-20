@@ -27,14 +27,23 @@ type CanvasControl
     member val isActive = isActive with get, set
 
     static member IsPressedWith
-        (canvasControl: CanvasControl, mouseButton: MouseButton, callback: option<unit -> unit>)
-        =
+        (
+            canvasControl: CanvasControl,
+            mouseButton: MouseButton,
+            offsetX: int,
+            offsetY: int,
+            callback: option<unit -> unit>
+        ) =
         if Mouse.readButtonPress mouseButton then
+            let trueX = canvasControl.X + offsetX
+            let trueY = canvasControl.Y + offsetY
+
+            let minX = trueX
+            let maxX = trueX + canvasControl.Width
+            let minY = trueY
+            let maxY = trueY + canvasControl.Height
+
             let mousePos = Mouse.getPosition ()
-            let minX = canvasControl.X
-            let maxX = canvasControl.X + canvasControl.Width
-            let minY = canvasControl.Y
-            let maxY = canvasControl.Y + canvasControl.Height
 
             if
                 mousePos.X >= float32 minX
@@ -52,11 +61,11 @@ type CanvasControl
         else
             false
 
-    static member IsLeftPressed(gridControl: CanvasControl) =
-        CanvasControl.IsPressedWith(gridControl, MouseButton.Left, gridControl.OnLeftClick)
+    static member IsLeftPressed(gridControl: CanvasControl, offsetX: int, offsetY: int) =
+        CanvasControl.IsPressedWith(gridControl, MouseButton.Left, offsetX, offsetY, gridControl.OnLeftClick)
 
-    static member IsRightPressed(gridControl: CanvasControl) =
-        CanvasControl.IsPressedWith(gridControl, MouseButton.Right, gridControl.OnRightClick)
+    static member IsRightPressed(gridControl: CanvasControl, offsetX: int, offsetY: int) =
+        CanvasControl.IsPressedWith(gridControl, MouseButton.Right, offsetX, offsetY, gridControl.OnRightClick)
 
     static member create = new CanvasControl(0, 0, 0, 0, None, None, true)
 

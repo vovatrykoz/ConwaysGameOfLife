@@ -58,16 +58,10 @@ type ControlManager(game: Game) =
             if Keyboard.readKeyPress key then
                 action ())
 
-    member private this.ProcessGridControls() =
-        this.Canvas.Controls
-        |> Seq.iter (fun gridControl ->
-            CanvasControl.IsLeftPressed gridControl |> ignore
-            CanvasControl.IsRightPressed gridControl |> ignore)
-
     member this.ReadInput() =
         this.ProcessButtons()
         this.ProcessKeyActions()
-        this.ProcessGridControls()
+        this.Canvas.ProcessControls()
 
     member this.UpdateControls() =
         this.Buttons

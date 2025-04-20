@@ -70,8 +70,23 @@ type Canvas
     member this.ProcessControls() =
         this.Controls
         |> Seq.iter (fun canvasControl ->
-            CanvasControl.IsLeftPressed canvasControl |> ignore
-            CanvasControl.IsRightPressed canvasControl |> ignore)
+            let offsetX = this.DrawingAreaX * this.BaseCellSize
+            let offsetY = this.DrawingAreaY * this.BaseCellSize
+
+            let trueX = canvasControl.X + offsetX
+            let trueY = canvasControl.Y + offsetY
+
+            if
+                trueX < this.X
+                || trueX >= this.X + this.Width
+                || trueY < this.Y
+                || trueY >= this.Y + this.Height
+            then
+                ()
+            else
+                CanvasControl.IsLeftPressed(canvasControl, offsetX, offsetY) |> ignore
+
+                CanvasControl.IsRightPressed(canvasControl, offsetX, offsetY) |> ignore)
 
     member this.MoveCameraRight() =
         this.DrawingAreaX <- this.DrawingAreaX - 1
