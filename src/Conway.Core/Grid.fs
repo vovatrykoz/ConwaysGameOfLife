@@ -82,29 +82,35 @@ type ConwayGrid = {
 
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
-        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
+        async {
+            let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
-        match livingNeighborsCount with
-        | x when x < 2 ->
-            PlayerCell {
-                Status = Dead
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
-        | x when x = 2 ->
-            PlayerCell {
-                Status = currentCell.Status
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
-        | x when x = 3 ->
-            PlayerCell {
-                Status = Alive
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
-        | _ ->
-            PlayerCell {
-                Status = Dead
-                Memory = currentCell.Memory |> Stack.push currentCell.Status
-            }
+            match livingNeighborsCount with
+            | x when x < 2 ->
+                return
+                    PlayerCell {
+                        Status = Dead
+                        Memory = currentCell.Memory |> Stack.push currentCell.Status
+                    }
+            | x when x = 2 ->
+                return
+                    PlayerCell {
+                        Status = currentCell.Status
+                        Memory = currentCell.Memory |> Stack.push currentCell.Status
+                    }
+            | x when x = 3 ->
+                return
+                    PlayerCell {
+                        Status = Alive
+                        Memory = currentCell.Memory |> Stack.push currentCell.Status
+                    }
+            | _ ->
+                return
+                    PlayerCell {
+                        Status = Dead
+                        Memory = currentCell.Memory |> Stack.push currentCell.Status
+                    }
+        }
 
     [<CompiledName("Next")>]
     static member next(grid: ConwayGrid) =
@@ -120,11 +126,9 @@ type ConwayGrid = {
                         match cell with
                         | BorderCell -> return CalculationResult.create row col BorderCell
                         | PlayerCell playerCell ->
-                            return
-                                CalculationResult.create
-                                    row
-                                    col
-                                    (ConwayGrid.processPlayerCell row col playerCell grid.Board)
+                            let! typeResult = ConwayGrid.processPlayerCell row col playerCell grid.Board
+
+                            return CalculationResult.create row col typeResult
                     }
         ]
         |> Async.Parallel
