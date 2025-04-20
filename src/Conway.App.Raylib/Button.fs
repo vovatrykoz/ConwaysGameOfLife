@@ -13,7 +13,7 @@ type Button
         onClick: option<unit -> unit>,
         onPressAndHold: option<unit -> unit>,
         onUpdate: option<Button -> unit>,
-        shortcut: seq<KeyboardKey>
+        shortcut: option<KeyboardKey>
     ) =
 
     let mutable isCurrentlyPressed = false
@@ -57,27 +57,25 @@ type Button
     member val Shortcut = shortcut with get, set
 
     static member isShortcutPressed(button: Button) =
-        let shortcutPressed =
-            not (button.Shortcut |> Seq.isEmpty)
-            && button.Shortcut |> Seq.forall (fun key -> Keyboard.readKeyPress key)
-
-        if shortcutPressed then
-            button.IsPressed <- true
-
-            match button.OnClick with
-            | None -> ()
-            | Some callback -> callback ()
-
-            button.IsPressed
-        else
+        match button.Shortcut with
+        | None ->
             button.IsPressed <- false
             button.IsPressed
+        | Some shortcut ->
+            if Keyboard.readKeyPress shortcut then
+                button.IsPressed <- true
 
-    static member internal isPressed(button: Button) =
-        let shortcutPressed =
-            button.Shortcut |> Seq.forall (fun key -> Keyboard.readKeyDown key)
+                match button.OnClick with
+                | None -> ()
+                | Some callback -> callback ()
 
-        if Mouse.readButtonPress MouseButton.Left || shortcutPressed then
+                button.IsPressed
+            else
+                button.IsPressed <- false
+                button.IsPressed
+
+    static member isPressed(button: Button) =
+        if Mouse.readButtonPress MouseButton.Left then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
             let maxX = button.X + button.Size
@@ -100,7 +98,7 @@ type Button
             button.IsPressed <- false
             button.IsPressed
 
-    static member internal isClicked(button: Button) =
+    static member isClicked(button: Button) =
         if Mouse.readButtonClick MouseButton.Left then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
@@ -123,7 +121,7 @@ type Button
             button.IsClicked <- false
             button.IsClicked
 
-    static member internal isReleased(button: Button) =
+    static member isReleased(button: Button) =
         if not (Mouse.buttonHasBeenReleased MouseButton.Left) then
             false
         else
@@ -146,3 +144,50 @@ type Button
                 true
             else
                 false
+
+    static member create = new Button(0, 0, 0, "", true, true, None, None, None, None)
+
+    static member position x y (button: Button) =
+        button.X <- x
+        button.Y <- y
+        button
+
+    static member size size (button: Button) =
+        button.Size <- size
+        button
+
+    static member text text (button: Button) =
+        button.Text <- text
+        button
+
+    static member activate(button: Button) =
+        button.IsActive <- true
+        button
+
+    static member deactivate(button: Button) =
+        button.IsActive <- false
+        button
+
+    static member show(button: Button) =
+        button.IsVisible <- true
+        button
+
+    static member hide(button: Button) =
+        button.IsVisible <- false
+        button
+
+    static member onClickCallback callback (button: Button) =
+        button.OnClick <- Some callback
+        button
+
+    static member onPressAndHoldCallback callback (button: Button) =
+        button.OnPressAndHold <- Some callback
+        button
+
+    static member onUpdateCallback callback (button: Button) =
+        button.OnUpdate <- Some callback
+        button
+
+    static member shortcut shortcut (button: Button) =
+        button.Shortcut <- Some shortcut
+        button

@@ -125,30 +125,46 @@ let clearCallback () =
         mutex.ReleaseMutex()
 
 let toggleButton =
-    new Button(600, 300, 50, "", true, true, Some toggleGame, None, Some update, seq { KeyboardKey.Space })
+    Button.create
+    |> Button.position 600 300
+    |> Button.size 50
+    |> Button.onClickCallback toggleGame
+    |> Button.onUpdateCallback update
+    |> Button.shortcut KeyboardKey.Space
 
 let advanceButton =
-    new Button(700, 400, 50, "Next", true, true, Some advanceOnce, None, Some updateOnRun, seq { KeyboardKey.Right })
+    Button.create
+    |> Button.position 700 400
+    |> Button.size 50
+    |> Button.text "Next"
+    |> Button.onClickCallback advanceOnce
+    |> Button.onUpdateCallback updateOnRun
+    |> Button.shortcut KeyboardKey.Right
 
 let advanceBackButton =
-    new Button(
-        600,
-        400,
-        50,
-        "Previous",
-        true,
-        true,
-        Some advanceBackOnce,
-        None,
-        Some updateOnRunBack,
-        seq { KeyboardKey.Left }
-    )
+    Button.create
+    |> Button.position 600 400
+    |> Button.size 50
+    |> Button.text "Previous"
+    |> Button.onClickCallback advanceBackOnce
+    |> Button.onUpdateCallback updateOnRunBack
+    |> Button.shortcut KeyboardKey.Left
 
 let resetButton =
-    new Button(700, 500, 50, "Reset", true, true, Some resetCallback, None, None, Seq.empty)
+    Button.create
+    |> Button.position 700 500
+    |> Button.size 50
+    |> Button.text "Reset"
+    |> Button.onClickCallback resetCallback
+    |> Button.onUpdateCallback updateOnRun
 
 let clearButton =
-    new Button(600, 500, 50, "Clear", true, true, Some clearCallback, None, None, Seq.empty)
+    Button.create
+    |> Button.position 600 500
+    |> Button.size 50
+    |> Button.text "Clear"
+    |> Button.onClickCallback clearCallback
+    |> Button.onUpdateCallback updateOnRun
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
