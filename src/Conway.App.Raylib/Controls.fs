@@ -1,12 +1,14 @@
 namespace Conway.App.Raylib
 
-type ControlManager() =
+open Conway.Core
+
+type ControlManager(game: Game) =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
     member val Buttons = seq<Button> Seq.empty with get, set
 
-    member val Canvas = new Canvas(0, 0, 525, 525, 1) with get, set
+    member val Canvas = new Canvas(0, 0, game, 25, 1) with get, set
 
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons

@@ -1,27 +1,101 @@
 namespace Conway.App.Raylib
 
-type Canvas(x: int, y: int, canvasSize: int, drawingAreaSize: int, scale: int) =
+open Conway.Core
+
+module private ControlsInitializer =
+    let initFrom (game: Game) width height =
+        let mutable controls = seq<CanvasControl> Seq.empty
+
+        game.State.Board
+        |> Array2D.iteri (fun row col cellType ->
+            match cellType with
+            | BorderCell -> ()
+            | PlayerCell _ ->
+                let makeAliveCallback =
+                    fun _ ->
+                        match game.State.Board[row, col] with
+                        | BorderCell -> ()
+                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
+
+                        // erase the history since the player has altered the board
+                        game.clearHistory ()
+
+                let makeDeadCallback =
+                    fun _ ->
+                        match game.State.Board[row, col] with
+                        | BorderCell -> ()
+                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
+
+                        // erase the history since the player has altered the board
+                        game.clearHistory ()
+
+                controls <-
+                    seq {
+                        CanvasControl.create
+                        |> CanvasControl.position (col * width) (row * height)
+                        |> CanvasControl.width width
+                        |> CanvasControl.height height
+                        |> CanvasControl.onLeftClickCallback makeAliveCallback
+                        |> CanvasControl.onRightClickCallback makeDeadCallback
+                    }
+                    |> Seq.append controls)
+
+        controls
+
+type Canvas(x: int, y: int, game: Game, baseCellSize: int, scale: int) =
+
     member val X = x with get, set
 
     member val Y = y with get, set
 
-    member val Size = canvasSize with get, set
+    member val BaseCellSize = baseCellSize with get, set
+
+    member val Rows = game.State.Board |> Array2D.length1 with get
+
+    member val Columns = game.State.Board |> Array2D.length2 with get
 
     member val DrawingAreaX = x with get, set
 
     member val DrawingAreaY = y with get, set
 
-    member val DrawingAreaSize = drawingAreaSize with get, set
-
     member val Scale = scale with get, set
 
-    member val Controls = seq<CanvasControl> Seq.empty with get, set
+    member val Controls = ControlsInitializer.initFrom game baseCellSize baseCellSize with get, set
 
-    member this.AddControl(canvasControl: CanvasControl) =
+    member private this.AddControl(canvasControl: CanvasControl) =
         this.Controls <- seq { canvasControl } |> Seq.append this.Controls
 
-    member this.AddControls(canvasControls: seq<CanvasControl>) =
-        this.Controls <- canvasControls |> Seq.append this.Controls
+    member private this.InitControlsFromGame(game: Game) =
+        game.State.Board
+        |> Array2D.iteri (fun row col cellType ->
+            match cellType with
+            | BorderCell -> ()
+            | PlayerCell _ ->
+                let makeAliveCallback =
+                    fun _ ->
+                        match game.State.Board[row, col] with
+                        | BorderCell -> ()
+                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
+
+                        // erase the history since the player has altered the board
+                        game.clearHistory ()
+
+                let makeDeadCallback =
+                    fun _ ->
+                        match game.State.Board[row, col] with
+                        | BorderCell -> ()
+                        | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
+
+                        // erase the history since the player has altered the board
+                        game.clearHistory ()
+
+                CanvasControl.create
+                |> CanvasControl.position (col * 25) (row * 25)
+                |> CanvasControl.width 25
+                |> CanvasControl.height 25
+                |> CanvasControl.onLeftClickCallback makeAliveCallback
+                |> CanvasControl.onRightClickCallback makeDeadCallback
+                |> this.AddControl)
 
     member this.ProcessControls() =
         this.Controls

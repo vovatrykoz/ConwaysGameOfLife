@@ -3,7 +3,15 @@ namespace Conway.App.Raylib
 open Raylib_cs
 
 type CanvasControl
-    (x: int, y: int, width: int, height: int, onLeftClick: option<unit -> unit>, onRightClick: option<unit -> unit>) =
+    (
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        onLeftClick: option<unit -> unit>,
+        onRightClick: option<unit -> unit>,
+        isActive: bool
+    ) =
     member val X = x with get, set
 
     member val Y = y with get, set
@@ -15,6 +23,8 @@ type CanvasControl
     member val OnLeftClick = onLeftClick with get, set
 
     member val OnRightClick = onRightClick with get, set
+
+    member val isActive = isActive with get, set
 
     static member IsPressedWith(gridControl: CanvasControl, mouseButton: MouseButton, callback: option<unit -> unit>) =
         if Mouse.readButtonPress mouseButton then
@@ -46,7 +56,7 @@ type CanvasControl
     static member IsRightPressed(gridControl: CanvasControl) =
         CanvasControl.IsPressedWith(gridControl, MouseButton.Right, gridControl.OnRightClick)
 
-    static member create = new CanvasControl(0, 0, 0, 0, None, None)
+    static member create = new CanvasControl(0, 0, 0, 0, None, None, true)
 
     static member position x y (gridControl: CanvasControl) =
         gridControl.X <- x

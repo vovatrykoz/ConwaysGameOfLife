@@ -166,39 +166,8 @@ let clearButton =
 
 let buttons = [ toggleButton; advanceButton; advanceBackButton; resetButton; clearButton ]
 
-let controlManager = new ControlManager()
+let controlManager = new ControlManager(game)
 controlManager.AddButtons buttons
-
-game.State.Board
-|> Array2D.iteri (fun row col cellType ->
-    match cellType with
-    | BorderCell -> ()
-    | PlayerCell _ ->
-        let makeAliveCallback =
-            fun _ ->
-                match game.State.Board[row, col] with
-                | BorderCell -> ()
-                | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
-
-                // erase the history since the player has altered the board
-                game.clearHistory ()
-
-        let makeDeadCallback =
-            fun _ ->
-                match game.State.Board[row, col] with
-                | BorderCell -> ()
-                | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
-
-                // erase the history since the player has altered the board
-                game.clearHistory ()
-
-        CanvasControl.create
-        |> CanvasControl.position (col * 25) (row * 25)
-        |> CanvasControl.width 25
-        |> CanvasControl.height 25
-        |> CanvasControl.onLeftClickCallback makeAliveCallback
-        |> CanvasControl.onRightClickCallback makeDeadCallback
-        |> controlManager.Canvas.AddControl)
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
