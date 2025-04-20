@@ -1,5 +1,6 @@
 ﻿namespace Conway.Core
 
+[<Struct>]
 type CellStatus =
     | Alive
     | Dead

@@ -47,7 +47,7 @@ module Display =
         Raylib.BeginDrawing()
         Raylib.ClearBackground Color.White
 
-        renderBoardOnCanvas controls.Canvas game.State.Board
+        renderBoardOnCanvas controls.Canvas (ConwayGrid.board game.State)
         renderControls controls
         renderGenerationCounter game.Generation
 

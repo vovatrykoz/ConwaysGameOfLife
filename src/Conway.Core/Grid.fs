@@ -18,42 +18,48 @@ type private CalculationResult = {
         CellType = cellType
     }
 
-type ConwayGrid = {
+type ConwayGrid = private {
     Board: GridCellType[,]
+    Buffer: GridCellType[,]
 } with
 
     [<CompiledName("CreateDead")>]
-    static member createDead width height = {
-        Board =
+    static member createDead width height =
+        let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
                     PlayerCell Cell.dead)
-    }
+
+        { Board = initArr; Buffer = initArr }
 
     [<CompiledName("CreateLiving")>]
-    static member createLiving width height = {
-        Board =
+    static member createLiving width height =
+        let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
                     PlayerCell Cell.living)
-    }
+
+        { Board = initArr; Buffer = initArr }
 
     [<CompiledName("Init")>]
-    static member init width height initializer = {
-        Board =
+    static member init width height initializer =
+        let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
                     PlayerCell(initializer (i - 1) (j - 1)))
-    }
+
+        { Board = initArr; Buffer = initArr }
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
+
+    static member board grid = grid.Board
 
     [<CompiledName("CollectNeighbors")>]
     static member private collectNeighbors row col (board: GridCellType array2d) = [
@@ -82,59 +88,44 @@ type ConwayGrid = {
 
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
-        async {
-            let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
+        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
-            match livingNeighborsCount with
-            | x when x < 2 ->
-                return
-                    PlayerCell {
-                        Status = Dead
-                        Memory = currentCell.Memory |> Stack.push currentCell.Status
-                    }
-            | x when x = 2 ->
-                return
-                    PlayerCell {
-                        Status = currentCell.Status
-                        Memory = currentCell.Memory |> Stack.push currentCell.Status
-                    }
-            | x when x = 3 ->
-                return
-                    PlayerCell {
-                        Status = Alive
-                        Memory = currentCell.Memory |> Stack.push currentCell.Status
-                    }
-            | _ ->
-                return
-                    PlayerCell {
-                        Status = Dead
-                        Memory = currentCell.Memory |> Stack.push currentCell.Status
-                    }
-        }
+        match livingNeighborsCount with
+        | x when x < 2 ->
+            PlayerCell {
+                Status = Dead
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
+        | x when x = 2 ->
+            PlayerCell {
+                Status = currentCell.Status
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
+        | x when x = 3 ->
+            PlayerCell {
+                Status = Alive
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
+        | _ ->
+            PlayerCell {
+                Status = Dead
+                Memory = currentCell.Memory |> Stack.push currentCell.Status
+            }
 
     [<CompiledName("Next")>]
     static member next(grid: ConwayGrid) =
         let rows = Array2D.length1 grid.Board
         let cols = Array2D.length2 grid.Board
 
-        [
-            for row in 0 .. rows - 1 do
-                for col in 0 .. cols - 1 ->
-                    async {
-                        let cell = grid.Board[row, col]
+        for row in 0 .. rows - 1 do
+            for col in 0 .. cols - 1 do
+                grid.Buffer[row, col] <-
+                    match grid.Board[row, col] with
+                    | BorderCell -> BorderCell
+                    | PlayerCell playerCell -> ConwayGrid.processPlayerCell row col playerCell grid.Board
 
-                        match cell with
-                        | BorderCell -> return CalculationResult.create row col BorderCell
-                        | PlayerCell playerCell ->
-                            let! typeResult = ConwayGrid.processPlayerCell row col playerCell grid.Board
-
-                            return CalculationResult.create row col typeResult
-                    }
-        ]
-        |> Async.Parallel
-        |> Async.RunSynchronously
-        |> Array.iter (fun calculationResult ->
-            grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
+        grid.Buffer
+        |> Array2D.iteri (fun row col value -> grid.Board[row, col] <- value)
 
         grid
 

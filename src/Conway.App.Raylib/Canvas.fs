@@ -5,18 +5,18 @@ open Conway.Core
 module private ControlsInitializer =
     let makeAliveCallback row col (game: Game) =
         fun _ ->
-            match game.State.Board[row, col] with
+            match (ConwayGrid.board game.State)[row, col] with
             | BorderCell -> ()
-            | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.living)
+            | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.living
 
             // erase the history since the player has altered the board
             game.clearHistory ()
 
     let makeDeadCallback row col (game: Game) =
         fun _ ->
-            match game.State.Board[row, col] with
+            match (ConwayGrid.board game.State)[row, col] with
             | BorderCell -> ()
-            | PlayerCell _ -> game.State.Board[row, col] <- (PlayerCell Cell.dead)
+            | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.dead
 
             // erase the history since the player has altered the board
             game.clearHistory ()
@@ -24,7 +24,7 @@ module private ControlsInitializer =
     let initFrom (game: Game) width height =
         let mutable controls: list<CanvasControl> = List.empty
 
-        game.State.Board
+        ConwayGrid.board game.State
         |> Array2D.iteri (fun row col cellType ->
             match cellType with
             | BorderCell -> ()
@@ -53,9 +53,9 @@ type Canvas
 
     member val BaseCellSize = baseCellSize with get, set
 
-    member val Rows = game.State.Board |> Array2D.length1 with get
+    member val Rows = ConwayGrid.board game.State |> Array2D.length1 with get
 
-    member val Columns = game.State.Board |> Array2D.length2 with get
+    member val Columns = ConwayGrid.board game.State |> Array2D.length2 with get
 
     member val DrawingAreaX = drawingX with get, set
 

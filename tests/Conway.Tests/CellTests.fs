@@ -34,7 +34,7 @@ module ``Grid tests`` =
 
         let actual = ConwayGrid.createDead 2 2
 
-        Assert.That(actual.Board, Is.EqualTo expectedBoard)
+        Assert.That(ConwayGrid.board actual, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``Can create a living grid using the dedicated method on the Grid type`` () =
@@ -49,7 +49,7 @@ module ``Grid tests`` =
 
         let actual = ConwayGrid.createLiving 2 2
 
-        Assert.That(actual.Board, Is.EqualTo expectedBoard)
+        Assert.That(ConwayGrid.board actual, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``Can create a living grid using the init method on the Grid type`` () =
@@ -86,7 +86,7 @@ module ``Grid tests`` =
 
         let actual = ConwayGrid.init 3 3 initializer
 
-        Assert.That(actual.Board, Is.EqualTo expectedBoard)
+        Assert.That(ConwayGrid.board actual, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``All-dead grid remains dead after one iteration`` () =
