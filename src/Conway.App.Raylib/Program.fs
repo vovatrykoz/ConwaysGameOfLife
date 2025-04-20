@@ -192,13 +192,13 @@ game.State.Board
                 // erase the history since the player has altered the board
                 game.clearHistory ()
 
-        GridControl.create
-        |> GridControl.position (col * 25) (row * 25)
-        |> GridControl.width 25
-        |> GridControl.height 25
-        |> GridControl.onLeftClickCallback makeAliveCallback
-        |> GridControl.onRightClickCallback makeDeadCallback
-        |> controlManager.AddGridControl)
+        CanvasControl.create
+        |> CanvasControl.position (col * 25) (row * 25)
+        |> CanvasControl.width 25
+        |> CanvasControl.height 25
+        |> CanvasControl.onLeftClickCallback makeAliveCallback
+        |> CanvasControl.onRightClickCallback makeDeadCallback
+        |> controlManager.Canvas.AddControl)
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 

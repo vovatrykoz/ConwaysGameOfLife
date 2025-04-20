@@ -6,16 +6,13 @@ type ControlManager() =
 
     member val Buttons = seq<Button> Seq.empty with get, set
 
-    member val GridControls = seq<GridControl> Seq.empty with get, set
+    member val Canvas = new Canvas(0, 0, 525, 525, 1) with get, set
 
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons
 
     member this.AddButtons buttons =
         this.Buttons <- buttons |> Seq.append this.Buttons
-
-    member this.AddGridControl(gridControl: GridControl) =
-        this.GridControls <- seq { gridControl } |> Seq.append this.GridControls
 
     member private this.ProcessButtons() =
         this.Buttons
@@ -48,10 +45,10 @@ type ControlManager() =
                         this.ActivatedButton <- None)
 
     member private this.ProcessGridControls() =
-        this.GridControls
+        this.Canvas.Controls
         |> Seq.iter (fun gridControl ->
-            GridControl.IsLeftPressed gridControl |> ignore
-            GridControl.IsRightPressed gridControl |> ignore)
+            CanvasControl.IsLeftPressed gridControl |> ignore
+            CanvasControl.IsRightPressed gridControl |> ignore)
 
     member this.ReadInput() =
         this.ProcessButtons()
