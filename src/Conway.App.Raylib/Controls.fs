@@ -2,38 +2,77 @@ namespace Conway.App.Raylib
 
 open Raylib_cs
 
+type GridControl(x: int, y: int, size: int, onLeftClick: option<unit -> unit>, onRightClick: option<unit -> unit>) =
+    member val X = x with get, set
+
+    member val Y = y with get, set
+
+    member val Size = size with get, set
+
+    member val OnLeftClick = onLeftClick with get, set
+
+    member val OnRightClick = onRightClick with get, set
+
 type ControlManager() =
 
-    member val private ActivatedButtons: list<Button> = List.empty with get, set
+    member val private ActivatedButton: option<Button> = None with get, set
 
     member val Buttons = seq<Button> Seq.empty with get, set
+
+    member val GridControls = seq<GridControl> Seq.empty with get, set
 
     member this.AddButton(button: Button) =
         this.Buttons <- seq { button } |> Seq.append this.Buttons
 
-    member this.ReadInput() =
+    member this.AddGridControl(gridControl: GridControl) =
+        this.GridControls <- seq { gridControl } |> Seq.append this.GridControls
+
+    member private this.ProcessButtons() =
         this.Buttons
         |> Seq.iter (fun button ->
             match button.IsActive with
             | false -> ()
             | true ->
                 if Button.isClicked button then
-                    match button.OnClick with
-                    | Some callback -> callback ()
-                    | None -> ()
+                    this.ActivatedButton <- Some button
 
-                if not (this.ActivatedButtons |> List.contains button) then
+                match this.ActivatedButton with
+                | None ->
                     if Button.isPressed button then
-                        this.ActivatedButtons <- button :: this.ActivatedButtons
+                        this.ActivatedButton <- Some button
 
                         match button.OnPressAndHold with
                         | Some callback -> callback ()
                         | None -> ()
-                else
-                    ()
+                | Some pressedButton when pressedButton = button ->
+                    if Button.isPressed button then
+                        match button.OnPressAndHold with
+                        | Some callback -> callback ()
+                        | None -> ()
+                | Some _ -> ()
 
-                if Mouse.buttonIsUp MouseButton.Left then
-                    this.ActivatedButtons <- List.empty)
+                match this.ActivatedButton with
+                | None -> ()
+                | Some activatedButton ->
+                    if Button.isReleased activatedButton then
+                        this.ActivatedButton <- None)
+
+    member private this.ProcessGridControls() =
+        this.GridControls
+        |> Seq.iter (fun gridControl ->
+            if Mouse.readButtonPress MouseButton.Left then
+                match gridControl.OnLeftClick with
+                | None -> ()
+                | Some callback -> callback ()
+
+            if Mouse.readButtonPress MouseButton.Right then
+                match gridControl.OnRightClick with
+                | None -> ()
+                | Some callback -> callback ())
+
+    member this.ReadInput() =
+        this.ProcessButtons()
+        this.ProcessGridControls()
 
     member this.UpdateControls() =
         this.Buttons

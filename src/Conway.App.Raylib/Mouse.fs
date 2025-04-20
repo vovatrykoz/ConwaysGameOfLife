@@ -12,4 +12,7 @@ module Mouse =
 
     let buttonIsUp key = raylibTrue (Raylib.IsMouseButtonUp key)
 
+    let buttonHasBeenReleased key =
+        raylibTrue (Raylib.IsMouseButtonReleased key)
+
     let getPosition () = Raylib.GetMousePosition()

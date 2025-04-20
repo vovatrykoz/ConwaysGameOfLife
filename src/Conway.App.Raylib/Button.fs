@@ -66,6 +66,7 @@ type Button
                 && mousePos.X <= float32 maxX
                 && mousePos.Y >= float32 minY
                 && mousePos.Y <= float32 maxY
+                || button.IsPressed
             then
                 button.IsPressed <- true
                 button.IsPressed
@@ -98,3 +99,27 @@ type Button
         else
             button.IsClicked <- false
             button.IsClicked
+
+    static member internal isReleased(button: Button) =
+        if not (Mouse.buttonHasBeenReleased MouseButton.Left) then
+            false
+        else
+            let mousePos = Mouse.getPosition ()
+            let minX = button.X
+            let maxX = button.X + button.Size
+            let minY = button.Y
+            let maxY = button.Y + button.Size
+
+            if
+                mousePos.X >= float32 minX
+                && mousePos.X <= float32 maxX
+                && mousePos.Y >= float32 minY
+                && mousePos.Y <= float32 maxY
+            then
+                match button.OnClick with
+                | None -> ()
+                | Some callback -> callback ()
+
+                true
+            else
+                false
