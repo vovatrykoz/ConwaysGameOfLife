@@ -8,24 +8,31 @@ module Display =
         Raylib.InitWindow(800, 600, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) board =
+        Raylib.DrawRectangleLinesEx(
+            new Rectangle(float32 canvas.X, float32 canvas.Y, float32 canvas.Width, float32 canvas.Height),
+            2.0f,
+            Color.Black
+        )
+
         board
         |> Array2D.iteri (fun row col cell ->
             match cell with
             | BorderCell -> ()
             | PlayerCell playerCell ->
-                match playerCell.Status with
-                | Dead ->
-                    Draw.deadCell
-                        (col + canvas.DrawingAreaX)
-                        (row + canvas.DrawingAreaY)
-                        canvas.BaseCellSize
-                        canvas.BaseCellSize
-                | Alive ->
-                    Draw.livingCell
-                        (col + canvas.DrawingAreaX)
-                        (row + canvas.DrawingAreaY)
-                        canvas.BaseCellSize
-                        canvas.BaseCellSize)
+                let trueX = col + canvas.DrawingAreaX
+                let trueY = row + canvas.DrawingAreaY
+
+                if
+                    trueX * canvas.BaseCellSize < canvas.X
+                    || trueX * canvas.BaseCellSize >= canvas.X + canvas.Width
+                    || trueY * canvas.BaseCellSize < canvas.Y
+                    || trueY * canvas.BaseCellSize >= canvas.Y + canvas.Height
+                then
+                    ()
+                else
+                    match playerCell.Status with
+                    | Dead -> Draw.deadCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize
+                    | Alive -> Draw.livingCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize)
 
     let private renderControls (controls: ControlManager) =
         controls.Buttons

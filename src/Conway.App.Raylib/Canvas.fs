@@ -42,11 +42,16 @@ module private ControlsInitializer =
 
         controls
 
-type Canvas(x: int, y: int, game: Game, baseCellSize: int, scale: int) =
+type Canvas
+    (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, baseCellSize: int, scale: int) =
 
     member val X = x with get, set
 
     member val Y = y with get, set
+
+    member val Width = width with get, set
+
+    member val Height = height with get, set
 
     member val BaseCellSize = baseCellSize with get, set
 
@@ -54,9 +59,9 @@ type Canvas(x: int, y: int, game: Game, baseCellSize: int, scale: int) =
 
     member val Columns = game.State.Board |> Array2D.length2 with get
 
-    member val DrawingAreaX = x with get, set
+    member val DrawingAreaX = drawingX with get, set
 
-    member val DrawingAreaY = y with get, set
+    member val DrawingAreaY = drawingY with get, set
 
     member val Scale = scale with get, set
 

@@ -9,7 +9,7 @@ type ControlManager(game: Game) =
 
     member val Buttons = seq<Button> Seq.empty with get, set
 
-    member val Canvas = new Canvas(0, 0, game, 25, 1) with get, set
+    member val Canvas = new Canvas(25, 25, 525, 525, 0, 0, game, 25, 1) with get, set
 
     member val KeyActions = seq<KeyboardKey * (unit -> unit)> Seq.empty with get, set
 

@@ -26,13 +26,15 @@ type CanvasControl
 
     member val isActive = isActive with get, set
 
-    static member IsPressedWith(gridControl: CanvasControl, mouseButton: MouseButton, callback: option<unit -> unit>) =
+    static member IsPressedWith
+        (canvasControl: CanvasControl, mouseButton: MouseButton, callback: option<unit -> unit>)
+        =
         if Mouse.readButtonPress mouseButton then
             let mousePos = Mouse.getPosition ()
-            let minX = gridControl.X
-            let maxX = gridControl.X + gridControl.Width
-            let minY = gridControl.Y
-            let maxY = gridControl.Y + gridControl.Height
+            let minX = canvasControl.X
+            let maxX = canvasControl.X + canvasControl.Width
+            let minY = canvasControl.Y
+            let maxY = canvasControl.Y + canvasControl.Height
 
             if
                 mousePos.X >= float32 minX

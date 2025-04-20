@@ -3,10 +3,6 @@ namespace Conway.App.Raylib
 open Raylib_cs
 
 module Draw =
-    let private width = 25
-
-    let private height = 25
-
     let border x y width height color =
         Raylib.DrawRectangleLines(x * width, y * height, width, height, color)
 
