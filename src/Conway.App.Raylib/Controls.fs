@@ -63,7 +63,7 @@ type ControlManager() =
             match button.IsActive with
             | false -> ()
             | true ->
-                if Button.isClicked button then
+                if Button.isClicked button || Button.isShortcutPressed button then
                     this.ActivatedButton <- Some button
 
                 match this.ActivatedButton with
@@ -100,7 +100,7 @@ type ControlManager() =
     member this.UpdateControls() =
         this.Buttons
         |> Seq.iter (fun button ->
-            match button.Update with
+            match button.OnUpdate with
             | Some updateCallback -> updateCallback button
             | None -> ())
 

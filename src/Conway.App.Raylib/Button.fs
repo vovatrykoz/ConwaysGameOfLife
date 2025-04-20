@@ -12,7 +12,8 @@ type Button
         isVisible: bool,
         onClick: option<unit -> unit>,
         onPressAndHold: option<unit -> unit>,
-        update: option<Button -> unit>
+        onUpdate: option<Button -> unit>,
+        shortcut: seq<KeyboardKey>
     ) =
 
     let mutable isCurrentlyPressed = false
@@ -51,10 +52,32 @@ type Button
 
     member val OnPressAndHold = onPressAndHold with get, set
 
-    member val Update = update with get, set
+    member val OnUpdate = onUpdate with get, set
+
+    member val Shortcut = shortcut with get, set
+
+    static member isShortcutPressed(button: Button) =
+        let shortcutPressed =
+            not (button.Shortcut |> Seq.isEmpty)
+            && button.Shortcut |> Seq.forall (fun key -> Keyboard.readKeyPress key)
+
+        if shortcutPressed then
+            button.IsPressed <- true
+
+            match button.OnClick with
+            | None -> ()
+            | Some callback -> callback ()
+
+            button.IsPressed
+        else
+            button.IsPressed <- false
+            button.IsPressed
 
     static member internal isPressed(button: Button) =
-        if Mouse.readButtonPress MouseButton.Left then
+        let shortcutPressed =
+            button.Shortcut |> Seq.forall (fun key -> Keyboard.readKeyDown key)
+
+        if Mouse.readButtonPress MouseButton.Left || shortcutPressed then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
             let maxX = button.X + button.Size

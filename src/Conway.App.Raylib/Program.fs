@@ -69,11 +69,7 @@ let advanceBackOnce () =
     finally
         mutex.ReleaseMutex()
 
-let keysToProcess = [
-    Keyboard.readSpacePress, toggleGame
-    Keyboard.readRightArrowKey, advanceOnce
-    Keyboard.readLeftArrowKey, advanceBackOnce
-]
+let keysToProcess = []
 
 let update (button: Button) =
     try
@@ -129,19 +125,30 @@ let clearCallback () =
         mutex.ReleaseMutex()
 
 let toggleButton =
-    new Button(600, 300, 50, "", true, true, Some toggleGame, None, Some update)
+    new Button(600, 300, 50, "", true, true, Some toggleGame, None, Some update, seq { KeyboardKey.Space })
 
 let advanceButton =
-    new Button(700, 400, 50, "Next", true, true, Some advanceOnce, None, Some updateOnRun)
+    new Button(700, 400, 50, "Next", true, true, Some advanceOnce, None, Some updateOnRun, seq { KeyboardKey.Right })
 
 let advanceBackButton =
-    new Button(600, 400, 50, "Previous", true, true, Some advanceBackOnce, None, Some updateOnRunBack)
+    new Button(
+        600,
+        400,
+        50,
+        "Previous",
+        true,
+        true,
+        Some advanceBackOnce,
+        None,
+        Some updateOnRunBack,
+        seq { KeyboardKey.Left }
+    )
 
 let resetButton =
-    new Button(700, 500, 50, "Reset", true, true, Some resetCallback, None, None)
+    new Button(700, 500, 50, "Reset", true, true, Some resetCallback, None, None, Seq.empty)
 
 let clearButton =
-    new Button(600, 500, 50, "Clear", true, true, Some clearCallback, None, None)
+    new Button(600, 500, 50, "Clear", true, true, Some clearCallback, None, None, Seq.empty)
 
 let controlManager = new ControlManager()
 controlManager.AddButton toggleButton
