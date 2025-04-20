@@ -29,15 +29,14 @@ module private ControlsInitializer =
                         // erase the history since the player has altered the board
                         game.clearHistory ()
 
-                controls <- 
-                    (
-                        CanvasControl.create
-                        |> CanvasControl.position (col * width) (row * height)
-                        |> CanvasControl.width width
-                        |> CanvasControl.height height
-                        |> CanvasControl.onLeftClickCallback makeAliveCallback
-                        |> CanvasControl.onRightClickCallback makeDeadCallback
-                    ) :: controls)
+                controls <-
+                    (CanvasControl.create
+                     |> CanvasControl.position (col * width) (row * height)
+                     |> CanvasControl.width width
+                     |> CanvasControl.height height
+                     |> CanvasControl.onLeftClickCallback makeAliveCallback
+                     |> CanvasControl.onRightClickCallback makeDeadCallback)
+                    :: controls)
 
         controls |> List.toArray
 

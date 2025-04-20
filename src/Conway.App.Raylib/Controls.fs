@@ -11,10 +11,9 @@ type ControlManager(game: Game) =
 
     member val Canvas = new Canvas(25, 25, 525, 525, 0, 0, game, 25, 1) with get, set
 
-    member val KeyActions: list<KeyboardKey * (unit -> unit)>  = List.empty with get, set
+    member val KeyActions: list<KeyboardKey * (unit -> unit)> = List.empty with get, set
 
-    member this.AddButton(button: Button) =
-        this.Buttons <- button :: this.Buttons
+    member this.AddButton(button: Button) = this.Buttons <- button :: this.Buttons
 
     member this.AddButtons buttons =
         this.Buttons <- this.Buttons |> List.append buttons

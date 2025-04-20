@@ -120,12 +120,17 @@ type ConwayGrid = {
                         match cell with
                         | BorderCell -> return CalculationResult.create row col BorderCell
                         | PlayerCell playerCell ->
-                            return CalculationResult.create row col (ConwayGrid.processPlayerCell row col playerCell grid.Board)
+                            return
+                                CalculationResult.create
+                                    row
+                                    col
+                                    (ConwayGrid.processPlayerCell row col playerCell grid.Board)
                     }
         ]
         |> Async.Parallel
         |> Async.RunSynchronously
-        |> Array.iter (fun calculationResult -> grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
+        |> Array.iter (fun calculationResult ->
+            grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
 
     [<CompiledName("Previous")>]
     static member previous grid =
