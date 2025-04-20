@@ -265,13 +265,12 @@ module ``Grid tests`` =
         let expectedInitializerTwo i j =
             ``expected array after the second iteration``[i][j]
 
-        let actual = ConwayGrid.init 3 3 setupInitializer
-        ConwayGrid.next actual
+        let actual = ConwayGrid.init 3 3 setupInitializer |> ConwayGrid.next
         let expectedBoardOne = ConwayGrid.init 3 3 expectedInitializerOne
 
         Assert.That(actual, Is.EqualTo expectedBoardOne)
 
-        ConwayGrid.next actual
+        let actual = ConwayGrid.next actual
         let expectedBoardTwo = ConwayGrid.init 3 3 expectedInitializerTwo
 
         Assert.That(actual, Is.EqualTo expectedBoardTwo)

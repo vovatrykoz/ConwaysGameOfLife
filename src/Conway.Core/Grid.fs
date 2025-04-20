@@ -136,26 +136,40 @@ type ConwayGrid = {
         |> Array.iter (fun calculationResult ->
             grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
 
+        grid
+
     [<CompiledName("Previous")>]
     static member previous grid =
-        let newBoard =
-            grid.Board
-            |> Array2D.map (fun cell ->
-                task {
-                    match cell with
-                    | BorderCell -> return BorderCell
-                    | PlayerCell playerCell ->
-                        let previousState, otherMemories = Stack.tryPop playerCell.Memory
+        let rows = Array2D.length1 grid.Board
+        let cols = Array2D.length2 grid.Board
 
-                        match previousState with
-                        | None -> return PlayerCell playerCell
-                        | Some state ->
-                            return
-                                PlayerCell {
-                                    Status = state
-                                    Memory = otherMemories
-                                }
-                })
-            |> Array2D.map (fun task -> task.Result)
+        [
+            for row in 0 .. rows - 1 do
+                for col in 0 .. cols - 1 ->
+                    async {
+                        let cell = grid.Board[row, col]
 
-        { grid with Board = newBoard }
+                        match cell with
+                        | BorderCell -> return CalculationResult.create row col BorderCell
+                        | PlayerCell playerCell ->
+                            let previousState, otherMemories = Stack.tryPop playerCell.Memory
+
+                            match previousState with
+                            | None -> return CalculationResult.create row col (PlayerCell playerCell)
+                            | Some state ->
+                                return
+                                    CalculationResult.create
+                                        row
+                                        col
+                                        (PlayerCell {
+                                            Status = state
+                                            Memory = otherMemories
+                                        })
+                    }
+        ]
+        |> Async.Parallel
+        |> Async.RunSynchronously
+        |> Array.iter (fun calculationResult ->
+            grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
+
+        grid

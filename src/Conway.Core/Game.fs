@@ -37,11 +37,11 @@ type Game(initialState: ConwayGrid) =
         match mode with
         | Infinite ->
             while true do
-                ConwayGrid.next this.State
+                this.State <- ConwayGrid.next this.State
                 this.Generation <- this.Generation + 1
         | Limited steps ->
             for _ = 1 to steps do
-                ConwayGrid.next this.State
+                this.State <- ConwayGrid.next this.State
                 this.Generation <- this.Generation + 1
         | Paused -> ()
 
@@ -50,7 +50,7 @@ type Game(initialState: ConwayGrid) =
 
     [<CompiledName("StepBack")>]
     member this.stepBack() =
-        this.State <- ConwayGrid.previous this.State
+        ConwayGrid.previous this.State |> ignore
 
         if this.Generation > 1 then
             this.Generation <- this.Generation - 1
