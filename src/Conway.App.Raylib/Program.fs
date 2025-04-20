@@ -116,7 +116,7 @@ let clearCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- Preset.deadPreset |> ConwayGrid.initFromPreset
+        | Paused -> game.State <- ConwayGrid.createDead 101 101
 
         game.clearHistory ()
     finally

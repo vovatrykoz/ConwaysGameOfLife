@@ -23,7 +23,7 @@ type ControlManager(game: Game) =
 
     member private this.ProcessButtons() =
         this.Buttons
-        |> Seq.iter (fun button ->
+        |> List.iter (fun button ->
             match button.IsActive with
             | false -> ()
             | true ->
@@ -53,7 +53,7 @@ type ControlManager(game: Game) =
 
     member private this.ProcessKeyActions() =
         this.KeyActions
-        |> Seq.iter (fun (key, action) ->
+        |> List.iter (fun (key, action) ->
             if Keyboard.readKeyPress key then
                 action ())
 
@@ -64,7 +64,7 @@ type ControlManager(game: Game) =
 
     member this.UpdateControls() =
         this.Buttons
-        |> Seq.iter (fun button ->
+        |> List.iter (fun button ->
             match button.OnUpdate with
             | Some updateCallback -> updateCallback button
             | None -> ())

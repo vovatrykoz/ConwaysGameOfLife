@@ -67,7 +67,7 @@ type Canvas
 
     member this.ProcessControls() =
         this.Controls
-        |> Seq.iter (fun canvasControl ->
+        |> Array.iter (fun canvasControl ->
             let offsetX = this.DrawingAreaX * this.BaseCellSize
             let offsetY = this.DrawingAreaY * this.BaseCellSize
 
