@@ -3,8 +3,8 @@ open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
 
-let gridWidth = 5001
-let gridHeight = 5001
+let gridWidth = 1001
+let gridHeight = 1001
 
 let windowWidth = 1920
 
