@@ -2,9 +2,11 @@
 open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
-open System.Threading
 
-let startingState = ConwayGrid.createDead 1001 1001
+let width = 2001
+let height = 2001
+
+let startingState = ConwayGrid.createDead width height
 
 let game = new Game(startingState)
 
@@ -76,7 +78,7 @@ let resetCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- ConwayGrid.createDead 1001 1001
+        | Paused -> game.State <- ConwayGrid.createDead width height
 
         game.clearHistory ())
 
@@ -85,7 +87,7 @@ let clearCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- ConwayGrid.createDead 1001 1001
+        | Paused -> game.State <- ConwayGrid.createDead width height
 
         game.clearHistory ())
 
@@ -149,9 +151,12 @@ gameRunningState |> gameUpdateLoop |> Async.Start
 
 Display.init ()
 
+let renderTexture = Raylib.LoadRenderTexture(width, height)
+
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.render game controlManager
+    Display.render game controlManager renderTexture
 
+Raylib.UnloadRenderTexture(renderTexture)
 Display.close ()

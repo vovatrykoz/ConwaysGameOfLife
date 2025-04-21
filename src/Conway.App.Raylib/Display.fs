@@ -2,8 +2,14 @@ namespace Conway.App.Raylib
 
 open Conway.Core
 open Raylib_cs
+open System.Numerics
 
 module Display =
+    let posVec = Vector2(0.0f, 0.0f)
+
+    let textureFlipRec width height =
+        Rectangle(posVec, Vector2(width, -height))
+
     let init () =
         Raylib.InitWindow(800, 600, "Conway's game of life")
 
@@ -43,14 +49,18 @@ module Display =
 
     let private renderGenerationCounter generation = Draw.textBox $"Generation {generation}"
 
-    let render (game: Game) (controls: ControlManager) =
-        Raylib.BeginDrawing()
-        Raylib.ClearBackground Color.White
+    let render (game: Game) (controls: ControlManager) texture =
+        Raylib.BeginTextureMode(texture)
 
         renderBoardOnCanvas controls.Canvas (ConwayGrid.board game.State)
+
+        Raylib.EndTextureMode()
+        
+        Raylib.BeginDrawing()       
+        Raylib.ClearBackground Color.White
         renderControls controls
         renderGenerationCounter game.Generation
-
+        Raylib.DrawTextureRec(texture.Texture, textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height), posVec, Color.White)
         Raylib.EndDrawing()
 
     let close () = Raylib.CloseWindow()
