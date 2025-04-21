@@ -35,5 +35,5 @@ module Draw =
                 Color.Black
             )
 
-    let textBox (text: string) =
-        Raylib.DrawText(text, 600, 50, 24, Color.Black)
+    let textBox x y fontSize (text: string) =
+        Raylib.DrawText(text, x, y, fontSize, Color.Black)

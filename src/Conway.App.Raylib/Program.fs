@@ -3,10 +3,14 @@ open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
 
-let width = 1001
-let height = 1001
+let gridWidth = 1001
+let gridHeight = 1001
 
-let startingState = ConwayGrid.createDead width height
+let windowWidth = 1920
+
+let windowHeight = 1080
+
+let startingState = ConwayGrid.createDead gridWidth gridHeight
 
 let game = new Game(startingState)
 
@@ -18,7 +22,7 @@ let mutable gameRunningState = Paused
 
 let rec gameUpdateLoop state =
     async {
-        do! Async.Sleep 100
+        do! Async.Sleep 34
 
         withLock (fun _ ->
             match gameRunningState with
@@ -78,7 +82,7 @@ let resetCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- ConwayGrid.createDead width height
+        | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
 
         game.clearHistory ())
 
@@ -87,13 +91,13 @@ let clearCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- ConwayGrid.createDead width height
+        | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
 
         game.clearHistory ())
 
 let toggleButton =
     Button.create
-    |> Button.position 600 300
+    |> Button.position (windowWidth - 200) (windowHeight - 300)
     |> Button.size 50
     |> Button.onClickCallback toggleGame
     |> Button.onUpdateCallback update
@@ -101,7 +105,7 @@ let toggleButton =
 
 let advanceButton =
     Button.create
-    |> Button.position 700 400
+    |> Button.position (windowWidth - 100) (windowHeight - 200)
     |> Button.size 50
     |> Button.text "Next"
     |> Button.onClickCallback advanceOnce
@@ -110,7 +114,7 @@ let advanceButton =
 
 let advanceBackButton =
     Button.create
-    |> Button.position 600 400
+    |> Button.position (windowWidth - 200) (windowHeight - 200)
     |> Button.size 50
     |> Button.text "Previous"
     |> Button.onClickCallback advanceBackOnce
@@ -119,7 +123,7 @@ let advanceBackButton =
 
 let resetButton =
     Button.create
-    |> Button.position 700 500
+    |> Button.position (windowWidth - 100) (windowHeight - 100)
     |> Button.size 50
     |> Button.text "Reset"
     |> Button.onClickCallback resetCallback
@@ -127,7 +131,7 @@ let resetButton =
 
 let clearButton =
     Button.create
-    |> Button.position 600 500
+    |> Button.position (windowWidth - 200) (windowHeight - 100)
     |> Button.size 50
     |> Button.text "Clear"
     |> Button.onClickCallback clearCallback
@@ -149,14 +153,14 @@ controlManager.KeyActions <- keyboardActions
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
-Display.init ()
+Display.init windowWidth windowHeight
 
-let renderTexture = Raylib.LoadRenderTexture(width, height)
+let renderTexture = Raylib.LoadRenderTexture(windowWidth - 300, windowHeight - 50)
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     controlManager.ReadInput()
     controlManager.UpdateControls()
     Display.render game controlManager renderTexture
 
-Raylib.UnloadRenderTexture(renderTexture)
+Raylib.UnloadRenderTexture renderTexture
 Display.close ()

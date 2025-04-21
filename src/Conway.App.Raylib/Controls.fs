@@ -9,7 +9,7 @@ type ControlManager(game: Game) =
 
     member val Buttons: list<Button> = List.empty with get, set
 
-    member val Canvas = new Canvas(25, 25, 525, 525, 0, 0, game, 25, 1) with get, set
+    member val Canvas = new Canvas(25, 25, 1920 - 300, 1080 - 50, 0, 0, game, 25, 1) with get, set
 
     member val KeyActions: list<KeyboardKey * (unit -> unit)> = List.empty with get, set
 

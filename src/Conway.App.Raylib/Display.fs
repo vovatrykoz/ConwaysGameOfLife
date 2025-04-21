@@ -10,8 +10,9 @@ module Display =
     let textureFlipRec width height =
         Rectangle(posVec, Vector2(width, -height))
 
-    let init () =
-        Raylib.InitWindow(800, 600, "Conway's game of life")
+    let init width height =
+        Raylib.SetConfigFlags ConfigFlags.FullscreenMode
+        Raylib.InitWindow(width, height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) board =
         Raylib.DrawRectangleLinesEx(
@@ -47,20 +48,29 @@ module Display =
             | true -> Draw.button button
             | false -> ())
 
-    let private renderGenerationCounter generation = Draw.textBox $"Generation {generation}"
+    let private renderGenerationCounter generation =
+        Draw.textBox 1680 50 24 $"Generation {generation}"
 
     let render (game: Game) (controls: ControlManager) texture =
-        Raylib.BeginTextureMode(texture)
-
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.Blank
         renderBoardOnCanvas controls.Canvas (ConwayGrid.board game.State)
 
         Raylib.EndTextureMode()
-        
-        Raylib.BeginDrawing()       
+
+        Raylib.BeginDrawing()
         Raylib.ClearBackground Color.White
+
         renderControls controls
         renderGenerationCounter game.Generation
-        Raylib.DrawTextureRec(texture.Texture, textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height), posVec, Color.White)
+
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
+
         Raylib.EndDrawing()
 
     let close () = Raylib.CloseWindow()
