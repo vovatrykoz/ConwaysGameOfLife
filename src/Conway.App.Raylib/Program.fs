@@ -3,8 +3,8 @@ open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
 
-let width = 2001
-let height = 2001
+let width = 1001
+let height = 1001
 
 let startingState = ConwayGrid.createDead width height
 
