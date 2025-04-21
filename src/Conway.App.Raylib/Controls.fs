@@ -7,7 +7,7 @@ type ControlManager(game: Game) =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
-    member val Buttons: list<Button> = List.empty with get, set
+    member val Buttons: List<Button> = List.empty with get, set
 
     member val Canvas = new Canvas(25, 25, 1920 - 300, 1080 - 50, 0, 0, game, 25, 1) with get, set
 

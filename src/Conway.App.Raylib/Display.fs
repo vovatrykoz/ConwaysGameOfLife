@@ -21,29 +21,32 @@ module Display =
             Color.Black
         )
 
-        board
-        |> Array2D.iteri (fun row col cell ->
-            match cell with
-            | BorderCell -> ()
-            | PlayerCell playerCell ->
-                let trueX = col + canvas.DrawingAreaX
-                let trueY = row + canvas.DrawingAreaY
+        let rows = (board |> Array2D.length1) - 2
+        let cols = (board |> Array2D.length2) - 2
 
-                if
-                    trueX * canvas.BaseCellSize < canvas.X
-                    || trueX * canvas.BaseCellSize >= canvas.X + canvas.Width
-                    || trueY * canvas.BaseCellSize < canvas.Y
-                    || trueY * canvas.BaseCellSize >= canvas.Y + canvas.Height
-                then
-                    ()
-                else
-                    match playerCell.Status with
-                    | Dead -> Draw.deadCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize
-                    | Alive -> Draw.livingCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize)
+        for row in 1 .. rows do
+            for col in 1 .. cols do
+                match board[row, col] with
+                | BorderCell -> ()
+                | PlayerCell playerCell ->
+                    let trueX = col + canvas.DrawingAreaX
+                    let trueY = row + canvas.DrawingAreaY
+
+                    if
+                        trueX * canvas.BaseCellSize < canvas.X
+                        || trueX * canvas.BaseCellSize >= canvas.X + canvas.Width
+                        || trueY * canvas.BaseCellSize < canvas.Y
+                        || trueY * canvas.BaseCellSize >= canvas.Y + canvas.Height
+                    then
+                        ()
+                    else
+                        match playerCell.Status with
+                        | Dead -> Draw.deadCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize
+                        | Alive -> Draw.livingCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize
 
     let private renderControls (controls: ControlManager) =
         controls.Buttons
-        |> Seq.iter (fun button ->
+        |> List.iter (fun button ->
             match button.IsVisible with
             | true -> Draw.button button
             | false -> ())
