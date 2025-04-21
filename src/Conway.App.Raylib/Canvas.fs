@@ -22,23 +22,23 @@ module private ControlsInitializer =
             game.clearHistory ()
 
     let initFrom (game: Game) width height =
-        let mutable controls: list<CanvasControl> = List.empty
+        let board = game.State |> ConwayGrid.board
+        let rows = board |> Array2D.length1
+        let cols = board |> Array2D.length2
+        let total = rows * cols
+        let controls: array<CanvasControl> = 
+            Array.init total (fun i -> 
+                let row = i / rows
+                let col = i % rows
 
-        ConwayGrid.board game.State
-        |> Array2D.iteri (fun row col cellType ->
-            match cellType with
-            | BorderCell -> ()
-            | PlayerCell _ ->
-                controls <-
-                    (CanvasControl.create
-                     |> CanvasControl.position (col * width) (row * height)
-                     |> CanvasControl.width width
-                     |> CanvasControl.height height
-                     |> CanvasControl.onLeftClickCallback (makeAliveCallback row col game)
-                     |> CanvasControl.onRightClickCallback (makeDeadCallback row col game))
-                    :: controls)
+                CanvasControl.create
+                |> CanvasControl.position (col * width) (row * height)
+                |> CanvasControl.width width
+                |> CanvasControl.height height
+                |> CanvasControl.onLeftClickCallback (makeAliveCallback row col game)
+                |> CanvasControl.onRightClickCallback (makeDeadCallback row col game))
 
-        controls |> List.toArray
+        controls
 
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, baseCellSize: int, scale: int) =
