@@ -1,29 +1,17 @@
 namespace Conway.Core
 
 open System.Collections.Generic
+open System.Threading.Tasks
 
 [<Struct; NoComparison>]
 type GridCellType =
     | BorderCell
     | PlayerCell of Cell
 
-[<Struct; NoComparison>]
-type private CalculationResult = {
-    Row: int
-    Column: int
-    CellType: GridCellType
-} with
-
-    static member create row col cellType = {
-        Row = row
-        Column = col
-        CellType = cellType
-    }
-
 [<NoComparison>]
 type ConwayGrid = private {
-    Board: GridCellType[,]
-    Buffer: GridCellType[,]
+    Buffers: GridCellType[,][]
+    mutable ActiveBufferIndex: int
     Memory: Stack<GridCellType[,]>
 } with
 
@@ -36,7 +24,7 @@ type ConwayGrid = private {
                 else
                     PlayerCell Cell.dead)
 
-        { Board = initArr (); Buffer = initArr (); Memory = new Stack<GridCellType[,]>() }
+        { Buffers = [| initArr (); initArr () |]; ActiveBufferIndex = 0; Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("CreateLiving")>]
     static member createLiving width height =
@@ -47,7 +35,7 @@ type ConwayGrid = private {
                 else
                     PlayerCell Cell.living)
 
-        { Board = initArr (); Buffer = initArr (); Memory = new Stack<GridCellType[,]>() }
+        { Buffers = [| initArr (); initArr () |]; ActiveBufferIndex = 0; Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("Init")>]
     static member init width height initializer =
@@ -58,12 +46,12 @@ type ConwayGrid = private {
                 else
                     PlayerCell(initializer (i - 1) (j - 1)))
 
-        { Board = initArr (); Buffer = initArr (); Memory = new Stack<GridCellType[,]>()  }
+        { Buffers = [| initArr (); initArr () |]; ActiveBufferIndex = 0; Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
 
-    static member board grid = grid.Board
+    static member board grid = grid.Buffers[grid.ActiveBufferIndex]
 
     [<CompiledName("CollectNeighbors")>]
     static member private collectNeighbors row col (board: GridCellType array2d) = [|
@@ -101,26 +89,27 @@ type ConwayGrid = private {
 
     [<CompiledName("Next")>]
     static member next(grid: ConwayGrid) =
-        let rows = Array2D.length1 grid.Board
-        let cols = Array2D.length2 grid.Board
+        let activeIndex = grid.ActiveBufferIndex
+        let passiveIndex = (activeIndex + 1) % grid.Buffers.Length
+        let rows = Array2D.length1 grid.Buffers[activeIndex]
+        let cols = Array2D.length2 grid.Buffers[activeIndex]
 
-        for row in 0 .. rows - 1 do
+        Parallel.For(0, rows, fun row ->
             for col in 0 .. cols - 1 do
-                grid.Buffer[row, col] <-
-                    match grid.Board[row, col] with
+                grid.Buffers[passiveIndex][row, col] <-
+                    match grid.Buffers[activeIndex][row, col] with
                     | BorderCell -> BorderCell
-                    | PlayerCell playerCell -> PlayerCell (ConwayGrid.processPlayerCell row col playerCell grid.Board)
+                    | PlayerCell playerCell -> PlayerCell (ConwayGrid.processPlayerCell row col playerCell grid.Buffers[activeIndex])
+        ) |> ignore
 
-        for row in 0 .. rows - 1 do
-            for col in 0 .. cols - 1 do
-                grid.Board[row, col] <- grid.Buffer[row, col]
+        grid.ActiveBufferIndex <- passiveIndex
 
         grid
 
     [<CompiledName("Previous")>]
     static member previous grid =
-        let rows = Array2D.length1 grid.Board
-        let cols = Array2D.length2 grid.Board
+        let rows = Array2D.length1 grid.Buffers[grid.ActiveBufferIndex]
+        let cols = Array2D.length2 grid.Buffers[grid.ActiveBufferIndex]
 
         if grid.Memory.Count <= 0 then
             grid
@@ -129,7 +118,6 @@ type ConwayGrid = private {
 
             for row in 0 .. rows - 1 do
                 for col in 0 .. cols - 1 do
-                    grid.Board[row, col] <- previousState[row, col]
-
+                    grid.Buffers[grid.ActiveBufferIndex][row, col] <- previousState[row, col]
 
             grid
