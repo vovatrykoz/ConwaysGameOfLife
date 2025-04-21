@@ -29,36 +29,36 @@ type ConwayGrid = private {
 
     [<CompiledName("CreateDead")>]
     static member createDead width height =
-        let initArr =
+        let initArr () =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
                     PlayerCell Cell.dead)
 
-        { Board = initArr; Buffer = initArr; Memory = new Stack<GridCellType[,]>() }
+        { Board = initArr (); Buffer = initArr (); Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("CreateLiving")>]
     static member createLiving width height =
-        let initArr =
+        let initArr () =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
                     PlayerCell Cell.living)
 
-        { Board = initArr; Buffer = initArr; Memory = new Stack<GridCellType[,]>() }
+        { Board = initArr (); Buffer = initArr (); Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("Init")>]
     static member init width height initializer =
-        let initArr =
+        let initArr () =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
                     BorderCell
                 else
                     PlayerCell(initializer (i - 1) (j - 1)))
 
-        { Board = initArr; Buffer = initArr; Memory = new Stack<GridCellType[,]>()  }
+        { Board = initArr (); Buffer = initArr (); Memory = new Stack<GridCellType[,]>()  }
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
@@ -66,7 +66,7 @@ type ConwayGrid = private {
     static member board grid = grid.Board
 
     [<CompiledName("CollectNeighbors")>]
-    static member private collectNeighbors row col (board: GridCellType array2d) = [
+    static member private collectNeighbors row col (board: GridCellType array2d) = [|
         board.[row - 1, col - 1]
         board.[row - 1, col]
         board.[row - 1, col + 1]
@@ -75,23 +75,22 @@ type ConwayGrid = private {
         board.[row + 1, col - 1]
         board.[row + 1, col]
         board.[row + 1, col + 1]
-    ]
+    |]
 
     [<CompiledName("CountLivingNeighbors")>]
-    static member private countLivingNeighbors row col (board: GridCellType array2d) =
+    static member private countLivingNeighbors row col board =
         board
         |> ConwayGrid.collectNeighbors row col
-        |> List.filter (fun neighbor ->
+        |> Array.fold (fun acc neighbor ->
             match neighbor with
-            | BorderCell -> false
+            | BorderCell -> acc
             | PlayerCell cell ->
                 match cell.Status with
-                | Dead -> false
-                | Alive -> true)
-        |> List.length
+                | Dead -> acc
+                | Alive -> acc + 1) 0
 
     [<CompiledName("ProcessPlayerCell")>]
-    static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
+    static member private processPlayerCell row col currentCell board =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
@@ -111,6 +110,10 @@ type ConwayGrid = private {
                     match grid.Board[row, col] with
                     | BorderCell -> BorderCell
                     | PlayerCell playerCell -> PlayerCell (ConwayGrid.processPlayerCell row col playerCell grid.Board)
+
+        for row in 0 .. rows - 1 do
+            for col in 0 .. cols - 1 do
+                grid.Board[row, col] <- grid.Buffer[row, col]
 
         grid
 

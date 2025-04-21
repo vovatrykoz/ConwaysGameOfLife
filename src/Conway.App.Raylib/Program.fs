@@ -164,7 +164,7 @@ let clearButton =
     |> Button.onClickCallback clearCallback
     |> Button.onUpdateCallback updateOnRun
 
-let buttons = [ toggleButton; advanceButton; advanceBackButton; resetButton; clearButton ]
+let buttons = [ toggleButton; advanceButton; resetButton; clearButton ]
 
 let controlManager = new ControlManager(game)
 controlManager.AddButtons buttons
