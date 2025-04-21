@@ -1,7 +1,5 @@
 namespace Conway.Core
 
-open System.Threading
-
 type GameMode =
     | Infinite
     | Limited of int

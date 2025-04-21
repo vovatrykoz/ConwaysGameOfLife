@@ -24,7 +24,11 @@ type ConwayGrid = private {
                 else
                     PlayerCell Cell.dead)
 
-        { Buffers = [| initArr (); initArr () |]; ActiveBufferIndex = 0; Memory = new Stack<GridCellType[,]>() }
+        {
+            Buffers = [| initArr (); initArr () |]
+            ActiveBufferIndex = 0
+            Memory = new Stack<GridCellType[,]>()
+        }
 
     [<CompiledName("CreateLiving")>]
     static member createLiving width height =
@@ -35,7 +39,11 @@ type ConwayGrid = private {
                 else
                     PlayerCell Cell.living)
 
-        { Buffers = [| initArr (); initArr () |]; ActiveBufferIndex = 0; Memory = new Stack<GridCellType[,]>() }
+        {
+            Buffers = [| initArr (); initArr () |]
+            ActiveBufferIndex = 0
+            Memory = new Stack<GridCellType[,]>()
+        }
 
     [<CompiledName("Init")>]
     static member init width height initializer =
@@ -46,7 +54,11 @@ type ConwayGrid = private {
                 else
                     PlayerCell(initializer (i - 1) (j - 1)))
 
-        { Buffers = [| initArr (); initArr () |]; ActiveBufferIndex = 0; Memory = new Stack<GridCellType[,]>() }
+        {
+            Buffers = [| initArr (); initArr () |]
+            ActiveBufferIndex = 0
+            Memory = new Stack<GridCellType[,]>()
+        }
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
@@ -69,13 +81,15 @@ type ConwayGrid = private {
     static member private countLivingNeighbors row col board =
         board
         |> ConwayGrid.collectNeighbors row col
-        |> Array.fold (fun acc neighbor ->
-            match neighbor with
-            | BorderCell -> acc
-            | PlayerCell cell ->
-                match cell.Status with
-                | Dead -> acc
-                | Alive -> acc + 1) 0
+        |> Array.fold
+            (fun acc neighbor ->
+                match neighbor with
+                | BorderCell -> acc
+                | PlayerCell cell ->
+                    match cell.Status with
+                    | Dead -> acc
+                    | Alive -> acc + 1)
+            0
 
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell board =
@@ -94,13 +108,18 @@ type ConwayGrid = private {
         let rows = Array2D.length1 grid.Buffers[activeIndex]
         let cols = Array2D.length2 grid.Buffers[activeIndex]
 
-        Parallel.For(0, rows, fun row ->
-            for col in 0 .. cols - 1 do
-                grid.Buffers[passiveIndex][row, col] <-
-                    match grid.Buffers[activeIndex][row, col] with
-                    | BorderCell -> BorderCell
-                    | PlayerCell playerCell -> PlayerCell (ConwayGrid.processPlayerCell row col playerCell grid.Buffers[activeIndex])
-        ) |> ignore
+        Parallel.For(
+            1,
+            rows - 1,
+            fun row ->
+                for col in 1 .. cols - 2 do
+                    grid.Buffers[passiveIndex][row, col] <-
+                        match grid.Buffers[activeIndex][row, col] with
+                        | BorderCell -> BorderCell
+                        | PlayerCell playerCell ->
+                            PlayerCell(ConwayGrid.processPlayerCell row col playerCell grid.Buffers[activeIndex])
+        )
+        |> ignore
 
         grid.ActiveBufferIndex <- passiveIndex
 
@@ -114,7 +133,7 @@ type ConwayGrid = private {
         if grid.Memory.Count <= 0 then
             grid
         else
-            let previousState = grid.Memory.Pop();
+            let previousState = grid.Memory.Pop()
 
             for row in 0 .. rows - 1 do
                 for col in 0 .. cols - 1 do

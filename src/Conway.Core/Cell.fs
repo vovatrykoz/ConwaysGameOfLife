@@ -1,7 +1,5 @@
 ﻿namespace Conway.Core
 
-open System.Collections.Generic
-
 [<Struct>]
 type CellStatus =
     | Alive
@@ -13,14 +11,10 @@ type Cell = {
 } with
 
     [<CompiledName("Living")>]
-    static member living = {
-        Status = Alive
-    }
+    static member living = { Status = Alive }
 
     [<CompiledName("Dead")>]
-    static member dead = {
-        Status = Dead
-    }
+    static member dead = { Status = Dead }
 
     [<CompiledName("Create")>]
     static member create status = { Status = status }
