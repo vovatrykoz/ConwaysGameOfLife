@@ -10,23 +10,20 @@ type CellStatus =
 [<Struct; NoComparison>]
 type Cell = {
     Status: CellStatus
-    Memory: Stack<CellStatus>
 } with
 
     [<CompiledName("Living")>]
     static member living = {
         Status = Alive
-        Memory = new Stack<CellStatus>()
     }
 
     [<CompiledName("Dead")>]
     static member dead = {
         Status = Dead
-        Memory = new Stack<CellStatus>()
     }
 
     [<CompiledName("Create")>]
-    static member create status memory = { Status = status; Memory = memory }
+    static member create status = { Status = status }
 
     [<CompiledName("IsAlive")>]
     static member isAlive cell = cell.Status = Alive

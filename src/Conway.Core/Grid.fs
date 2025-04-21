@@ -1,5 +1,7 @@
 namespace Conway.Core
 
+open System.Collections.Generic
+
 [<Struct; NoComparison>]
 type GridCellType =
     | BorderCell
@@ -22,6 +24,7 @@ type private CalculationResult = {
 type ConwayGrid = private {
     Board: GridCellType[,]
     Buffer: GridCellType[,]
+    Memory: Stack<GridCellType[,]>
 } with
 
     [<CompiledName("CreateDead")>]
@@ -33,7 +36,7 @@ type ConwayGrid = private {
                 else
                     PlayerCell Cell.dead)
 
-        { Board = initArr; Buffer = initArr }
+        { Board = initArr; Buffer = initArr; Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("CreateLiving")>]
     static member createLiving width height =
@@ -44,7 +47,7 @@ type ConwayGrid = private {
                 else
                     PlayerCell Cell.living)
 
-        { Board = initArr; Buffer = initArr }
+        { Board = initArr; Buffer = initArr; Memory = new Stack<GridCellType[,]>() }
 
     [<CompiledName("Init")>]
     static member init width height initializer =
@@ -55,7 +58,7 @@ type ConwayGrid = private {
                 else
                     PlayerCell(initializer (i - 1) (j - 1)))
 
-        { Board = initArr; Buffer = initArr }
+        { Board = initArr; Buffer = initArr; Memory = new Stack<GridCellType[,]>()  }
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
@@ -90,13 +93,12 @@ type ConwayGrid = private {
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell (board: GridCellType array2d) =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
-        currentCell.Memory.Push currentCell.Status
 
         match livingNeighborsCount with
-        | x when x < 2 -> Cell.create Dead currentCell.Memory
-        | x when x = 2 -> Cell.create currentCell.Status currentCell.Memory
-        | x when x = 3 -> Cell.create Alive currentCell.Memory
-        | _ -> Cell.create Dead currentCell.Memory
+        | x when x < 2 -> Cell.create Dead
+        | x when x = 2 -> Cell.create currentCell.Status
+        | x when x = 3 -> Cell.create Alive
+        | _ -> Cell.create Dead
 
     [<CompiledName("Next")>]
     static member next(grid: ConwayGrid) =
@@ -110,9 +112,6 @@ type ConwayGrid = private {
                     | BorderCell -> BorderCell
                     | PlayerCell playerCell -> PlayerCell (ConwayGrid.processPlayerCell row col playerCell grid.Board)
 
-        grid.Buffer
-        |> Array2D.iteri (fun row col value -> grid.Board[row, col] <- value)
-
         grid
 
     [<CompiledName("Previous")>]
@@ -120,37 +119,14 @@ type ConwayGrid = private {
         let rows = Array2D.length1 grid.Board
         let cols = Array2D.length2 grid.Board
 
-        [
+        if grid.Memory.Count <= 0 then
+            grid
+        else
+            let previousState = grid.Memory.Pop();
+
             for row in 0 .. rows - 1 do
-                for col in 0 .. cols - 1 ->
-                    async {
-                        let cell = grid.Board[row, col]
+                for col in 0 .. cols - 1 do
+                    grid.Board[row, col] <- previousState[row, col]
 
-                        match cell with
-                        | BorderCell -> return CalculationResult.create row col BorderCell
-                        | PlayerCell playerCell ->
-                            let previousState =
-                                if playerCell.Memory.Count <= 0 then
-                                    None
-                                else
-                                    Some(playerCell.Memory.Pop())
 
-                            match previousState with
-                            | None -> return CalculationResult.create row col (PlayerCell playerCell)
-                            | Some state ->
-                                return
-                                    CalculationResult.create
-                                        row
-                                        col
-                                        (PlayerCell {
-                                            Status = state
-                                            Memory = playerCell.Memory
-                                        })
-                    }
-        ]
-        |> Async.Parallel
-        |> Async.RunSynchronously
-        |> Array.iter (fun calculationResult ->
-            grid.Board[calculationResult.Row, calculationResult.Column] <- calculationResult.CellType)
-
-        grid
+            grid

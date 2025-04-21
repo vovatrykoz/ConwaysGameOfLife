@@ -56,20 +56,7 @@ type Game(initialState: ConwayGrid) =
             this.Generation <- this.Generation - 1
 
     [<CompiledName("ClearHistory")>]
-    member this.clearHistory() = this.Generation <- 1
+    member this.clearHistory() = this.State.Memory.Clear()
 
     [<CompiledName("HasMemoryLoss")>]
-    member this.hasMemoryLoss() =
-        let mutable memoryLossPresent = false
-
-        for i in 0 .. (Array2D.length1 this.State.Board - 1) do
-            for j in 0 .. (Array2D.length2 this.State.Board - 1) do
-                match this.State.Board[i, j] with
-                | PlayerCell playerCell ->
-                    if playerCell.Memory.Count <= 0 then
-                        memoryLossPresent <- true
-                    else
-                        ()
-                | BorderCell -> ()
-
-        memoryLossPresent
+    member this.hasMemoryLoss() = this.State.Memory.Count <= 0
