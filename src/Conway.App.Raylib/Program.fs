@@ -14,7 +14,7 @@ let mutable gameRunningState = Paused
 
 let rec gameUpdateLoop state =
     async {
-        do! Async.Sleep 500
+        do! Async.Sleep 100
 
         try
             mutex.WaitOne() |> ignore
@@ -102,7 +102,7 @@ let resetCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- startingState
+        | Paused -> game.State <- ConwayGrid.createDead 1001 1001
 
         game.clearHistory ()
 
@@ -116,7 +116,7 @@ let clearCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- ConwayGrid.createDead 101 101
+        | Paused -> game.State <- ConwayGrid.createDead 1001 1001
 
         game.clearHistory ()
     finally

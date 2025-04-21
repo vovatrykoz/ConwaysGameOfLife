@@ -56,7 +56,9 @@ type Game(initialState: ConwayGrid) =
             this.Generation <- this.Generation - 1
 
     [<CompiledName("ClearHistory")>]
-    member this.clearHistory() = this.State.Memory.Clear()
+    member this.clearHistory() =
+        this.Generation <- 1
+        this.State.Memory.Clear()
 
     [<CompiledName("HasMemoryLoss")>]
     member this.hasMemoryLoss() = this.State.Memory.Count <= 0
