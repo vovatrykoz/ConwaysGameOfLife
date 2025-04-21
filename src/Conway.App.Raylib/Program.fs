@@ -8,7 +8,9 @@ let startingState = ConwayGrid.createDead 1001 1001
 
 let game = new Game(startingState)
 
-let mutex = new Mutex()
+let mainSync = obj ()
+
+let withLock f = lock mainSync f
 
 let mutable gameRunningState = Paused
 
@@ -16,9 +18,7 @@ let rec gameUpdateLoop state =
     async {
         do! Async.Sleep 100
 
-        try
-            mutex.WaitOne() |> ignore
-
+        withLock (fun _ ->
             match gameRunningState with
             | Infinite -> game.runOneStep ()
             | Limited x when x > 1 ->
@@ -27,67 +27,43 @@ let rec gameUpdateLoop state =
             | Limited _ ->
                 game.runOneStep ()
                 gameRunningState <- Paused
-            | Paused -> ()
-        finally
-            mutex.ReleaseMutex()
+            | Paused -> ())
 
         return! gameUpdateLoop state
     }
 
 let toggleGame () =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         gameRunningState <-
             match gameRunningState with
             | Paused -> Infinite
-            | _ -> Paused
-    finally
-        mutex.ReleaseMutex()
+            | _ -> Paused)
 
 let advanceOnce () =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.runOneStep ()
-
-    finally
-        mutex.ReleaseMutex()
+        | Paused -> game.runOneStep ())
 
 let advanceBackOnce () =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.stepBack ()
-
-    finally
-        mutex.ReleaseMutex()
+        | Paused -> game.stepBack ())
 
 let update (button: Button) =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         match gameRunningState with
         | Paused -> button.Text <- "Run"
-        | _ -> button.Text <- "Pause"
-    finally
-        mutex.ReleaseMutex()
+        | _ -> button.Text <- "Pause")
 
 let updateOnRun (button: Button) =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         match gameRunningState with
         | Paused -> button.IsActive <- true
-        | _ -> button.IsActive <- false
-    finally
-        mutex.ReleaseMutex()
+        | _ -> button.IsActive <- false)
 
 let updateOnRunBack (button: Button) =
     updateOnRun button
@@ -96,31 +72,22 @@ let updateOnRunBack (button: Button) =
         button.IsActive <- false
 
 let resetCallback () =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead 1001 1001
 
-        game.clearHistory ()
-
-    finally
-        mutex.ReleaseMutex()
+        game.clearHistory ())
 
 let clearCallback () =
-    try
-        mutex.WaitOne() |> ignore
-
+    withLock (fun _ ->
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead 1001 1001
 
-        game.clearHistory ()
-    finally
-        mutex.ReleaseMutex()
+        game.clearHistory ())
 
 let toggleButton =
     Button.create

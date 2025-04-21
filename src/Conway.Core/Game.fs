@@ -12,21 +12,13 @@ type Game(initialState: ConwayGrid) =
 
     let mutable generation = 1
 
-    member val private mutex = new Mutex()
+    member val private internalLock = obj ()
+
+    member private this.WithLock f = lock this.internalLock f
 
     member this.State
-        with get () =
-            try
-                this.mutex.WaitOne() |> ignore
-                internalState
-            finally
-                this.mutex.ReleaseMutex()
-        and set newState =
-            try
-                this.mutex.WaitOne() |> ignore
-                internalState <- newState
-            finally
-                this.mutex.ReleaseMutex()
+        with get () = this.WithLock(fun _ -> internalState)
+        and set newState = this.WithLock(fun _ -> internalState <- newState)
 
     member _.Generation
         with get () = generation
