@@ -5,6 +5,7 @@ namespace Conway.Core
 /// </summary>
 [<Struct>]
 type CellStatus =
+
     /// <summary>
     /// Indicates that the cell is alive.
     /// </summary>
@@ -20,6 +21,7 @@ type CellStatus =
 /// </summary>
 [<Struct; NoComparison>]
 type Cell = {
+
     /// <summary>
     /// The current status of the cell (alive or dead).
     /// </summary>

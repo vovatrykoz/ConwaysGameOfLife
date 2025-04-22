@@ -26,8 +26,9 @@ module private ControlsInitializer =
         let rows = board |> Array2D.length1
         let cols = board |> Array2D.length2
         let total = rows * cols
-        let controls: array<CanvasControl> = 
-            Array.init total (fun i -> 
+
+        let controls: array<CanvasControl> =
+            Array.init total (fun i ->
                 let row = i / rows
                 let col = i % rows
 
@@ -66,25 +67,37 @@ type Canvas
     member val Controls = ControlsInitializer.initFrom game baseCellSize baseCellSize with get, set
 
     member this.ProcessControls() =
-        this.Controls
-        |> Array.iter (fun canvasControl ->
-            let offsetX = this.DrawingAreaX * this.BaseCellSize
-            let offsetY = this.DrawingAreaY * this.BaseCellSize
+        let offsetX = this.DrawingAreaX * this.BaseCellSize
+        let offsetY = this.DrawingAreaY * this.BaseCellSize
 
-            let trueX = canvasControl.X + offsetX
-            let trueY = canvasControl.Y + offsetY
+        let activeWidth =
+            min ((this.Width - offsetX) / this.BaseCellSize) (this.Width / this.BaseCellSize)
 
-            if
-                trueX < this.X
-                || trueX >= this.X + this.Width
-                || trueY < this.Y
-                || trueY >= this.Y + this.Height
-            then
-                ()
-            else
-                CanvasControl.IsLeftPressed(canvasControl, offsetX, offsetY) |> ignore
+        let activeHeight =
+            min ((this.Height - offsetY) / this.BaseCellSize) (this.Height / this.BaseCellSize)
 
-                CanvasControl.IsRightPressed(canvasControl, offsetX, offsetY) |> ignore)
+        let startX = max (1 - this.DrawingAreaX) 1
+        let startY = max (1 - this.DrawingAreaY) 1
+        let endX = startX + activeWidth
+        let endY = startY + activeHeight
+
+        for row in startY..endY do
+            for col in startX..endX do
+                let canvasControl = this.Controls[row * this.Columns + col]
+                let trueX = canvasControl.X + offsetX
+                let trueY = canvasControl.Y + offsetY
+
+                if
+                    trueX < this.X
+                    || trueX >= this.X + this.Width
+                    || trueY < this.Y
+                    || trueY >= this.Y + this.Height
+                then
+                    ()
+                else
+                    CanvasControl.IsLeftPressed(canvasControl, offsetX, offsetY) |> ignore
+
+                    CanvasControl.IsRightPressed(canvasControl, offsetX, offsetY) |> ignore
 
     member this.MoveCameraRight() =
         this.DrawingAreaX <- this.DrawingAreaX - 1
