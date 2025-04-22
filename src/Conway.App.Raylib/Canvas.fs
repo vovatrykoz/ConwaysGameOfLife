@@ -4,23 +4,21 @@ open Conway.Core
 open Raylib_cs
 
 module private CanvasArea =
-    let makeAliveCallback row col (game: Game) =
-        fun _ ->
-            match (ConwayGrid.board game.State)[row, col] with
-            | BorderCell -> ()
-            | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.living
+    let makeAlive row col (game: Game) =
+        match (ConwayGrid.board game.State)[row, col] with
+        | BorderCell -> ()
+        | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.living
 
-            // erase the history since the player has altered the board
-            game.clearHistory ()
+        // erase the history since the player has altered the board
+        game.clearHistory ()
 
-    let makeDeadCallback row col (game: Game) =
-        fun _ ->
-            match (ConwayGrid.board game.State)[row, col] with
-            | BorderCell -> ()
-            | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.dead
+    let makeDead row col (game: Game) =
+        match (ConwayGrid.board game.State)[row, col] with
+        | BorderCell -> ()
+        | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.dead
 
-            // erase the history since the player has altered the board
-            game.clearHistory ()
+        // erase the history since the player has altered the board
+        game.clearHistory ()
 
     let IsPressedWith
         (x: int)
@@ -30,7 +28,6 @@ module private CanvasArea =
         (mouseButton: MouseButton)
         (offsetX: int)
         (offsetY: int)
-        (callback: unit -> unit)
         =
         if Mouse.readButtonPress mouseButton then
             let trueX = x + offsetX
@@ -49,7 +46,6 @@ module private CanvasArea =
                 && mousePos.Y >= float32 minY
                 && mousePos.Y <= float32 maxY
             then
-                callback ()
                 true
             else
                 false
@@ -63,9 +59,8 @@ module private CanvasArea =
         (height: int)
         (offsetX: int)
         (offsetY: int)
-        (callback: unit -> unit)
         =
-        IsPressedWith x y width height MouseButton.Left offsetX offsetY callback
+        IsPressedWith x y width height MouseButton.Left offsetX offsetY
 
     let IsRightPressed
         (x: int)
@@ -74,9 +69,8 @@ module private CanvasArea =
         (height: int)
         (offsetX: int)
         (offsetY: int)
-        (callback: unit -> unit)
         =
-        IsPressedWith x y width height MouseButton.Right offsetX offsetY callback
+        IsPressedWith x y width height MouseButton.Right offsetX offsetY
 
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, cellSize: int, scale: int) =
@@ -128,25 +122,11 @@ type Canvas
                 let width = this.CellSize
                 let height = this.CellSize
 
-                CanvasArea.IsLeftPressed
-                    x
-                    y
-                    width
-                    height
-                    offsetX
-                    offsetY
-                    (CanvasArea.makeAliveCallback row col this.Game)
-                |> ignore
+                if CanvasArea.IsLeftPressed x y width height offsetX offsetY then 
+                    CanvasArea.makeAlive row col this.Game
 
-                CanvasArea.IsRightPressed
-                    x
-                    y
-                    width
-                    height
-                    offsetX
-                    offsetY
-                    (CanvasArea.makeDeadCallback row col this.Game)
-                |> ignore
+                if CanvasArea.IsRightPressed x y width height offsetX offsetY then
+                    CanvasArea.makeAlive row col this.Game
 
     member this.MoveCameraRight() =
         this.DrawingAreaX <- this.DrawingAreaX - 1
