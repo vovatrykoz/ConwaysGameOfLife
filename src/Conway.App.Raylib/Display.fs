@@ -14,18 +14,17 @@ module Display =
         Raylib.SetConfigFlags ConfigFlags.FullscreenMode
         Raylib.InitWindow(width, height, "Conway's game of life")
 
-    let private renderBoardOnCanvas (canvas: Canvas) board =
+    let private renderBoardOnCanvas (canvas: Canvas) (board: GridCellType[,]) =
         Raylib.DrawRectangleLinesEx(
             new Rectangle(float32 canvas.X, float32 canvas.Y, float32 canvas.Width, float32 canvas.Height),
             2.0f,
             Color.Black
         )
 
-        let rows = (board |> Array2D.length1) - 2
-        let cols = (board |> Array2D.length2) - 2
+        let startX, startY, endX, endY = canvas.CalculateVisibleRange()
 
-        for row in 1 .. rows do
-            for col in 1 .. cols do
+        for row in startY..endY do
+            for col in startX..endX do
                 match board[row, col] with
                 | BorderCell -> ()
                 | PlayerCell playerCell ->

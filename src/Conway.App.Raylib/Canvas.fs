@@ -66,7 +66,7 @@ type Canvas
 
     member val Controls = ControlsInitializer.initFrom game baseCellSize baseCellSize with get, set
 
-    member this.ProcessControls() =
+    member this.CalculateVisibleRange() =
         let offsetX = this.DrawingAreaX * this.BaseCellSize
         let offsetY = this.DrawingAreaY * this.BaseCellSize
 
@@ -80,6 +80,13 @@ type Canvas
         let startY = max (1 - this.DrawingAreaY) 1
         let endX = startX + activeWidth
         let endY = startY + activeHeight
+
+        startX, startY, endX, endY
+
+    member this.ProcessControls() =
+        let offsetX = this.DrawingAreaX * this.BaseCellSize
+        let offsetY = this.DrawingAreaY * this.BaseCellSize
+        let startX, startY, endX, endY = this.CalculateVisibleRange()
 
         for row in startY..endY do
             for col in startX..endX do
