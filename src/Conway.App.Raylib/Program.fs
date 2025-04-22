@@ -2,15 +2,59 @@
 open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
+open System
 
-let gridWidth = 1001
-let gridHeight = 1001
+let defaultGridWidth = 1001
+let defaultGridHeight = 1001
+
+let args = Environment.GetCommandLineArgs()
+
+let gridWidth =
+    if Array.length args >= 2 then
+        try
+            let result = int args[1]
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid width to: {result}")
+            result
+        with _ ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {defaultGridWidth}")
+            defaultGridWidth
+    else
+        Raylib.TraceLog(
+            TraceLogLevel.Info,
+            $"No width value provided. Setting the grid to the default width value: {defaultGridWidth}"
+        )
+
+        defaultGridWidth
+
+let gridHeight =
+    if Array.length args = 3 then
+        try
+            let result = int args[2]
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
+            result
+        with _ ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
+
+            defaultGridHeight
+    else
+        Raylib.TraceLog(
+            TraceLogLevel.Info,
+            $"No height value provided. Setting the grid to the default height value: {defaultGridHeight}"
+        )
+
+        defaultGridHeight
 
 let windowWidth = 1920
 
 let windowHeight = 1080
 
-let startingState = ConwayGrid.createDead gridWidth gridHeight
+// 1 in 5 odds that a cell is living
+let oddsOfGettingLivingCell = 5
+
+let startingState =
+    ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
 
 let game = new Game(startingState)
 
