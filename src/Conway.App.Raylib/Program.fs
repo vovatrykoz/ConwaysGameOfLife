@@ -139,7 +139,32 @@ let clearButton =
 
 let buttons = [ toggleButton; advanceButton; resetButton; clearButton ]
 
-let controlManager = new ControlManager(game)
+let canvasX = 25
+let canvasY = 25
+let cellSize = 25
+
+let widthOffset = cellSize * 12
+let heightOffset = cellSize * 2
+
+let focusAreaX = 500
+let focusAreaY = 500
+
+let scale = 1
+
+let canvas =
+    new Canvas(
+        canvasX,
+        canvasY,
+        windowWidth - widthOffset,
+        windowHeight - heightOffset,
+        focusAreaX,
+        focusAreaY,
+        game,
+        cellSize,
+        scale
+    )
+
+let controlManager = new ControlManager(canvas)
 controlManager.AddButtons buttons
 
 let keyboardActions = [
@@ -155,7 +180,7 @@ gameRunningState |> gameUpdateLoop |> Async.Start
 
 Display.init windowWidth windowHeight
 
-let renderTexture = Raylib.LoadRenderTexture(windowWidth - 300, windowHeight - 50)
+let renderTexture = Raylib.LoadRenderTexture(canvas.Width, canvas.Height)
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     controlManager.ReadInput()

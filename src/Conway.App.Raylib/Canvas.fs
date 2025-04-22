@@ -79,7 +79,7 @@ module private CanvasArea =
         IsPressedWith x y width height MouseButton.Right offsetX offsetY callback
 
 type Canvas
-    (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, baseCellSize: int, scale: int) =
+    (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, cellSize: int, scale: int) =
 
     member val X = x with get, set
 
@@ -89,27 +89,25 @@ type Canvas
 
     member val Height = height with get, set
 
-    member val BaseCellSize = baseCellSize with get, set
+    member val CellSize = cellSize with get, set
 
-    member val Rows = ConwayGrid.board game.State |> Array2D.length1 with get
+    member val Game = game with get, set
 
-    member val Columns = ConwayGrid.board game.State |> Array2D.length2 with get
+    member val DrawingAreaX = -drawingX with get, set
 
-    member val DrawingAreaX = drawingX with get, set
-
-    member val DrawingAreaY = drawingY with get, set
+    member val DrawingAreaY = -drawingY with get, set
 
     member val Scale = scale with get, set
 
     member this.CalculateVisibleRange() =
-        let offsetX = this.DrawingAreaX * this.BaseCellSize
-        let offsetY = this.DrawingAreaY * this.BaseCellSize
+        let offsetX = this.DrawingAreaX * this.CellSize
+        let offsetY = this.DrawingAreaY * this.CellSize
 
         let activeWidth =
-            min ((this.Width - offsetX) / this.BaseCellSize) (this.Width / this.BaseCellSize)
+            min ((this.Width - offsetX) / this.CellSize) (this.Width / this.CellSize)
 
         let activeHeight =
-            min ((this.Height - offsetY) / this.BaseCellSize) (this.Height / this.BaseCellSize)
+            min ((this.Height - offsetY) / this.CellSize) (this.Height / this.CellSize)
 
         let startX = max (1 - this.DrawingAreaX) 1
         let startY = max (1 - this.DrawingAreaY) 1
@@ -119,16 +117,16 @@ type Canvas
         startX, startY, endX, endY
 
     member this.ProcessControls() =
-        let offsetX = this.DrawingAreaX * this.BaseCellSize
-        let offsetY = this.DrawingAreaY * this.BaseCellSize
+        let offsetX = this.DrawingAreaX * this.CellSize
+        let offsetY = this.DrawingAreaY * this.CellSize
         let startX, startY, endX, endY = this.CalculateVisibleRange()
 
         for row in startY..endY do
             for col in startX..endX do
-                let x = col * this.BaseCellSize
-                let y = row * this.BaseCellSize
-                let width = this.BaseCellSize
-                let height = this.BaseCellSize
+                let x = col * this.CellSize
+                let y = row * this.CellSize
+                let width = this.CellSize
+                let height = this.CellSize
                 let trueX = x + offsetX
                 let trueY = y + offsetY
 
@@ -147,7 +145,7 @@ type Canvas
                         height
                         offsetX
                         offsetY
-                        (CanvasArea.makeAliveCallback row col game)
+                        (CanvasArea.makeAliveCallback row col this.Game)
                     |> ignore
 
                     CanvasArea.IsRightPressed
@@ -157,7 +155,7 @@ type Canvas
                         height
                         offsetX
                         offsetY
-                        (CanvasArea.makeDeadCallback row col game)
+                        (CanvasArea.makeDeadCallback row col this.Game)
                     |> ignore
 
     member this.MoveCameraRight() =

@@ -32,16 +32,16 @@ module Display =
                     let trueY = row + canvas.DrawingAreaY
 
                     if
-                        trueX * canvas.BaseCellSize < canvas.X
-                        || trueX * canvas.BaseCellSize >= canvas.X + canvas.Width
-                        || trueY * canvas.BaseCellSize < canvas.Y
-                        || trueY * canvas.BaseCellSize >= canvas.Y + canvas.Height
+                        trueX * canvas.CellSize < canvas.X
+                        || trueX * canvas.CellSize >= canvas.X + canvas.Width
+                        || trueY * canvas.CellSize < canvas.Y
+                        || trueY * canvas.CellSize >= canvas.Y + canvas.Height
                     then
                         ()
                     else
                         match playerCell.Status with
-                        | Dead -> Draw.deadCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize
-                        | Alive -> Draw.livingCell trueX trueY canvas.BaseCellSize canvas.BaseCellSize
+                        | Dead -> Draw.deadCell trueX trueY canvas.CellSize canvas.CellSize
+                        | Alive -> Draw.livingCell trueX trueY canvas.CellSize canvas.CellSize
 
     let private renderControls (controls: ControlManager) =
         controls.Buttons

@@ -3,13 +3,13 @@ namespace Conway.App.Raylib
 open Conway.Core
 open Raylib_cs
 
-type ControlManager(game: Game) =
+type ControlManager(canvas: Canvas) =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
-    member val Buttons: List<Button> = List.empty with get, set
+    member val Buttons: list<Button> = List.empty with get, set
 
-    member val Canvas = new Canvas(25, 25, 1920 - 300, 1080 - 50, 0, 0, game, 25, 1) with get, set
+    member val Canvas = canvas with get, set
 
     member val KeyActions: list<KeyboardKey * (unit -> unit)> = List.empty with get, set
 
