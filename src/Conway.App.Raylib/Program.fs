@@ -3,6 +3,7 @@ open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
 open System
+open System.Threading
 
 let windowWidth = 1920
 
@@ -62,62 +63,83 @@ let startingState =
 
 let game = new Game(startingState)
 
-let mainSync = obj ()
-
-let withLock f = lock mainSync f
+let mainLock = new ReaderWriterLockSlim()
 
 let mutable gameRunningState = Paused
 
-let rec gameUpdateLoop state =
+let rec gameUpdateLoop () =
     async {
         do! Async.Sleep 34
 
-        withLock (fun _ ->
-            match gameRunningState with
-            | Infinite -> game.runOneStep ()
-            | Limited x when x > 1 ->
-                game.runOneStep ()
-                gameRunningState <- Limited(x - 1)
-            | Limited _ ->
-                game.runOneStep ()
-                gameRunningState <- Paused
-            | Paused -> ())
+        let mutable shouldRun = false
 
-        return! gameUpdateLoop state
+        try
+            mainLock.EnterWriteLock()
+            shouldRun <-
+                match gameRunningState with
+                | Infinite -> true
+                | Limited x when x > 1 ->
+                    gameRunningState <- Limited(x - 1)
+                    true
+                | Limited _ ->
+                    gameRunningState <- Paused
+                    true
+                | Paused -> false
+        finally
+            mainLock.ExitWriteLock()
+
+        if shouldRun then game.runOneStep ()
+
+        return! gameUpdateLoop ()
     }
 
 let toggleGame () =
-    withLock (fun _ ->
-        gameRunningState <-
-            match gameRunningState with
-            | Paused -> Infinite
-            | _ -> Paused)
+        try
+            mainLock.EnterWriteLock ()
+            gameRunningState <-
+                match gameRunningState with
+                | Paused -> Infinite
+                | _ -> Paused
+        finally
+            mainLock.ExitWriteLock ()
 
 let advanceOnce () =
-    withLock (fun _ ->
+    try
+        mainLock.EnterReadLock()
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.runOneStep ())
+        | Paused -> game.runOneStep ()
+    finally
+        mainLock.ExitReadLock()
 
 let advanceBackOnce () =
-    withLock (fun _ ->
+    try
+        mainLock.EnterReadLock()
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.stepBack ())
+        | Paused -> game.stepBack ()
+    finally
+        mainLock.ExitReadLock()
 
 let update (button: Button) =
-    withLock (fun _ ->
+    try
+        mainLock.EnterReadLock()
         match gameRunningState with
         | Paused -> button.Text <- "Run"
-        | _ -> button.Text <- "Pause")
+        | _ -> button.Text <- "Pause"
+    finally
+        mainLock.ExitReadLock()
 
 let updateOnRun (button: Button) =
-    withLock (fun _ ->
+    try
+        mainLock.EnterReadLock()
         match gameRunningState with
         | Paused -> button.IsActive <- true
-        | _ -> button.IsActive <- false)
+        | _ -> button.IsActive <- false
+    finally
+        mainLock.ExitReadLock()
 
 let updateOnRunBack (button: Button) =
     updateOnRun button
@@ -126,22 +148,26 @@ let updateOnRunBack (button: Button) =
         button.IsActive <- false
 
 let resetCallback () =
-    withLock (fun _ ->
+    try
+        mainLock.EnterReadLock()
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
-
-        game.clearHistory ())
+        game.clearHistory ()
+    finally
+        mainLock.ExitReadLock()
 
 let clearCallback () =
-    withLock (fun _ ->
+    try
+        mainLock.EnterReadLock()
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
-
-        game.clearHistory ())
+        game.clearHistory ()
+    finally
+        mainLock.ExitReadLock()
 
 let toggleButton =
     Button.create
@@ -226,7 +252,7 @@ let keyboardActions = [|
 
 controlManager.KeyActions.AddRange keyboardActions
 
-gameRunningState |> gameUpdateLoop |> Async.Start
+gameUpdateLoop () |> Async.Start
 
 let renderTexture = Raylib.LoadRenderTexture(canvas.Width, canvas.Height)
 

@@ -15,8 +15,8 @@ type Game(initialState: ConwayGrid) =
     member private this.WithLock f = lock this.internalLock f
 
     member this.State
-        with get () = this.WithLock(fun _ -> internalState)
-        and set newState = this.WithLock(fun _ -> internalState <- newState)
+        with get () = internalState
+        and set newState = internalState <- newState
 
     member _.Generation
         with get () = generation
