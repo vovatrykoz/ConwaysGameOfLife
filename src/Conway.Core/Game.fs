@@ -10,10 +10,6 @@ type Game(initialState: ConwayGrid) =
 
     let mutable generation = 1
 
-    member val private internalLock = obj ()
-
-    member private this.WithLock f = lock this.internalLock f
-
     member this.State
         with get () = internalState
         and set newState = internalState <- newState
