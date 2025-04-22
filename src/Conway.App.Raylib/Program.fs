@@ -67,6 +67,7 @@ let mainLock = new ReaderWriterLockSlim()
 
 let mutable gameRunningState = Paused
 
+[<TailCall>]
 let rec gameUpdateLoop () =
     async {
         do! Async.Sleep 34
