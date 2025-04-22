@@ -1,8 +1,9 @@
 namespace Conway.App.Raylib
 
 open Conway.Core
+open Raylib_cs
 
-module private ControlsInitializer =
+module private CanvasArea =
     let makeAliveCallback row col (game: Game) =
         fun _ ->
             match (ConwayGrid.board game.State)[row, col] with
@@ -21,25 +22,61 @@ module private ControlsInitializer =
             // erase the history since the player has altered the board
             game.clearHistory ()
 
-    let initFrom (game: Game) width height =
-        let board = game.State |> ConwayGrid.board
-        let rows = board |> Array2D.length1
-        let cols = board |> Array2D.length2
-        let total = rows * cols
+    let IsPressedWith
+        (x: int)
+        (y: int)
+        (width: int)
+        (height: int)
+        (mouseButton: MouseButton)
+        (offsetX: int)
+        (offsetY: int)
+        (callback: unit -> unit)
+        =
+        if Mouse.readButtonPress mouseButton then
+            let trueX = x + offsetX
+            let trueY = y + offsetY
 
-        let controls: array<CanvasControl> =
-            Array.init total (fun i ->
-                let row = i / rows
-                let col = i % rows
+            let minX = trueX
+            let maxX = trueX + width
+            let minY = trueY
+            let maxY = trueY + height
 
-                CanvasControl.create
-                |> CanvasControl.position (col * width) (row * height)
-                |> CanvasControl.width width
-                |> CanvasControl.height height
-                |> CanvasControl.onLeftClickCallback (makeAliveCallback row col game)
-                |> CanvasControl.onRightClickCallback (makeDeadCallback row col game))
+            let mousePos = Mouse.getPosition ()
 
-        controls
+            if
+                mousePos.X >= float32 minX
+                && mousePos.X <= float32 maxX
+                && mousePos.Y >= float32 minY
+                && mousePos.Y <= float32 maxY
+            then
+                callback ()
+                true
+            else
+                false
+        else
+            false
+
+    let IsLeftPressed
+        (x: int)
+        (y: int)
+        (width: int)
+        (height: int)
+        (offsetX: int)
+        (offsetY: int)
+        (callback: unit -> unit)
+        =
+        IsPressedWith x y width height MouseButton.Left offsetX offsetY callback
+
+    let IsRightPressed
+        (x: int)
+        (y: int)
+        (width: int)
+        (height: int)
+        (offsetX: int)
+        (offsetY: int)
+        (callback: unit -> unit)
+        =
+        IsPressedWith x y width height MouseButton.Right offsetX offsetY callback
 
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, baseCellSize: int, scale: int) =
@@ -63,8 +100,6 @@ type Canvas
     member val DrawingAreaY = drawingY with get, set
 
     member val Scale = scale with get, set
-
-    member val Controls = ControlsInitializer.initFrom game baseCellSize baseCellSize with get, set
 
     member this.CalculateVisibleRange() =
         let offsetX = this.DrawingAreaX * this.BaseCellSize
@@ -90,9 +125,12 @@ type Canvas
 
         for row in startY..endY do
             for col in startX..endX do
-                let canvasControl = this.Controls[row * this.Columns + col]
-                let trueX = canvasControl.X + offsetX
-                let trueY = canvasControl.Y + offsetY
+                let x = col * this.BaseCellSize
+                let y = row * this.BaseCellSize
+                let width = this.BaseCellSize
+                let height = this.BaseCellSize
+                let trueX = x + offsetX
+                let trueY = y + offsetY
 
                 if
                     trueX < this.X
@@ -102,9 +140,25 @@ type Canvas
                 then
                     ()
                 else
-                    CanvasControl.IsLeftPressed(canvasControl, offsetX, offsetY) |> ignore
+                    CanvasArea.IsLeftPressed
+                        x
+                        y
+                        width
+                        height
+                        offsetX
+                        offsetY
+                        (CanvasArea.makeAliveCallback row col game)
+                    |> ignore
 
-                    CanvasControl.IsRightPressed(canvasControl, offsetX, offsetY) |> ignore
+                    CanvasArea.IsRightPressed
+                        x
+                        y
+                        width
+                        height
+                        offsetX
+                        offsetY
+                        (CanvasArea.makeDeadCallback row col game)
+                    |> ignore
 
     member this.MoveCameraRight() =
         this.DrawingAreaX <- this.DrawingAreaX - 1

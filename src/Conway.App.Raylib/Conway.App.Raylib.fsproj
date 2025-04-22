@@ -9,7 +9,7 @@
     <Compile Include="Keyboard.fs" />
     <Compile Include="Mouse.fs" />
     <Compile Include="Button.fs" />
-    <Compile Include="GridControl.fs" />
+    
     <Compile Include="Canvas.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
