@@ -34,7 +34,7 @@ let gridHeight =
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
             result
         with _ ->
-            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[2]}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
 
             defaultGridHeight
