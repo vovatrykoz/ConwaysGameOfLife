@@ -114,12 +114,12 @@ type Canvas
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
-        startX, startY, endX, endY
+        struct (startX, startY, endX, endY)
 
     member this.ProcessControls() =
         let offsetX = this.DrawingAreaX * this.CellSize
         let offsetY = this.DrawingAreaY * this.CellSize
-        let startX, startY, endX, endY = this.CalculateVisibleRange()
+        let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
 
         for row in startY..endY do
             for col in startX..endX do

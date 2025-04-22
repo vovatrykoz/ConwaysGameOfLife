@@ -21,7 +21,7 @@ module Display =
             Color.Black
         )
 
-        let startX, startY, endX, endY = canvas.CalculateVisibleRange()
+        let struct (startX, startY, endX, endY) = canvas.CalculateVisibleRange()
 
         for row in startY..endY do
             for col in startX..endX do
