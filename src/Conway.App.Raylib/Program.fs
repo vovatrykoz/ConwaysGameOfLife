@@ -216,6 +216,8 @@ let keyboardActions = [|
     KeyboardKey.A, controlManager.Canvas.MoveCameraLeft
     KeyboardKey.S, controlManager.Canvas.MoveCameraDown
     KeyboardKey.D, controlManager.Canvas.MoveCameraRight
+    KeyboardKey.Z, controlManager.Canvas.ZoomIn
+    KeyboardKey.X, controlManager.Canvas.ZoomOut
 |]
 
 controlManager.KeyActions.AddRange keyboardActions

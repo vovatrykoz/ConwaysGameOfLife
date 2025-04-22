@@ -169,3 +169,7 @@ type Canvas
 
     member this.MoveCameraDown() =
         this.DrawingAreaY <- this.DrawingAreaY - 1
+
+    member this.ZoomIn() = this.CellSize <- this.CellSize + 5
+
+    member this.ZoomOut() = this.CellSize <- this.CellSize - 5
