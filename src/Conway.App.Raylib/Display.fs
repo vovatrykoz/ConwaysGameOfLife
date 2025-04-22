@@ -52,6 +52,15 @@ module Display =
     let private renderGenerationCounter generation =
         Draw.textBox 1680 50 24 $"Generation {generation}"
 
+    let loadingScreen x y =
+        for _ in 0..10 do
+            Raylib.BeginDrawing()
+            Raylib.ClearBackground Color.White
+
+            Draw.textBox x y 48 "Loading..."
+
+            Raylib.EndDrawing()
+
     let render (game: Game) (controls: ControlManager) texture =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.Blank

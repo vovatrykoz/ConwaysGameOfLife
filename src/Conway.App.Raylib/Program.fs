@@ -4,6 +4,14 @@ open Conway.App.Raylib.Aliases
 open Raylib_cs
 open System
 
+let windowWidth = 1920
+
+let windowHeight = 1080
+
+Display.init windowWidth windowHeight
+
+Display.loadingScreen (windowWidth / 2) (windowHeight / 2)
+
 let defaultGridWidth = 1001
 let defaultGridHeight = 1001
 
@@ -45,10 +53,6 @@ let gridHeight =
         )
 
         defaultGridHeight
-
-let windowWidth = 1920
-
-let windowHeight = 1080
 
 // 1 in 5 odds that a cell is living
 let oddsOfGettingLivingCell = 5
@@ -223,8 +227,6 @@ let keyboardActions = [|
 controlManager.KeyActions.AddRange keyboardActions
 
 gameRunningState |> gameUpdateLoop |> Async.Start
-
-Display.init windowWidth windowHeight
 
 let renderTexture = Raylib.LoadRenderTexture(canvas.Width, canvas.Height)
 
