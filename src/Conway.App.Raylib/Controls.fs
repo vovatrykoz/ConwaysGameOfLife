@@ -60,7 +60,7 @@ type ControlManager(canvas: Canvas) =
     member this.ReadInput() =
         this.ProcessButtons()
         this.ProcessKeyActions()
-        this.Canvas.ProcessControls()
+        this.Canvas.ProcessDrawableArea()
 
     member this.UpdateControls() =
         this.Buttons

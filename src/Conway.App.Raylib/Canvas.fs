@@ -116,7 +116,7 @@ type Canvas
 
         struct (startX, startY, endX, endY)
 
-    member this.ProcessControls() =
+    member this.ProcessDrawableArea() =
         let offsetX = this.DrawingAreaX * this.CellSize
         let offsetY = this.DrawingAreaY * this.CellSize
         let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
