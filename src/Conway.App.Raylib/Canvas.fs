@@ -127,36 +127,26 @@ type Canvas
                 let y = row * this.CellSize
                 let width = this.CellSize
                 let height = this.CellSize
-                let trueX = x + offsetX
-                let trueY = y + offsetY
 
-                if
-                    trueX < this.X
-                    || trueX >= this.X + this.Width
-                    || trueY < this.Y
-                    || trueY >= this.Y + this.Height
-                then
-                    ()
-                else
-                    CanvasArea.IsLeftPressed
-                        x
-                        y
-                        width
-                        height
-                        offsetX
-                        offsetY
-                        (CanvasArea.makeAliveCallback row col this.Game)
-                    |> ignore
+                CanvasArea.IsLeftPressed
+                    x
+                    y
+                    width
+                    height
+                    offsetX
+                    offsetY
+                    (CanvasArea.makeAliveCallback row col this.Game)
+                |> ignore
 
-                    CanvasArea.IsRightPressed
-                        x
-                        y
-                        width
-                        height
-                        offsetX
-                        offsetY
-                        (CanvasArea.makeDeadCallback row col this.Game)
-                    |> ignore
+                CanvasArea.IsRightPressed
+                    x
+                    y
+                    width
+                    height
+                    offsetX
+                    offsetY
+                    (CanvasArea.makeDeadCallback row col this.Game)
+                |> ignore
 
     member this.MoveCameraRight() =
         this.DrawingAreaX <- this.DrawingAreaX - 1
