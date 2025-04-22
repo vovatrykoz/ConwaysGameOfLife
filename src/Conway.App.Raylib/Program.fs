@@ -12,8 +12,8 @@ Display.init windowWidth windowHeight
 
 Display.loadingScreen (windowWidth / 2) (windowHeight / 2)
 
-let defaultGridWidth = 1001
-let defaultGridHeight = 1001
+let defaultGridWidth = 1000
+let defaultGridHeight = 1000
 
 let args = Environment.GetCommandLineArgs()
 
