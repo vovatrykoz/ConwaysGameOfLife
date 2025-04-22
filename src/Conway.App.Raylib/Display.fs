@@ -16,7 +16,7 @@ module Display =
 
     let private renderBoardOnCanvas (canvas: Canvas) (board: GridCellType[,]) =
         Raylib.DrawRectangleLinesEx(
-            new Rectangle(float32 canvas.X, float32 canvas.Y, float32 canvas.Width, float32 canvas.Height),
+            Rectangle(float32 canvas.X, float32 canvas.Y, float32 canvas.Width, float32 canvas.Height),
             2.0f,
             Color.Black
         )
@@ -44,11 +44,10 @@ module Display =
                         | Alive -> Draw.livingCell trueX trueY canvas.CellSize canvas.CellSize
 
     let private renderControls (controls: ControlManager) =
-        controls.Buttons
-        |> List.iter (fun button ->
+        for button in controls.Buttons do
             match button.IsVisible with
             | true -> Draw.button button
-            | false -> ())
+            | false -> ()
 
     let private renderGenerationCounter generation =
         Draw.textBox 1680 50 24 $"Generation {generation}"

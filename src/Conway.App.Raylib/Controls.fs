@@ -1,29 +1,20 @@
 namespace Conway.App.Raylib
 
-open Conway.Core
+open System.Collections.Generic
 open Raylib_cs
 
 type ControlManager(canvas: Canvas) =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
-    member val Buttons: list<Button> = List.empty with get, set
+    member val Buttons: List<Button> = new List<Button>() with get, set
 
     member val Canvas = canvas with get, set
 
-    member val KeyActions: list<KeyboardKey * (unit -> unit)> = List.empty with get, set
-
-    member this.AddButton(button: Button) = this.Buttons <- button :: this.Buttons
-
-    member this.AddButtons buttons =
-        this.Buttons <- this.Buttons |> List.append buttons
-
-    member this.AddKeyAction (key: KeyboardKey) (action: unit -> unit) =
-        this.KeyActions <- (key, action) :: this.KeyActions
+    member val KeyActions: List<KeyboardKey * (unit -> unit)> = new List<KeyboardKey * (unit -> unit)>() with get, set
 
     member private this.ProcessButtons() =
-        this.Buttons
-        |> List.iter (fun button ->
+        for button in this.Buttons do
             match button.IsActive with
             | false -> ()
             | true ->
@@ -49,13 +40,12 @@ type ControlManager(canvas: Canvas) =
                 | None -> ()
                 | Some activatedButton ->
                     if Button.isReleased activatedButton then
-                        this.ActivatedButton <- None)
+                        this.ActivatedButton <- None
 
     member private this.ProcessKeyActions() =
-        this.KeyActions
-        |> List.iter (fun (key, action) ->
+        for key, action in this.KeyActions do
             if Keyboard.readKeyPress key then
-                action ())
+                action ()
 
     member this.ReadInput() =
         this.ProcessButtons()
@@ -63,8 +53,7 @@ type ControlManager(canvas: Canvas) =
         this.Canvas.ProcessDrawableArea()
 
     member this.UpdateControls() =
-        this.Buttons
-        |> List.iter (fun button ->
+        for button in this.Buttons do
             match button.OnUpdate with
             | Some updateCallback -> updateCallback button
-            | None -> ())
+            | None -> ()

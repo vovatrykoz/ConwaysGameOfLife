@@ -137,7 +137,7 @@ let clearButton =
     |> Button.onClickCallback clearCallback
     |> Button.onUpdateCallback updateOnRun
 
-let buttons = [ toggleButton; advanceButton; resetButton; clearButton ]
+let buttons = [| toggleButton; advanceButton; resetButton; clearButton |]
 
 let canvasX = 25
 let canvasY = 25
@@ -165,16 +165,16 @@ let canvas =
     )
 
 let controlManager = new ControlManager(canvas)
-controlManager.AddButtons buttons
+controlManager.Buttons.AddRange buttons
 
-let keyboardActions = [
+let keyboardActions = [|
     KeyboardKey.W, controlManager.Canvas.MoveCameraUp
     KeyboardKey.A, controlManager.Canvas.MoveCameraLeft
     KeyboardKey.S, controlManager.Canvas.MoveCameraDown
     KeyboardKey.D, controlManager.Canvas.MoveCameraRight
-]
+|]
 
-controlManager.KeyActions <- keyboardActions
+controlManager.KeyActions.AddRange keyboardActions
 
 gameRunningState |> gameUpdateLoop |> Async.Start
 
