@@ -126,7 +126,7 @@ type Canvas
                     CanvasArea.makeAlive row col this.Game
 
                 if CanvasArea.IsRightPressed x y width height offsetX offsetY then
-                    CanvasArea.makeAlive row col this.Game
+                    CanvasArea.makeDead row col this.Game
 
     member this.MoveCameraRight() =
         this.DrawingAreaX <- this.DrawingAreaX - 1
