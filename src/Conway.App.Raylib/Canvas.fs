@@ -85,6 +85,10 @@ type Canvas
 
     member val CellSize = cellSize with get, set
 
+    member val private MaxCellSize = 50
+
+    member val private MinCellSize = 5
+
     member val Game = game with get, set
 
     member val DrawingAreaX = -drawingX with get, set
@@ -128,20 +132,20 @@ type Canvas
                 if CanvasArea.IsRightPressed x y width height offsetX offsetY then
                     CanvasArea.makeDead row col this.Game
 
-    member this.MoveCameraRight() =
-        this.DrawingAreaX <- this.DrawingAreaX - 1
+    member this.MoveCameraRight(speed: int) =
+        this.DrawingAreaX <- this.DrawingAreaX - speed
 
-    member this.MoveCameraLeft() =
-        this.DrawingAreaX <- this.DrawingAreaX + 1
+    member this.MoveCameraLeft(speed: int) =
+        this.DrawingAreaX <- this.DrawingAreaX + speed
 
-    member this.MoveCameraUp() =
-        this.DrawingAreaY <- this.DrawingAreaY + 1
+    member this.MoveCameraUp(speed: int) =
+        this.DrawingAreaY <- this.DrawingAreaY + speed
 
-    member this.MoveCameraDown() =
-        this.DrawingAreaY <- this.DrawingAreaY - 1
+    member this.MoveCameraDown(speed: int) =
+        this.DrawingAreaY <- this.DrawingAreaY - speed
 
-    member this.ZoomIn() =
-        this.CellSize <- min (this.CellSize + 5) 50
+    member this.ZoomIn(speed: int) =
+        this.CellSize <- min (this.CellSize + speed) this.MaxCellSize
 
-    member this.ZoomOut() =
-        this.CellSize <- max (this.CellSize - 5) 5
+    member this.ZoomOut(speed: int) =
+        this.CellSize <- max (this.CellSize - speed) this.MinCellSize
