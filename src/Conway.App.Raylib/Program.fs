@@ -76,6 +76,7 @@ let rec gameUpdateLoop () =
 
         try
             mainLock.EnterWriteLock()
+
             shouldRun <-
                 match gameRunningState with
                 | Infinite -> true
@@ -89,24 +90,27 @@ let rec gameUpdateLoop () =
         finally
             mainLock.ExitWriteLock()
 
-        if shouldRun then game.runOneStep ()
+        if shouldRun then
+            game.runOneStep ()
 
         return! gameUpdateLoop ()
     }
 
 let toggleGame () =
-        try
-            mainLock.EnterWriteLock ()
-            gameRunningState <-
-                match gameRunningState with
-                | Paused -> Infinite
-                | _ -> Paused
-        finally
-            mainLock.ExitWriteLock ()
+    try
+        mainLock.EnterWriteLock()
+
+        gameRunningState <-
+            match gameRunningState with
+            | Paused -> Infinite
+            | _ -> Paused
+    finally
+        mainLock.ExitWriteLock()
 
 let advanceOnce () =
     try
         mainLock.EnterReadLock()
+
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
@@ -117,6 +121,7 @@ let advanceOnce () =
 let advanceBackOnce () =
     try
         mainLock.EnterReadLock()
+
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
@@ -127,6 +132,7 @@ let advanceBackOnce () =
 let update (button: Button) =
     try
         mainLock.EnterReadLock()
+
         match gameRunningState with
         | Paused -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
@@ -136,6 +142,7 @@ let update (button: Button) =
 let updateOnRun (button: Button) =
     try
         mainLock.EnterReadLock()
+
         match gameRunningState with
         | Paused -> button.IsActive <- true
         | _ -> button.IsActive <- false
@@ -151,10 +158,12 @@ let updateOnRunBack (button: Button) =
 let resetCallback () =
     try
         mainLock.EnterReadLock()
+
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
+
         game.clearHistory ()
     finally
         mainLock.ExitReadLock()
@@ -162,10 +171,12 @@ let resetCallback () =
 let clearCallback () =
     try
         mainLock.EnterReadLock()
+
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
+
         game.clearHistory ()
     finally
         mainLock.ExitReadLock()

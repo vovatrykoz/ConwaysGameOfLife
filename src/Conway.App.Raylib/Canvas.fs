@@ -48,24 +48,10 @@ module private CanvasArea =
         else
             false
 
-    let IsLeftPressed
-        (x: int)
-        (y: int)
-        (width: int)
-        (height: int)
-        (offsetX: int)
-        (offsetY: int)
-        =
+    let IsLeftPressed (x: int) (y: int) (width: int) (height: int) (offsetX: int) (offsetY: int) =
         IsPressedWith x y width height MouseButton.Left offsetX offsetY
 
-    let IsRightPressed
-        (x: int)
-        (y: int)
-        (width: int)
-        (height: int)
-        (offsetX: int)
-        (offsetY: int)
-        =
+    let IsRightPressed (x: int) (y: int) (width: int) (height: int) (offsetX: int) (offsetY: int) =
         IsPressedWith x y width height MouseButton.Right offsetX offsetY
 
 type Canvas
@@ -134,7 +120,7 @@ type Canvas
                 let width = this.CellSize
                 let height = this.CellSize
 
-                if CanvasArea.IsLeftPressed x y width height offsetX offsetY then 
+                if CanvasArea.IsLeftPressed x y width height offsetX offsetY then
                     CanvasArea.makeAlive row col this.Game
 
                 if CanvasArea.IsRightPressed x y width height offsetX offsetY then
