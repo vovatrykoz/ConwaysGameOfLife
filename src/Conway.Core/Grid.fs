@@ -4,31 +4,22 @@ open System
 open System.Collections.Generic
 open System.Threading.Tasks
 
-[<Struct; NoComparison>]
-type GridCellType =
-    | BorderCell
-    | PlayerCell of Cell
-
 [<NoComparison>]
 type ConwayGrid = private {
-    Buffers: GridCellType[,][]
+    Buffers: Cell[,][]
     mutable ActiveBufferIndex: int
-    Memory: Stack<GridCellType[,]>
+    Memory: Stack<Cell[,]>
 } with
 
     [<CompiledName("CreateDead")>]
     static member createDead width height =
         let initArr =
-            Array2D.init (height + 2) (width + 2) (fun i j ->
-                if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    BorderCell
-                else
-                    PlayerCell Cell.dead)
+            Array2D.init (height + 2) (width + 2) (fun _ _ -> Cell.dead)
 
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<GridCellType[,]>()
+            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("CreateLiving")>]
@@ -36,14 +27,14 @@ type ConwayGrid = private {
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    BorderCell
+                    Cell.dead
                 else
-                    PlayerCell Cell.living)
+                    Cell.living)
 
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<GridCellType[,]>()
+            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("CreateRandom")>]
@@ -53,19 +44,19 @@ type ConwayGrid = private {
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    BorderCell
+                    Cell.dead
                 else
                     let randomValue = random.Next(0, oddsOfLiving - 1)
 
                     if randomValue = 0 then
-                        PlayerCell Cell.living
+                        Cell.living
                     else
-                        PlayerCell Cell.dead)
+                        Cell.dead)
 
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<GridCellType[,]>()
+            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("Init")>]
@@ -73,14 +64,14 @@ type ConwayGrid = private {
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    BorderCell
+                    Cell.dead
                 else
-                    PlayerCell(initializer (i - 1) (j - 1)))
+                    initializer (i - 1) (j - 1))
 
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<GridCellType[,]>()
+            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("InitFromPreset")>]
@@ -89,80 +80,56 @@ type ConwayGrid = private {
     static member board grid = grid.Buffers[grid.ActiveBufferIndex]
 
     [<CompiledName("CountLivingNeighbors")>]
-    static member private countLivingNeighbors row col (board: GridCellType array2d) =
+    static member private countLivingNeighbors row col (board: Cell array2d) =
         let mutable counter = 0
 
         counter <-
             counter
-            + (match board.[row - 1, col - 1] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row - 1, col - 1].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row - 1, col] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row - 1, col].Status with
+               | Dead -> 0
+               | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row - 1, col + 1] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row - 1, col + 1].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row, col + 1] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row, col + 1].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row, col - 1] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row, col - 1].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row + 1, col - 1] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row + 1, col - 1].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row + 1, col] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row + 1, col].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter <-
             counter
-            + (match board.[row + 1, col + 1] with
-               | BorderCell -> 0
-               | PlayerCell cell ->
-                   match cell.Status with
-                   | Dead -> 0
-                   | Alive -> 1)
+            + (match board.[row + 1, col + 1].Status with
+                | Dead -> 0
+                | Alive -> 1)
 
         counter
 
@@ -189,10 +156,7 @@ type ConwayGrid = private {
             fun row ->
                 for col in 1 .. cols - 2 do
                     grid.Buffers[passiveIndex][row, col] <-
-                        match grid.Buffers[activeIndex][row, col] with
-                        | BorderCell -> BorderCell
-                        | PlayerCell playerCell ->
-                            PlayerCell(ConwayGrid.processPlayerCell row col playerCell grid.Buffers[activeIndex])
+                        ConwayGrid.processPlayerCell row col (grid.Buffers[activeIndex][row, col]) grid.Buffers[activeIndex]
         )
         |> ignore
 

@@ -5,17 +5,13 @@ open Raylib_cs
 
 module private CanvasArea =
     let makeAlive row col (game: Game) =
-        match (ConwayGrid.board game.State)[row, col] with
-        | BorderCell -> ()
-        | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.living
+        (ConwayGrid.board game.State)[row, col] <- Cell.living
 
         // erase the history since the player has altered the board
         game.clearHistory ()
 
     let makeDead row col (game: Game) =
-        match (ConwayGrid.board game.State)[row, col] with
-        | BorderCell -> ()
-        | PlayerCell _ -> (ConwayGrid.board game.State)[row, col] <- PlayerCell Cell.dead
+        (ConwayGrid.board game.State)[row, col] <- Cell.dead
 
         // erase the history since the player has altered the board
         game.clearHistory ()

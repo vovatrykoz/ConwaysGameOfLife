@@ -14,7 +14,7 @@ module Display =
         Raylib.SetConfigFlags ConfigFlags.FullscreenMode
         Raylib.InitWindow(width, height, "Conway's game of life")
 
-    let private renderBoardOnCanvas (canvas: Canvas) (board: GridCellType[,]) =
+    let private renderBoardOnCanvas (canvas: Canvas) (board: Cell[,]) =
         Raylib.DrawRectangleLinesEx(
             Rectangle(float32 canvas.X, float32 canvas.Y, float32 canvas.Width, float32 canvas.Height),
             2.0f,
@@ -25,23 +25,12 @@ module Display =
 
         for row in startY..endY do
             for col in startX..endX do
-                match board[row, col] with
-                | BorderCell -> ()
-                | PlayerCell playerCell ->
-                    let trueX = col + canvas.DrawingAreaX
-                    let trueY = row + canvas.DrawingAreaY
+                let trueX = col + canvas.DrawingAreaX
+                let trueY = row + canvas.DrawingAreaY
 
-                    if
-                        trueX * canvas.CellSize < canvas.X
-                        || trueX * canvas.CellSize >= canvas.X + canvas.Width
-                        || trueY * canvas.CellSize < canvas.Y
-                        || trueY * canvas.CellSize >= canvas.Y + canvas.Height
-                    then
-                        ()
-                    else
-                        match playerCell.Status with
-                        | Dead -> Draw.deadCell trueX trueY canvas.CellSize canvas.CellSize
-                        | Alive -> Draw.livingCell trueX trueY canvas.CellSize canvas.CellSize
+                match board[row, col].Status with
+                | Dead -> Draw.deadCell trueX trueY canvas.CellSize canvas.CellSize
+                | Alive -> Draw.livingCell trueX trueY canvas.CellSize canvas.CellSize
 
     let private renderControls (controls: ControlManager) =
         for button in controls.Buttons do
