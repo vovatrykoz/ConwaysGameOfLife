@@ -83,53 +83,29 @@ type ConwayGrid = private {
     static member private countLivingNeighbors row col (board: Cell array2d) =
         let mutable counter = 0
 
-        counter <-
-            counter
-            + (match board.[row - 1, col - 1].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row - 1, col - 1].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row - 1, col].Status with
-               | Dead -> 0
-               | Alive -> 1)
+        if board.[row - 1, col].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row - 1, col + 1].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row - 1, col + 1].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row, col + 1].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row, col - 1].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row, col - 1].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row, col + 1].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row + 1, col - 1].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row + 1, col - 1].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row + 1, col].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row + 1, col].Status.IsAlive then
+            counter <- counter + 1
 
-        counter <-
-            counter
-            + (match board.[row + 1, col + 1].Status with
-                | Dead -> 0
-                | Alive -> 1)
+        if board.[row + 1, col + 1].Status.IsAlive then
+            counter <- counter + 1
 
         counter
 
