@@ -75,6 +75,14 @@ module private CanvasArea =
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, cellSize: int, scale: int) =
 
+    let maxCellSizeLimit = 50
+
+    let minCellSizeLimit = 5
+
+    let mutable currentMaxCellSize = maxCellSizeLimit
+
+    let mutable currentMinCellSize = minCellSizeLimit
+
     member val X = x with get, set
 
     member val Y = y with get, set
@@ -85,9 +93,13 @@ type Canvas
 
     member val CellSize = cellSize with get, set
 
-    member val private MaxCellSize = 50
+    member _.MaxCellSize
+        with get () = currentMaxCellSize
+        and set value = currentMaxCellSize <- min maxCellSizeLimit (max minCellSizeLimit value)
 
-    member val private MinCellSize = 5
+    member _.MinCellSize
+        with get () = currentMinCellSize
+        and set value = currentMinCellSize <- min maxCellSizeLimit (max minCellSizeLimit value)
 
     member val Game = game with get, set
 
