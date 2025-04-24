@@ -91,7 +91,7 @@ let gameUpdateLoop () =
                 mainLock.ExitWriteLock()
 
             if shouldRun then
-                game.runOneStep ()
+                game.RunOneStep()
     }
 
 let toggleGame () =
@@ -112,7 +112,7 @@ let advanceOnce () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.runOneStep ()
+        | Paused -> game.RunOneStep()
     finally
         mainLock.ExitReadLock()
 
@@ -151,7 +151,7 @@ let resetCallback () =
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
 
-        game.clearHistory ()
+        game.ClearHistory()
     finally
         mainLock.ExitReadLock()
 
@@ -164,7 +164,7 @@ let clearCallback () =
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
 
-        game.clearHistory ()
+        game.ClearHistory()
     finally
         mainLock.ExitReadLock()
 

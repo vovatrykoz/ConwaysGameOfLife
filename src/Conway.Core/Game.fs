@@ -10,7 +10,7 @@ type Game(initialState: ConwayGrid) =
 
     let mutable generation = 1
 
-    member this.State
+    member _.State
         with get () = internalState
         and set newState = internalState <- newState
 
@@ -18,8 +18,7 @@ type Game(initialState: ConwayGrid) =
         with get () = generation
         and private set newValue = generation <- newValue
 
-    [<CompiledName("Run")>]
-    member this.run mode =
+    member this.Run(mode: GameMode) =
         match mode with
         | Infinite ->
             while true do
@@ -31,8 +30,6 @@ type Game(initialState: ConwayGrid) =
                 this.Generation <- this.Generation + 1
         | Paused -> ()
 
-    [<CompiledName("RunOneStep")>]
-    member this.runOneStep() = this.run (Limited 1)
+    member this.RunOneStep() = this.Run(Limited 1)
 
-    [<CompiledName("ClearHistory")>]
-    member this.clearHistory() = this.Generation <- 1
+    member this.ClearHistory() = this.Generation <- 1

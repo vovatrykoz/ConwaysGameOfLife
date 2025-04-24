@@ -8,13 +8,13 @@ module private CanvasArea =
         game.State.Board[row, col] <- Cell.living
 
         // erase the history since the player has altered the board
-        game.clearHistory ()
+        game.ClearHistory()
 
     let makeDead row col (game: Game) =
         game.State.Board[row, col] <- Cell.dead
 
         // erase the history since the player has altered the board
-        game.clearHistory ()
+        game.ClearHistory()
 
     let IsPressedWith (startX: int) (startY: int) (endX: int) (endY: int) (mouseButton: MouseButton) =
         if Mouse.readButtonPress mouseButton then
