@@ -15,7 +15,7 @@ module private UnsafeUtils =
     let inline retype<'T, 'U> (x: 'T) : 'U = (# "" x: 'U #)
 
 module Convert =
-    let inline CBoolToFsBool (cbool: CBool) = Convert.ToBoolean (sbyte cbool)
+    let inline CBoolToFsBool (cbool: CBool) = Convert.ToBoolean(sbyte cbool)
 
 module Aliases =
     let inline raylibTrue expr = expr |> Convert.CBoolToFsBool

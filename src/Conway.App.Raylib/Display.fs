@@ -15,7 +15,7 @@ module Display =
         Raylib.InitWindow(width, height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) (board: Cell[,]) =
-        Raylib.DrawRectangle(canvas.X, canvas.Y, canvas.Width, canvas.Height, Color.Black)
+        // Raylib.DrawRectangle(canvas.X, canvas.Y, canvas.Width, canvas.Height, Color.Black)
 
         let rows = Array2D.length1 board
         let cols = Array2D.length2 board
