@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -6,7 +6,6 @@
   <ItemGroup>
     <Compile Include="Cell.fsi" />
     <Compile Include="Cell.fs" />
-    <Compile Include="UnsafeUtils.fs" />
     <Compile Include="Grid.fsi" />
     <Compile Include="Grid.fs" />
     <Compile Include="Game.fs" />

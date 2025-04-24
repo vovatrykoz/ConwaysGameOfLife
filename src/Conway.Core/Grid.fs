@@ -84,18 +84,14 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
     [<CompiledName("CountLivingNeighbors")>]
     static member private countLivingNeighbors row col (board: Cell array2d) =
-        let mutable counter = 0
-
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row - 1, col - 1])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row - 1, col])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row - 1, col + 1])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row, col - 1])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row, col + 1])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row + 1, col - 1])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row + 1, col])
-        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row + 1, col + 1])
-
-        counter
+        Convert.ToInt32 (Cell.isAlive board.[row - 1, col - 1]) +
+        Convert.ToInt32 (Cell.isAlive board.[row - 1, col]) +
+        Convert.ToInt32 (Cell.isAlive board.[row - 1, col + 1]) +
+        Convert.ToInt32 (Cell.isAlive board.[row, col - 1]) +
+        Convert.ToInt32 (Cell.isAlive board.[row, col + 1]) +
+        Convert.ToInt32 (Cell.isAlive board.[row + 1, col - 1]) +
+        Convert.ToInt32 (Cell.isAlive board.[row + 1, col]) +
+        Convert.ToInt32 (Cell.isAlive board.[row + 1, col + 1])
 
     [<CompiledName("ProcessPlayerCell")>]
     static member private processPlayerCell row col currentCell board =

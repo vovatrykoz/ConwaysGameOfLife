@@ -1,6 +1,7 @@
 namespace Conway.App.Raylib
 
 open Raylib_cs
+open System
 
 // Warning FS0042: This construct is deprecated: it is only for use in the F# library
 #nowarn "42"
@@ -14,7 +15,7 @@ module private UnsafeUtils =
     let inline retype<'T, 'U> (x: 'T) : 'U = (# "" x: 'U #)
 
 module Convert =
-    let inline CBoolToFsBool (cbool: CBool) = UnsafeUtils.retype<CBool, bool> cbool
+    let inline CBoolToFsBool (cbool: CBool) = Convert.ToBoolean (sbyte cbool)
 
 module Aliases =
     let inline raylibTrue expr = expr |> Convert.CBoolToFsBool
