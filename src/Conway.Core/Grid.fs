@@ -79,14 +79,14 @@ type ConwayGrid = private {
     static member private countLivingNeighbors row col (board: Cell array2d) =
         let mutable counter = 0
 
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row - 1, col - 1])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row - 1, col])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row - 1, col + 1])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row, col - 1])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row, col + 1])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row + 1, col - 1])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row + 1, col])
-        counter <- counter + UnsafeUtils.retype (Cell.isAlive board.[row + 1, col + 1])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row - 1, col - 1])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row - 1, col])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row - 1, col + 1])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row, col - 1])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row, col + 1])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row + 1, col - 1])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row + 1, col])
+        counter <- counter + UnsafeUtils.retype<bool, int> (Cell.isAlive board.[row + 1, col + 1])
 
         counter
 
