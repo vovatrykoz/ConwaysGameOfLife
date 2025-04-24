@@ -3,20 +3,18 @@ module Conway.Tests
 open Conway.Core
 open NUnit.Framework
 
-(*
-
 module ``Cell Tests`` =
 
     [<Test>]
     let ``Can create a living cell using the dedicated method on the Cell type`` () =
-        let expected = { Status = Alive; Memory = Stack.empty }
+        let expected = { Status = Alive }
         let actual = Cell.living
 
         Assert.That(actual, Is.EqualTo expected)
 
     [<Test>]
     let ``Can create a dead cell using the dedicated method on the Cell type`` () =
-        let expected = { Status = Dead; Memory = Stack.empty }
+        let expected = { Status = Dead }
         let actual = Cell.dead
 
         Assert.That(actual, Is.EqualTo expected)
@@ -26,10 +24,10 @@ module ``Grid tests`` =
     [<Test>]
     let ``Can create a simple grid using the dedicated method on the Grid type`` () =
         let expectedArray = [|
-            [| BorderCell; BorderCell; BorderCell; BorderCell |]
-            [| BorderCell; PlayerCell Cell.dead; PlayerCell Cell.dead; BorderCell |]
-            [| BorderCell; PlayerCell Cell.dead; PlayerCell Cell.dead; BorderCell |]
-            [| BorderCell; BorderCell; BorderCell; BorderCell |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
         |]
 
         let expectedBoard = Array2D.init 4 4 (fun i j -> expectedArray[i][j])
@@ -41,10 +39,10 @@ module ``Grid tests`` =
     [<Test>]
     let ``Can create a living grid using the dedicated method on the Grid type`` () =
         let expectedArray = [|
-            [| BorderCell; BorderCell; BorderCell; BorderCell |]
-            [| BorderCell; PlayerCell Cell.living; PlayerCell Cell.living; BorderCell |]
-            [| BorderCell; PlayerCell Cell.living; PlayerCell Cell.living; BorderCell |]
-            [| BorderCell; BorderCell; BorderCell; BorderCell |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
+            [| Cell.dead; Cell.living; Cell.living; Cell.dead |]
+            [| Cell.dead; Cell.living; Cell.living; Cell.dead |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
         |]
 
         let expectedBoard = Array2D.init 4 4 (fun i j -> expectedArray[i][j])
@@ -56,29 +54,11 @@ module ``Grid tests`` =
     [<Test>]
     let ``Can create a living grid using the init method on the Grid type`` () =
         let expectedArray = [|
-            [| BorderCell; BorderCell; BorderCell; BorderCell; BorderCell |]
-            [|
-                BorderCell
-                PlayerCell Cell.living
-                PlayerCell Cell.dead
-                PlayerCell Cell.living
-                BorderCell
-            |]
-            [|
-                BorderCell
-                PlayerCell Cell.dead
-                PlayerCell Cell.living
-                PlayerCell Cell.dead
-                BorderCell
-            |]
-            [|
-                BorderCell
-                PlayerCell Cell.living
-                PlayerCell Cell.dead
-                PlayerCell Cell.living
-                BorderCell
-            |]
-            [| BorderCell; BorderCell; BorderCell; BorderCell; BorderCell |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
+            [| Cell.dead; Cell.living; Cell.dead; Cell.living; Cell.dead |]
+            [| Cell.dead; Cell.dead; Cell.living; Cell.dead; Cell.dead |]
+            [| Cell.dead; Cell.living; Cell.dead; Cell.living; Cell.dead |]
+            [| Cell.dead; Cell.dead; Cell.dead; Cell.dead; Cell.dead |]
         |]
 
         let initializer i j =
@@ -92,12 +72,11 @@ module ``Grid tests`` =
 
     [<Test>]
     let ``All-dead grid remains dead after one iteration`` () =
-        let initializer _ _ =
-            Cell.create Dead (Stack.empty |> Stack.push Dead)
+        let initializer _ _ = Cell.create Dead
 
-        let expectedBoard = ConwayGrid.init 3 3 initializer
+        let expectedBoard = ConwayGrid.init 3 3 initializer |> ConwayGrid.board
 
-        let actual = ConwayGrid.createDead 3 3 |> ConwayGrid.next
+        let actual = ConwayGrid.createDead 3 3 |> ConwayGrid.next |> ConwayGrid.board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -105,16 +84,17 @@ module ``Grid tests`` =
     let ``A cell dies with no living neighbors`` () =
         let initializerForExpected i j =
             if i = 1 && j = 1 then
-                Cell.create Dead (Stack.empty |> Stack.push Alive)
+                Cell.create Dead
             else
-                Cell.create Dead (Stack.empty |> Stack.push Dead)
+                Cell.create Dead
 
         let initializerForActual i j =
             if i = 1 && j = 1 then Cell.living else Cell.dead
 
-        let expectedBoard = ConwayGrid.init 3 3 initializerForExpected
+        let expectedBoard = ConwayGrid.init 3 3 initializerForExpected |> ConwayGrid.board
 
-        let actual = ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next
+        let actual =
+            ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next |> ConwayGrid.board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -122,9 +102,9 @@ module ``Grid tests`` =
     let ``A cell dies with one living neighbors`` () =
         let initializerForExpected i j =
             if i = 1 && j = 1 || i = 2 && j = 2 then
-                Cell.create Dead (Stack.empty |> Stack.push Alive)
+                Cell.create Dead
             else
-                Cell.create Dead (Stack.empty |> Stack.push Dead)
+                Cell.create Dead
 
         let initializerForActual i j =
             if i = 1 && j = 1 || i = 2 && j = 2 then
@@ -132,9 +112,10 @@ module ``Grid tests`` =
             else
                 Cell.dead
 
-        let expectedBoard = ConwayGrid.init 3 3 initializerForExpected
+        let expectedBoard = ConwayGrid.init 3 3 initializerForExpected |> ConwayGrid.board
 
-        let actual = ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next
+        let actual =
+            ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next |> ConwayGrid.board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -143,21 +124,17 @@ module ``Grid tests`` =
         let setup = [| [| Cell.living; Cell.living |]; [| Cell.living; Cell.dead |] |]
 
         let expectedArray = [|
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-            |]
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Dead)
-            |]
+            [| Cell.create Alive; Cell.create Alive |]
+            [| Cell.create Alive; Cell.create Alive |]
         |]
 
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next
-        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer
+        let actual =
+            ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next |> ConwayGrid.board
+
+        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer |> ConwayGrid.board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -167,21 +144,17 @@ module ``Grid tests`` =
         let setup = [| [| Cell.living; Cell.living |]; [| Cell.living; Cell.living |] |]
 
         let expectedArray = [|
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-            |]
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-            |]
+            [| Cell.create Alive; Cell.create Alive |]
+            [| Cell.create Alive; Cell.create Alive |]
         |]
 
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next
-        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer
+        let actual =
+            ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next |> ConwayGrid.board
+
+        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer |> ConwayGrid.board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -195,23 +168,17 @@ module ``Grid tests`` =
         // the two middle cells both have 4 living neighbors, therefore both are expected to die
         // The cell in the bottom right should become alive, as it had three living neighbors
         let expectedArray = [|
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Dead (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-            |]
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Dead (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Dead)
-            |]
+            [| Cell.create Alive; Cell.create Dead; Cell.create Alive |]
+            [| Cell.create Alive; Cell.create Dead; Cell.create Alive |]
         |]
 
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = ConwayGrid.init 3 2 setupInitializer |> ConwayGrid.next
-        let expectedBoard = ConwayGrid.init 3 2 expectedInitializer
+        let actual =
+            ConwayGrid.init 3 2 setupInitializer |> ConwayGrid.next |> ConwayGrid.board
+
+        let expectedBoard = ConwayGrid.init 3 2 expectedInitializer |> ConwayGrid.board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -224,39 +191,15 @@ module ``Grid tests`` =
         |]
 
         let ``expected array after the first iteration`` = [|
-            [|
-                Cell.create Dead (Stack.empty |> Stack.push Dead)
-                Cell.create Alive (Stack.empty |> Stack.push Dead)
-                Cell.create Dead (Stack.empty |> Stack.push Dead)
-            |]
-            [|
-                Cell.create Dead (Stack.empty |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Alive)
-                Cell.create Dead (Stack.empty |> Stack.push Alive)
-            |]
-            [|
-                Cell.create Dead (Stack.empty |> Stack.push Dead)
-                Cell.create Alive (Stack.empty |> Stack.push Dead)
-                Cell.create Dead (Stack.empty |> Stack.push Dead)
-            |]
+            [| Cell.create Dead; Cell.create Alive; Cell.create Dead |]
+            [| Cell.create Dead; Cell.create Alive; Cell.create Dead |]
+            [| Cell.create Dead; Cell.create Alive; Cell.create Dead |]
         |]
 
         let ``expected array after the second iteration`` = [|
-            [|
-                Cell.create Dead (Stack.empty |> Stack.push Dead |> Stack.push Dead)
-                Cell.create Dead (Stack.empty |> Stack.push Dead |> Stack.push Alive)
-                Cell.create Dead (Stack.empty |> Stack.push Dead |> Stack.push Dead)
-            |]
-            [|
-                Cell.create Alive (Stack.empty |> Stack.push Alive |> Stack.push Dead)
-                Cell.create Alive (Stack.empty |> Stack.push Alive |> Stack.push Alive)
-                Cell.create Alive (Stack.empty |> Stack.push Alive |> Stack.push Dead)
-            |]
-            [|
-                Cell.create Dead (Stack.empty |> Stack.push Dead |> Stack.push Dead)
-                Cell.create Dead (Stack.empty |> Stack.push Dead |> Stack.push Alive)
-                Cell.create Dead (Stack.empty |> Stack.push Dead |> Stack.push Dead)
-            |]
+            [| Cell.create Dead; Cell.create Dead; Cell.create Dead |]
+            [| Cell.create Alive; Cell.create Alive; Cell.create Alive |]
+            [| Cell.create Dead; Cell.create Dead; Cell.create Dead |]
         |]
 
         let setupInitializer i j = setup[i][j]
@@ -267,13 +210,18 @@ module ``Grid tests`` =
         let expectedInitializerTwo i j =
             ``expected array after the second iteration``[i][j]
 
-        let actual = ConwayGrid.init 3 3 setupInitializer |> ConwayGrid.next
-        let expectedBoardOne = ConwayGrid.init 3 3 expectedInitializerOne
+        let actualOne = ConwayGrid.init 3 3 setupInitializer |> ConwayGrid.next
 
-        Assert.That(actual, Is.EqualTo expectedBoardOne)
+        let actualBoardOne = ConwayGrid.board actualOne
 
-        let actual = ConwayGrid.next actual
-        let expectedBoardTwo = ConwayGrid.init 3 3 expectedInitializerTwo
+        let expectedBoardOne =
+            ConwayGrid.init 3 3 expectedInitializerOne |> ConwayGrid.board
 
-        Assert.That(actual, Is.EqualTo expectedBoardTwo)
-*)
+        Assert.That(actualBoardOne, Is.EqualTo expectedBoardOne)
+
+        let actualBoardTwo = ConwayGrid.next actualOne |> ConwayGrid.board
+
+        let expectedBoardTwo =
+            ConwayGrid.init 3 3 expectedInitializerTwo |> ConwayGrid.board
+
+        Assert.That(actualBoardTwo, Is.EqualTo expectedBoardTwo)
