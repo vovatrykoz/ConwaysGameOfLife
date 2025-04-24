@@ -4,6 +4,8 @@ open System
 open System.Collections.Generic
 open System.Threading.Tasks
 
+open System.Runtime.CompilerServices
+
 [<NoComparison>]
 type ConwayGrid = private {
     Buffers: Cell[,][]
@@ -79,14 +81,14 @@ type ConwayGrid = private {
     static member private countLivingNeighbors row col (board: Cell array2d) =
         let mutable counter = 0
 
-        counter <- counter + Convert.ToInt32 board.[row - 1, col - 1].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row - 1, col].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row - 1, col + 1].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row, col - 1].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row, col + 1].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row + 1, col - 1].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row + 1, col].Status.IsAlive
-        counter <- counter + Convert.ToInt32 board.[row + 1, col + 1].Status.IsAlive
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row - 1, col - 1])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row - 1, col])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row - 1, col + 1])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row, col - 1])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row, col + 1])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row + 1, col - 1])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row + 1, col])
+        counter <- counter + Convert.ToInt32(Cell.isAlive board.[row + 1, col + 1])
 
         counter
 
