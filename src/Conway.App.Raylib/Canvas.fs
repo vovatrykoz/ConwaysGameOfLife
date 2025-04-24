@@ -99,12 +99,14 @@ type Canvas
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board
 
-        let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
-        let adjustedEndX = max (min endX (cols - 2)) 1
-        let adjustedEndY = max (min endY (rows - 2)) 1
+        let struct (visibleStartX, visibleStartY, visibleEndX, visibleEndY) =
+            this.CalculateVisibleRange()
 
-        for row = startY to adjustedEndY do
-            for col = startX to adjustedEndX do
+        let adjustedEndX = max (min visibleEndX (cols - 2)) 1
+        let adjustedEndY = max (min visibleEndY (rows - 2)) 1
+
+        for row = visibleStartX to adjustedEndY do
+            for col = visibleStartY to adjustedEndX do
                 let startX = col * this.CellSize + offsetX
                 let startY = row * this.CellSize + offsetY
                 let endX = startX + this.CellSize
