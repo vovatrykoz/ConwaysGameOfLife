@@ -53,7 +53,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
         new ConwayGrid(initArr)
 
-    [<CompiledName("CreateRandom")>]
+    [<CompiledName("CreateRandomWithOdds")>]
     static member createRandomWithOdds width height oddsOfLiving =
         let random = new Random()
 
