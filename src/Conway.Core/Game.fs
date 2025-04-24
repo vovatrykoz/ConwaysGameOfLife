@@ -23,11 +23,11 @@ type Game(initialState: ConwayGrid) =
         match mode with
         | Infinite ->
             while true do
-                ConwayGrid.next this.State |> ignore
+                this.State.AdvanceToNextState() |> ignore
                 this.Generation <- this.Generation + 1
         | Limited steps ->
             for _ = 1 to steps do
-                ConwayGrid.next this.State |> ignore
+                this.State.AdvanceToNextState() |> ignore
                 this.Generation <- this.Generation + 1
         | Paused -> ()
 

@@ -76,9 +76,10 @@ module ``Grid tests`` =
 
         let expectedBoard = (ConwayGrid.init 3 3 initializer).Board
 
-        let actual = (ConwayGrid.createDead 3 3 |> ConwayGrid.next).Board
+        let actual = ConwayGrid.createDead 3 3
+        actual.AdvanceToNextState()
 
-        Assert.That(actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``A cell dies with no living neighbors`` () =
@@ -93,9 +94,10 @@ module ``Grid tests`` =
 
         let expectedBoard = (ConwayGrid.init 3 3 initializerForExpected).Board
 
-        let actual = (ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next).Board
+        let actual = ConwayGrid.init 3 3 initializerForActual
+        actual.AdvanceToNextState()
 
-        Assert.That(actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``A cell dies with one living neighbors`` () =
@@ -113,9 +115,10 @@ module ``Grid tests`` =
 
         let expectedBoard = (ConwayGrid.init 3 3 initializerForExpected).Board
 
-        let actual = (ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next).Board
+        let actual = ConwayGrid.init 3 3 initializerForActual
+        actual.AdvanceToNextState()
 
-        Assert.That(actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``A cell becomes alive with three living neighbors`` () =
@@ -129,11 +132,12 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = (ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next).Board
+        let actual = ConwayGrid.init 2 2 setupInitializer
+        actual.AdvanceToNextState()
 
         let expectedBoard = (ConwayGrid.init 2 2 expectedInitializer).Board
 
-        Assert.That(actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``A living cell with three living neighbors keeps on living`` () =
@@ -148,11 +152,12 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = (ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next).Board
+        let actual = ConwayGrid.init 2 2 setupInitializer
+        actual.AdvanceToNextState()
 
         let expectedBoard = (ConwayGrid.init 2 2 expectedInitializer).Board
 
-        Assert.That(actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``A cell with four living neighbors dies`` () =
@@ -171,11 +176,12 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual = (ConwayGrid.init 3 2 setupInitializer |> ConwayGrid.next).Board
+        let actual = ConwayGrid.init 3 2 setupInitializer
+        actual.AdvanceToNextState()
 
         let expectedBoard = (ConwayGrid.init 3 2 expectedInitializer).Board
 
-        Assert.That(actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``Three cells in a row stay alive by switching to rows and columns`` () =
@@ -205,7 +211,8 @@ module ``Grid tests`` =
         let expectedInitializerTwo i j =
             ``expected array after the second iteration``[i][j]
 
-        let actualOne = ConwayGrid.init 3 3 setupInitializer |> ConwayGrid.next
+        let actualOne = ConwayGrid.init 3 3 setupInitializer
+        actualOne.AdvanceToNextState()
 
         let actualBoardOne = actualOne.Board
 
@@ -213,7 +220,8 @@ module ``Grid tests`` =
 
         Assert.That(actualBoardOne, Is.EqualTo expectedBoardOne)
 
-        let actualBoardTwo = (ConwayGrid.next actualOne).Board
+        actualOne.AdvanceToNextState()
+        let actualBoardTwo = actualOne.Board
 
         let expectedBoardTwo = (ConwayGrid.init 3 3 expectedInitializerTwo).Board
 

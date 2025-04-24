@@ -4,21 +4,43 @@ open System
 open System.Threading.Tasks
 
 [<NoComparison>]
-type ConwayGrid = private {
-    Buffers: Cell[,][]
-    mutable ActiveBufferIndex: int
-} with
+type ConwayGrid private (startingGrid: Cell array2d) =
+
+    private new(width: int, height: int) =
+        let initArr = Array2D.create (height + 2) (width + 2) Cell.dead
+
+        new ConwayGrid(initArr)
+
+    member val private Buffers = [| Array2D.copy startingGrid; Array2D.copy startingGrid |] with get, set
+
+    member val private ActiveBufferIndex = 0 with get, set
 
     member this.Board = this.Buffers[this.ActiveBufferIndex]
 
-    [<CompiledName("CreateDead")>]
-    static member createDead width height =
-        let initArr = Array2D.init (height + 2) (width + 2) (fun _ _ -> Cell.dead)
+    member this.AdvanceToNextState() =
+        let activeIndex = this.ActiveBufferIndex
+        let passiveIndex = (activeIndex + 1) % this.Buffers.Length
+        let rows = Array2D.length1 this.Buffers[activeIndex]
+        let cols = Array2D.length2 this.Buffers[activeIndex]
 
-        {
-            Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
-            ActiveBufferIndex = 0
-        }
+        Parallel.For(
+            1,
+            rows - 1,
+            fun row ->
+                for col in 1 .. cols - 2 do
+                    this.Buffers[passiveIndex][row, col] <-
+                        ConwayGrid.processPlayerCell
+                            row
+                            col
+                            (this.Buffers[activeIndex][row, col])
+                            this.Buffers[activeIndex]
+        )
+        |> ignore
+
+        this.ActiveBufferIndex <- passiveIndex
+
+    [<CompiledName("CreateDead")>]
+    static member createDead width height = new ConwayGrid(width, height)
 
     [<CompiledName("CreateLiving")>]
     static member createLiving width height =
@@ -29,10 +51,7 @@ type ConwayGrid = private {
                 else
                     Cell.living)
 
-        {
-            Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
-            ActiveBufferIndex = 0
-        }
+        new ConwayGrid(initArr)
 
     [<CompiledName("CreateRandom")>]
     static member createRandomWithOdds width height oddsOfLiving =
@@ -47,10 +66,7 @@ type ConwayGrid = private {
 
                     if randomValue = 0 then Cell.living else Cell.dead)
 
-        {
-            Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
-            ActiveBufferIndex = 0
-        }
+        new ConwayGrid(initArr)
 
     [<CompiledName("Init")>]
     static member init width height initializer =
@@ -61,10 +77,7 @@ type ConwayGrid = private {
                 else
                     initializer (i - 1) (j - 1))
 
-        {
-            Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
-            ActiveBufferIndex = 0
-        }
+        new ConwayGrid(initArr)
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
@@ -93,28 +106,3 @@ type ConwayGrid = private {
         | x when x = 2 -> Cell.create currentCell.Status
         | x when x = 3 -> Cell.create Alive
         | _ -> Cell.create Dead
-
-    [<CompiledName("Next")>]
-    static member next(grid: ConwayGrid) =
-        let activeIndex = grid.ActiveBufferIndex
-        let passiveIndex = (activeIndex + 1) % grid.Buffers.Length
-        let rows = Array2D.length1 grid.Buffers[activeIndex]
-        let cols = Array2D.length2 grid.Buffers[activeIndex]
-
-        Parallel.For(
-            1,
-            rows - 1,
-            fun row ->
-                for col in 1 .. cols - 2 do
-                    grid.Buffers[passiveIndex][row, col] <-
-                        ConwayGrid.processPlayerCell
-                            row
-                            col
-                            (grid.Buffers[activeIndex][row, col])
-                            grid.Buffers[activeIndex]
-        )
-        |> ignore
-
-        grid.ActiveBufferIndex <- passiveIndex
-
-        grid
