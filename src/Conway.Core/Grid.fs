@@ -79,29 +79,14 @@ type ConwayGrid = private {
     static member private countLivingNeighbors row col (board: Cell array2d) =
         let mutable counter = 0
 
-        if board.[row - 1, col - 1].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row - 1, col].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row - 1, col + 1].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row, col - 1].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row, col + 1].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row + 1, col - 1].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row + 1, col].Status.IsAlive then
-            counter <- counter + 1
-
-        if board.[row + 1, col + 1].Status.IsAlive then
-            counter <- counter + 1
+        counter <- counter + Convert.ToInt32 board.[row - 1, col - 1].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row - 1, col].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row - 1, col + 1].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row, col - 1].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row, col + 1].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row + 1, col - 1].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row + 1, col].Status.IsAlive
+        counter <- counter + Convert.ToInt32 board.[row + 1, col + 1].Status.IsAlive
 
         counter
 
