@@ -67,33 +67,31 @@ let mainLock = new ReaderWriterLockSlim()
 
 let mutable gameRunningState = Paused
 
-[<TailCall>]
-let rec gameUpdateLoop () =
+let gameUpdateLoop () =
     async {
-        do! Async.Sleep 34
+        while true do
+            do! Async.Sleep 34
 
-        let mutable shouldRun = false
+            let mutable shouldRun = false
 
-        try
-            mainLock.EnterWriteLock()
+            try
+                mainLock.EnterWriteLock()
 
-            shouldRun <-
-                match gameRunningState with
-                | Infinite -> true
-                | Limited x when x > 1 ->
-                    gameRunningState <- Limited(x - 1)
-                    true
-                | Limited _ ->
-                    gameRunningState <- Paused
-                    true
-                | Paused -> false
-        finally
-            mainLock.ExitWriteLock()
+                shouldRun <-
+                    match gameRunningState with
+                    | Infinite -> true
+                    | Limited x when x > 1 ->
+                        gameRunningState <- Limited(x - 1)
+                        true
+                    | Limited _ ->
+                        gameRunningState <- Paused
+                        true
+                    | Paused -> false
+            finally
+                mainLock.ExitWriteLock()
 
-        if shouldRun then
-            game.runOneStep ()
-
-        return! gameUpdateLoop ()
+            if shouldRun then
+                game.runOneStep ()
     }
 
 let toggleGame () =
