@@ -16,31 +16,15 @@ module private CanvasArea =
         // erase the history since the player has altered the board
         game.clearHistory ()
 
-    let IsPressedWith
-        (x: int)
-        (y: int)
-        (width: int)
-        (height: int)
-        (mouseButton: MouseButton)
-        (offsetX: int)
-        (offsetY: int)
-        =
+    let IsPressedWith (startX: int) (startY: int) (endX: int) (endY: int) (mouseButton: MouseButton) =
         if Mouse.readButtonPress mouseButton then
-            let trueX = x + offsetX
-            let trueY = y + offsetY
-
-            let minX = trueX
-            let maxX = trueX + width
-            let minY = trueY
-            let maxY = trueY + height
-
             let mousePos = Mouse.getPosition ()
 
             if
-                mousePos.X >= float32 minX
-                && mousePos.X <= float32 maxX
-                && mousePos.Y >= float32 minY
-                && mousePos.Y <= float32 maxY
+                mousePos.X >= float32 startX
+                && mousePos.X <= float32 endX
+                && mousePos.Y >= float32 startY
+                && mousePos.Y <= float32 endY
             then
                 true
             else
@@ -48,11 +32,11 @@ module private CanvasArea =
         else
             false
 
-    let IsLeftPressed (x: int) (y: int) (width: int) (height: int) (offsetX: int) (offsetY: int) =
-        IsPressedWith x y width height MouseButton.Left offsetX offsetY
+    let IsLeftPressed (startX: int) (startY: int) (endX: int) (endY: int) =
+        IsPressedWith startX startY endX endY MouseButton.Left
 
-    let IsRightPressed (x: int) (y: int) (width: int) (height: int) (offsetX: int) (offsetY: int) =
-        IsPressedWith x y width height MouseButton.Right offsetX offsetY
+    let IsRightPressed (startX: int) (startY: int) (endX: int) (endY: int) =
+        IsPressedWith startX startY endX endY MouseButton.Right
 
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, cellSize: int, scale: int) =
@@ -121,15 +105,15 @@ type Canvas
 
         for row = startY to adjustedEndY do
             for col = startX to adjustedEndX do
-                let x = col * this.CellSize
-                let y = row * this.CellSize
-                let width = this.CellSize
-                let height = this.CellSize
+                let startX = col * this.CellSize + offsetX
+                let startY = row * this.CellSize + offsetY
+                let endX = startX + this.CellSize
+                let endY = startY + this.CellSize
 
-                if CanvasArea.IsLeftPressed x y width height offsetX offsetY then
+                if CanvasArea.IsLeftPressed startX startY endX endY then
                     CanvasArea.makeAlive row col this.Game
 
-                if CanvasArea.IsRightPressed x y width height offsetX offsetY then
+                if CanvasArea.IsRightPressed startX startY endX endY then
                     CanvasArea.makeDead row col this.Game
 
     member this.MoveCameraRight(speed: int) =

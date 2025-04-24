@@ -210,8 +210,8 @@ let cellSize = 25
 let widthOffset = cellSize * 12
 let heightOffset = cellSize * 2
 
-let focusAreaX = 1000
-let focusAreaY = 1000
+let focusAreaX = 500
+let focusAreaY = 500
 
 let scale = 1
 

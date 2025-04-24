@@ -1,7 +1,6 @@
 namespace Conway.Core
 
 open System
-open System.Collections.Generic
 open System.Threading.Tasks
 
 [<NoComparison>]
