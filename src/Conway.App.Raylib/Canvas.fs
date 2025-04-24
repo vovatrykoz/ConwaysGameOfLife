@@ -127,7 +127,6 @@ type Canvas
                 let height = this.CellSize
 
                 if CanvasArea.IsLeftPressed x y width height offsetX offsetY then
-                    printfn $"row {row} col {col}"
                     CanvasArea.makeAlive row col this.Game
 
                 if CanvasArea.IsRightPressed x y width height offsetX offsetY then
