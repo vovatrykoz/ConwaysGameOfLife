@@ -12,7 +12,9 @@ type Game(initialState: ConwayGrid) =
 
     member _.State
         with get () = internalState
-        and set newState = internalState <- newState
+        and set newState =
+            internalState <- newState
+            generation <- 1
 
     member _.Generation
         with get () = generation
