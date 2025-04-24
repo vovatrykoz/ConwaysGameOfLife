@@ -230,8 +230,8 @@ let cellSize = 25
 let widthOffset = cellSize * 12
 let heightOffset = cellSize * 2
 
-let focusAreaX = 500
-let focusAreaY = 500
+let focusAreaX = 1000
+let focusAreaY = 1000
 
 let scale = 1
 
@@ -252,12 +252,12 @@ let controlManager = new ControlManager(canvas)
 controlManager.Buttons.AddRange buttons
 
 let keyboardActions = [|
-    KeyboardKey.W, (fun _ -> controlManager.Canvas.MoveCameraUp(1))
-    KeyboardKey.A, (fun _ -> controlManager.Canvas.MoveCameraLeft(1))
-    KeyboardKey.S, (fun _ -> controlManager.Canvas.MoveCameraDown(1))
-    KeyboardKey.D, (fun _ -> controlManager.Canvas.MoveCameraRight(1))
-    KeyboardKey.Z, (fun _ -> controlManager.Canvas.ZoomIn(5))
-    KeyboardKey.X, (fun _ -> controlManager.Canvas.ZoomOut(5))
+    KeyboardKey.W, (fun _ -> controlManager.Canvas.MoveCameraUp 1)
+    KeyboardKey.A, (fun _ -> controlManager.Canvas.MoveCameraLeft 1)
+    KeyboardKey.S, (fun _ -> controlManager.Canvas.MoveCameraDown 1)
+    KeyboardKey.D, (fun _ -> controlManager.Canvas.MoveCameraRight 1)
+    KeyboardKey.Z, (fun _ -> controlManager.Canvas.ZoomIn 5)
+    KeyboardKey.X, (fun _ -> controlManager.Canvas.ZoomOut 5)
 |]
 
 controlManager.KeyActions.AddRange keyboardActions

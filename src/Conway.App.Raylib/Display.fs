@@ -25,13 +25,11 @@ module Display =
         let cols = Array2D.length2 board
 
         let struct (startX, startY, endX, endY) = canvas.CalculateVisibleRange()
-        let renderStartX = max (min startX cols - 1) 1
-        let renderStartY = max (min startY rows - 1) 1
-        let renderEndX = max (min endX cols - 1) 1
-        let renderEndY = max (min endY rows - 1) 1
+        let adjustedEndX = max (min endX (cols - 2)) 1
+        let adjustedEndY = max (min endY (rows - 2)) 1
 
-        for row in renderStartY..renderEndY do
-            for col in renderStartX..renderEndX do
+        for row = startY to adjustedEndY do
+            for col = startX to adjustedEndX do
                 let trueX = col + canvas.DrawingAreaX
                 let trueY = row + canvas.DrawingAreaY
 

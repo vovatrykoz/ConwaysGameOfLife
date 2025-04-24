@@ -116,19 +116,18 @@ type Canvas
         let cols = Array2D.length2 (ConwayGrid.board this.Game.State)
 
         let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
-        let processStartX = max (min startX cols - 1) 1
-        let processStartY = max (min startY rows - 1) 1
-        let processEndX = max (min endX cols - 1) 1
-        let processEndY = max (min endY rows - 1) 1
+        let adjustedEndX = max (min endX (cols - 2)) 1
+        let adjustedEndY = max (min endY (rows - 2)) 1
 
-        for row in processStartY..processEndY do
-            for col in processStartX..processEndX do
+        for row = startY to adjustedEndY do
+            for col = startX to adjustedEndX do
                 let x = col * this.CellSize
                 let y = row * this.CellSize
                 let width = this.CellSize
                 let height = this.CellSize
 
                 if CanvasArea.IsLeftPressed x y width height offsetX offsetY then
+                    printfn $"row {row} col {col}"
                     CanvasArea.makeAlive row col this.Game
 
                 if CanvasArea.IsRightPressed x y width height offsetX offsetY then
