@@ -54,7 +54,7 @@ type Cell = {
     /// <param name="cell">The cell to check.</param>
     /// <returns><c>true</c> if the cell is alive; otherwise, <c>false</c>.</returns>
     [<CompiledName("IsAlive")>]
-    static member isAlive: cell: Cell -> bool
+    static member inline isAlive: cell: Cell -> bool
 
     /// <summary>
     /// Determines whether the specified cell is dead.
@@ -62,4 +62,4 @@ type Cell = {
     /// <param name="cell">The cell to check.</param>
     /// <returns><c>true</c> if the cell is dead; otherwise, <c>false</c>.</returns>
     [<CompiledName("IsDead")>]
-    static member isDead: cell: Cell -> bool
+    static member inline isDead: cell: Cell -> bool

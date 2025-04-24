@@ -4,8 +4,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    
-    <Compile Include="Cell.fsi" /><Compile Include="Cell.fs" />
+    <Compile Include="Cell.fsi" />
+    <Compile Include="Cell.fs" />
+    <Compile Include="UnsafeUtils.fs" />
     <Compile Include="Grid.fs" />
     <Compile Include="Game.fs" />
   </ItemGroup>
