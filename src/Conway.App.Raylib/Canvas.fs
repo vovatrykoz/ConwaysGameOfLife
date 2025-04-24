@@ -5,13 +5,13 @@ open Raylib_cs
 
 module private CanvasArea =
     let makeAlive row col (game: Game) =
-        (ConwayGrid.board game.State)[row, col] <- Cell.living
+        game.State.Board[row, col] <- Cell.living
 
         // erase the history since the player has altered the board
         game.clearHistory ()
 
     let makeDead row col (game: Game) =
-        (ConwayGrid.board game.State)[row, col] <- Cell.dead
+        game.State.Board[row, col] <- Cell.dead
 
         // erase the history since the player has altered the board
         game.clearHistory ()
@@ -112,8 +112,8 @@ type Canvas
         let offsetX = this.DrawingAreaX * this.CellSize
         let offsetY = this.DrawingAreaY * this.CellSize
 
-        let rows = Array2D.length1 (ConwayGrid.board this.Game.State)
-        let cols = Array2D.length2 (ConwayGrid.board this.Game.State)
+        let rows = Array2D.length1 this.Game.State.Board
+        let cols = Array2D.length2 this.Game.State.Board
 
         let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
         let adjustedEndX = max (min endX (cols - 2)) 1

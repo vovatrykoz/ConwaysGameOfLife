@@ -116,17 +116,6 @@ let advanceOnce () =
     finally
         mainLock.ExitReadLock()
 
-let advanceBackOnce () =
-    try
-        mainLock.EnterReadLock()
-
-        match gameRunningState with
-        | Infinite
-        | Limited _ -> ()
-        | Paused -> game.stepBack ()
-    finally
-        mainLock.ExitReadLock()
-
 let update (button: Button) =
     try
         mainLock.EnterReadLock()
@@ -195,15 +184,6 @@ let advanceButton =
     |> Button.onClickCallback advanceOnce
     |> Button.onUpdateCallback updateOnRun
     |> Button.shortcut KeyboardKey.Right
-
-let advanceBackButton =
-    Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 200)
-    |> Button.size 50
-    |> Button.text "Previous"
-    |> Button.onClickCallback advanceBackOnce
-    |> Button.onUpdateCallback updateOnRunBack
-    |> Button.shortcut KeyboardKey.Left
 
 let resetButton =
     Button.create

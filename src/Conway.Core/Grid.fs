@@ -8,8 +8,9 @@ open System.Threading.Tasks
 type ConwayGrid = private {
     Buffers: Cell[,][]
     mutable ActiveBufferIndex: int
-    Memory: Stack<Cell[,]>
 } with
+
+    member this.Board = this.Buffers[this.ActiveBufferIndex]
 
     [<CompiledName("CreateDead")>]
     static member createDead width height =
@@ -18,7 +19,6 @@ type ConwayGrid = private {
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("CreateLiving")>]
@@ -33,7 +33,6 @@ type ConwayGrid = private {
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("CreateRandom")>]
@@ -52,7 +51,6 @@ type ConwayGrid = private {
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("Init")>]
@@ -67,13 +65,10 @@ type ConwayGrid = private {
         {
             Buffers = [| Array2D.copy initArr; Array2D.copy initArr |]
             ActiveBufferIndex = 0
-            Memory = new Stack<Cell[,]>()
         }
 
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
-
-    static member board grid = grid.Buffers[grid.ActiveBufferIndex]
 
     [<CompiledName("CountLivingNeighbors")>]
     static member private countLivingNeighbors row col (board: Cell array2d) =
@@ -124,19 +119,3 @@ type ConwayGrid = private {
         grid.ActiveBufferIndex <- passiveIndex
 
         grid
-
-    [<CompiledName("Previous")>]
-    static member previous grid =
-        let rows = Array2D.length1 grid.Buffers[grid.ActiveBufferIndex]
-        let cols = Array2D.length2 grid.Buffers[grid.ActiveBufferIndex]
-
-        if grid.Memory.Count <= 0 then
-            grid
-        else
-            let previousState = grid.Memory.Pop()
-
-            for row in 0 .. rows - 1 do
-                for col in 0 .. cols - 1 do
-                    grid.Buffers[grid.ActiveBufferIndex][row, col] <- previousState[row, col]
-
-            grid

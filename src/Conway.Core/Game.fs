@@ -34,17 +34,5 @@ type Game(initialState: ConwayGrid) =
     [<CompiledName("RunOneStep")>]
     member this.runOneStep() = this.run (Limited 1)
 
-    [<CompiledName("StepBack")>]
-    member this.stepBack() =
-        ConwayGrid.previous this.State |> ignore
-
-        if this.Generation > 1 then
-            this.Generation <- this.Generation - 1
-
     [<CompiledName("ClearHistory")>]
-    member this.clearHistory() =
-        this.Generation <- 1
-        this.State.Memory.Clear()
-
-    [<CompiledName("HasMemoryLoss")>]
-    member this.hasMemoryLoss() = this.State.Memory.Count <= 0
+    member this.clearHistory() = this.Generation <- 1

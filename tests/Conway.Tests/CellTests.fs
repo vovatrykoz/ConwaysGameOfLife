@@ -34,7 +34,7 @@ module ``Grid tests`` =
 
         let actual = ConwayGrid.createDead 2 2
 
-        Assert.That(ConwayGrid.board actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``Can create a living grid using the dedicated method on the Grid type`` () =
@@ -49,7 +49,7 @@ module ``Grid tests`` =
 
         let actual = ConwayGrid.createLiving 2 2
 
-        Assert.That(ConwayGrid.board actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``Can create a living grid using the init method on the Grid type`` () =
@@ -68,15 +68,15 @@ module ``Grid tests`` =
 
         let actual = ConwayGrid.init 3 3 initializer
 
-        Assert.That(ConwayGrid.board actual, Is.EqualTo expectedBoard)
+        Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
     let ``All-dead grid remains dead after one iteration`` () =
         let initializer _ _ = Cell.create Dead
 
-        let expectedBoard = ConwayGrid.init 3 3 initializer |> ConwayGrid.board
+        let expectedBoard = (ConwayGrid.init 3 3 initializer).Board
 
-        let actual = ConwayGrid.createDead 3 3 |> ConwayGrid.next |> ConwayGrid.board
+        let actual = (ConwayGrid.createDead 3 3 |> ConwayGrid.next).Board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -91,10 +91,9 @@ module ``Grid tests`` =
         let initializerForActual i j =
             if i = 1 && j = 1 then Cell.living else Cell.dead
 
-        let expectedBoard = ConwayGrid.init 3 3 initializerForExpected |> ConwayGrid.board
+        let expectedBoard = (ConwayGrid.init 3 3 initializerForExpected).Board
 
-        let actual =
-            ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next |> ConwayGrid.board
+        let actual = (ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next).Board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -112,10 +111,9 @@ module ``Grid tests`` =
             else
                 Cell.dead
 
-        let expectedBoard = ConwayGrid.init 3 3 initializerForExpected |> ConwayGrid.board
+        let expectedBoard = (ConwayGrid.init 3 3 initializerForExpected).Board
 
-        let actual =
-            ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next |> ConwayGrid.board
+        let actual = (ConwayGrid.init 3 3 initializerForActual |> ConwayGrid.next).Board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -131,10 +129,9 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual =
-            ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next |> ConwayGrid.board
+        let actual = (ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next).Board
 
-        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer |> ConwayGrid.board
+        let expectedBoard = (ConwayGrid.init 2 2 expectedInitializer).Board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -151,10 +148,9 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual =
-            ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next |> ConwayGrid.board
+        let actual = (ConwayGrid.init 2 2 setupInitializer |> ConwayGrid.next).Board
 
-        let expectedBoard = ConwayGrid.init 2 2 expectedInitializer |> ConwayGrid.board
+        let expectedBoard = (ConwayGrid.init 2 2 expectedInitializer).Board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -175,10 +171,9 @@ module ``Grid tests`` =
         let setupInitializer i j = setup[i][j]
         let expectedInitializer i j = expectedArray[i][j]
 
-        let actual =
-            ConwayGrid.init 3 2 setupInitializer |> ConwayGrid.next |> ConwayGrid.board
+        let actual = (ConwayGrid.init 3 2 setupInitializer |> ConwayGrid.next).Board
 
-        let expectedBoard = ConwayGrid.init 3 2 expectedInitializer |> ConwayGrid.board
+        let expectedBoard = (ConwayGrid.init 3 2 expectedInitializer).Board
 
         Assert.That(actual, Is.EqualTo expectedBoard)
 
@@ -212,16 +207,14 @@ module ``Grid tests`` =
 
         let actualOne = ConwayGrid.init 3 3 setupInitializer |> ConwayGrid.next
 
-        let actualBoardOne = ConwayGrid.board actualOne
+        let actualBoardOne = actualOne.Board
 
-        let expectedBoardOne =
-            ConwayGrid.init 3 3 expectedInitializerOne |> ConwayGrid.board
+        let expectedBoardOne = (ConwayGrid.init 3 3 expectedInitializerOne).Board
 
         Assert.That(actualBoardOne, Is.EqualTo expectedBoardOne)
 
-        let actualBoardTwo = ConwayGrid.next actualOne |> ConwayGrid.board
+        let actualBoardTwo = (ConwayGrid.next actualOne).Board
 
-        let expectedBoardTwo =
-            ConwayGrid.init 3 3 expectedInitializerTwo |> ConwayGrid.board
+        let expectedBoardTwo = (ConwayGrid.init 3 3 expectedInitializerTwo).Board
 
         Assert.That(actualBoardTwo, Is.EqualTo expectedBoardTwo)

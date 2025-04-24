@@ -58,7 +58,7 @@ module Display =
     let render (game: Game) (controls: ControlManager) texture =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.Blank
-        renderBoardOnCanvas controls.Canvas (ConwayGrid.board game.State)
+        renderBoardOnCanvas controls.Canvas game.State.Board
 
         Raylib.EndTextureMode()
 
