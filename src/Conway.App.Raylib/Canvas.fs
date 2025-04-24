@@ -111,10 +111,18 @@ type Canvas
     member this.ProcessDrawableArea() =
         let offsetX = this.DrawingAreaX * this.CellSize
         let offsetY = this.DrawingAreaY * this.CellSize
-        let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
 
-        for row in startY..endY do
-            for col in startX..endX do
+        let rows = Array2D.length1 (ConwayGrid.board this.Game.State)
+        let cols = Array2D.length2 (ConwayGrid.board this.Game.State)
+
+        let struct (startX, startY, endX, endY) = this.CalculateVisibleRange()
+        let processStartX = max (min startX cols - 1) 1
+        let processStartY = max (min startY rows - 1) 1
+        let processEndX = max (min endX cols - 1) 1
+        let processEndY = max (min endY rows - 1) 1
+
+        for row in processStartY..processEndY do
+            for col in processStartX..processEndX do
                 let x = col * this.CellSize
                 let y = row * this.CellSize
                 let width = this.CellSize
