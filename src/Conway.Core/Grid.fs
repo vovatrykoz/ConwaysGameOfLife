@@ -31,7 +31,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    passiveBuffer[row, col] <- ConwayGrid.processCellAt row col (activeBuffer[row, col]) activeBuffer
+                    passiveBuffer[row, col] <- ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
 
@@ -91,8 +91,8 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         + Convert.ToInt32(Cell.isAlive board.[row + 1, col])
         + Convert.ToInt32(Cell.isAlive board.[row + 1, col + 1])
 
-    [<CompiledName("ProcessPlayerCell")>]
-    static member private processCellAt row col currentCell board =
+    [<CompiledName("EvolveCellAt")>]
+    static member private evolveCellAt row col board currentCell =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
