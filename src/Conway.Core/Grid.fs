@@ -20,20 +20,18 @@ type ConwayGrid private (startingGrid: Cell array2d) =
     member this.AdvanceToNextState() =
         let activeIndex = this.ActiveBufferIndex
         let passiveIndex = (activeIndex + 1) % this.Buffers.Length
-        let rows = Array2D.length1 this.Buffers[activeIndex]
-        let cols = Array2D.length2 this.Buffers[activeIndex]
+        let activeBuffer = this.Buffers[activeIndex]
+        let passiveBuffer = this.Buffers[passiveIndex]
+
+        let rows = Array2D.length1 activeBuffer
+        let cols = Array2D.length2 activeBuffer
 
         Parallel.For(
             1,
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    this.Buffers[passiveIndex][row, col] <-
-                        ConwayGrid.processPlayerCell
-                            row
-                            col
-                            (this.Buffers[activeIndex][row, col])
-                            this.Buffers[activeIndex]
+                    passiveBuffer[row, col] <- ConwayGrid.processCellAt row col (activeBuffer[row, col]) activeBuffer
         )
         |> ignore
 
@@ -94,7 +92,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         + Convert.ToInt32(Cell.isAlive board.[row + 1, col + 1])
 
     [<CompiledName("ProcessPlayerCell")>]
-    static member private processPlayerCell row col currentCell board =
+    static member private processCellAt row col currentCell board =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
