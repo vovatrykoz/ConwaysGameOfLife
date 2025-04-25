@@ -96,6 +96,6 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
-        | x when x = 2 -> Cell.create currentCell.Status
-        | x when x = 3 -> Cell.living
+        | 2 -> Cell.create currentCell.Status
+        | 3 -> Cell.living
         | _ -> Cell.dead
