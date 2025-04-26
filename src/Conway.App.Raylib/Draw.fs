@@ -14,9 +14,23 @@ module Draw =
 
         Raylib.DrawRectangleLinesEx(rectangle, thickness, color)
 
-    let cell x y width height color =
-        Raylib.DrawRectangle(x * width, y * height, width, height, Color.Black)
-        Raylib.DrawRectangle(x * width + 1, y * height + 1, width - 2, height - 2, color)
+    let cell (x: float32) (y: float32) (width: float32) (height: float32) color =
+        Raylib.DrawRectanglePro(
+            Rectangle(System.Numerics.Vector2(x * width, y * height), System.Numerics.Vector2(width, height)),
+            System.Numerics.Vector2.Zero,
+            0.0f,
+            Color.Black
+        )
+
+        Raylib.DrawRectanglePro(
+            Rectangle(
+                System.Numerics.Vector2(x * width + 1.0f, y * height + 1.0f),
+                System.Numerics.Vector2(width - 2.0f, height - 2.0f)
+            ),
+            System.Numerics.Vector2.Zero,
+            0.0f,
+            color
+        )
 
     let livingCell x y width height = cell x y width height Color.Red
 
@@ -38,5 +52,5 @@ module Draw =
                 Color.Black
             )
 
-    let textBox x y fontSize (text: string) =
-        Raylib.DrawText(text, x, y, fontSize, Color.Black)
+    let textBox (x: float32) (y: float32) fontSize (text: string) =
+        Raylib.DrawText(text, int x, int y, fontSize, Color.Black)

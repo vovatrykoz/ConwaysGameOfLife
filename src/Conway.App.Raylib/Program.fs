@@ -12,7 +12,7 @@ let windowHeight = 1080
 
 Display.init windowWidth windowHeight
 
-Display.loadingScreen (windowWidth / 2) (windowHeight / 2)
+Display.loadingScreen (float32 (windowWidth / 2)) (float32 (windowHeight / 2))
 
 let defaultGridWidth = 1000
 let defaultGridHeight = 1000
@@ -204,15 +204,15 @@ let clearButton =
 
 let buttons = [| toggleButton; advanceButton; resetButton; clearButton |]
 
-let canvasX = 25
-let canvasY = 25
-let cellSize = 25
+let canvasX = 25.0f
+let canvasY = 25.0f
+let cellSize = 25.0f
 
-let widthOffset = cellSize * 12
-let heightOffset = cellSize * 2
+let widthOffset = cellSize * 12.0f
+let heightOffset = cellSize * 2.0f
 
-let focusAreaX = 500
-let focusAreaY = 500
+let focusAreaX = 500.0f
+let focusAreaY = 500.0f
 
 let scale = 1
 
@@ -220,8 +220,8 @@ let canvas =
     new Canvas(
         canvasX,
         canvasY,
-        windowWidth - widthOffset,
-        windowHeight - heightOffset,
+        float32 windowWidth - widthOffset,
+        float32 windowHeight - heightOffset,
         focusAreaX,
         focusAreaY,
         game,
@@ -233,19 +233,19 @@ let controlManager = new ControlManager(canvas)
 controlManager.Buttons.AddRange buttons
 
 let keyboardActions = [|
-    KeyboardKey.W, (fun _ -> controlManager.Canvas.MoveCameraUp 1)
-    KeyboardKey.A, (fun _ -> controlManager.Canvas.MoveCameraLeft 1)
-    KeyboardKey.S, (fun _ -> controlManager.Canvas.MoveCameraDown 1)
-    KeyboardKey.D, (fun _ -> controlManager.Canvas.MoveCameraRight 1)
-    KeyboardKey.Z, (fun _ -> controlManager.Canvas.ZoomIn 5)
-    KeyboardKey.X, (fun _ -> controlManager.Canvas.ZoomOut 5)
+    KeyboardKey.W, (fun _ -> controlManager.Canvas.MoveCameraUp 1.0f)
+    KeyboardKey.A, (fun _ -> controlManager.Canvas.MoveCameraLeft 1.0f)
+    KeyboardKey.S, (fun _ -> controlManager.Canvas.MoveCameraDown 1.0f)
+    KeyboardKey.D, (fun _ -> controlManager.Canvas.MoveCameraRight 1.0f)
+    KeyboardKey.Z, (fun _ -> controlManager.Canvas.ZoomIn 5.0f)
+    KeyboardKey.X, (fun _ -> controlManager.Canvas.ZoomOut 5.0f)
 |]
 
 controlManager.KeyActions.AddRange keyboardActions
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(canvas.Width, canvas.Height)
+let renderTexture = Raylib.LoadRenderTexture(int canvas.Width, int canvas.Height)
 let mutable fps = 0.0
 let maxSamples = 60
 let frameTimes = Array.create maxSamples 0.0

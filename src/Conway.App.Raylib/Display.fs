@@ -21,13 +21,15 @@ module Display =
         let cols = Array2D.length2 board
 
         let struct (startX, startY, endX, endY) = canvas.CalculateVisibleRange()
-        let adjustedEndX = max (min endX (cols - 2)) 1
-        let adjustedEndY = max (min endY (rows - 2)) 1
+        let startRow = int startY
+        let startCol = int startX
+        let endRow = max (min (int endY) (rows - 2)) 1
+        let endCol = max (min (int endX) (cols - 2)) 1
 
-        for row = startY to adjustedEndY do
-            for col = startX to adjustedEndX do
-                let trueX = col + canvas.DrawingAreaX
-                let trueY = row + canvas.DrawingAreaY
+        for row = startRow to endRow do
+            for col = startCol to endCol do
+                let trueX = float32 col + canvas.DrawingAreaX
+                let trueY = float32 row + canvas.DrawingAreaY
 
                 match board[row, col].Status with
                 | Dead -> Draw.deadCell trueX trueY canvas.CellSize canvas.CellSize
@@ -40,15 +42,15 @@ module Display =
             | false -> ()
 
     let private renderGenerationCounter (canvas: Canvas) generation =
-        Draw.textBox (canvas.X + canvas.Width + 5) canvas.Y 24 $"Generation {generation}"
+        Draw.textBox (canvas.X + canvas.Width + 5.0f) canvas.Y 24 $"Generation {generation}"
 
     let private renderFpsCounter (canvas: Canvas) fps =
-        Draw.textBox (canvas.X + canvas.Width + 5) (canvas.Y + 50) 24 $"FPS {fps}"
+        Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 50.0f) 24 $"FPS {fps}"
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
         Draw.textBox
-            (canvas.X + canvas.Width + 5)
-            (canvas.Y + 100)
+            (canvas.X + canvas.Width + 5.0f)
+            (canvas.Y + 100.0f)
             24
             $"Camera:\nX: {-canvas.DrawingAreaX} Y: {-canvas.DrawingAreaY}"
 

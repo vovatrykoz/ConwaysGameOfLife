@@ -16,7 +16,13 @@ module private CanvasArea =
         // erase the history since the player has altered the board
         game.ClearHistory()
 
-    let IsPressedWithShift (startX: int) (startY: int) (endX: int) (endY: int) (mouseButton: MouseButton) =
+    let IsPressedWithShift
+        (startX: float32)
+        (startY: float32)
+        (endX: float32)
+        (endY: float32)
+        (mouseButton: MouseButton)
+        =
         if
             (Keyboard.keyIsDown KeyboardKey.LeftShift
              || Keyboard.keyIsDown KeyboardKey.RightShift)
@@ -25,10 +31,10 @@ module private CanvasArea =
             let mousePos = Mouse.getPosition ()
 
             if
-                mousePos.X >= float32 startX
-                && mousePos.X <= float32 endX
-                && mousePos.Y >= float32 startY
-                && mousePos.Y <= float32 endY
+                mousePos.X >= startX
+                && mousePos.X <= endX
+                && mousePos.Y >= startY
+                && mousePos.Y <= endY
             then
                 true
             else
@@ -36,18 +42,28 @@ module private CanvasArea =
         else
             false
 
-    let IsLeftPressedWithShift (startX: int) (startY: int) (endX: int) (endY: int) =
+    let IsLeftPressedWithShift (startX: float32) (startY: float32) (endX: float32) (endY: float32) =
         IsPressedWithShift startX startY endX endY MouseButton.Left
 
-    let IsRightPressedWithShift (startX: int) (startY: int) (endX: int) (endY: int) =
+    let IsRightPressedWithShift (startX: float32) (startY: float32) (endX: float32) (endY: float32) =
         IsPressedWithShift startX startY endX endY MouseButton.Right
 
 type Canvas
-    (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, cellSize: int, scale: int) =
+    (
+        x: float32,
+        y: float32,
+        width: float32,
+        height: float32,
+        drawingX: float32,
+        drawingY: float32,
+        game: Game,
+        cellSize: float32,
+        scale: int
+    ) =
 
-    let maxCellSizeLimit = 50
+    let maxCellSizeLimit = 50.0f
 
-    let minCellSizeLimit = 5
+    let minCellSizeLimit = 5.0f
 
     let mutable currentMaxCellSize = maxCellSizeLimit
 
@@ -89,8 +105,8 @@ type Canvas
         let activeHeight =
             min ((this.Height - offsetY) / this.CellSize) (this.Height / this.CellSize)
 
-        let startX = max (1 - this.DrawingAreaX) 1
-        let startY = max (1 - this.DrawingAreaY) 1
+        let startX = max (1.0f - this.DrawingAreaX) 1.0f
+        let startY = max (1.0f - this.DrawingAreaY) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
@@ -102,8 +118,8 @@ type Canvas
         else
             let mouseDelta = Mouse.getDelta ()
 
-            this.DrawingAreaX <- this.DrawingAreaX + int mouseDelta.X / 8
-            this.DrawingAreaY <- this.DrawingAreaY + int mouseDelta.Y / 8
+            this.DrawingAreaX <- this.DrawingAreaX + mouseDelta.X / 8.0f
+            this.DrawingAreaY <- this.DrawingAreaY + mouseDelta.Y / 8.0f
 
     member this.ProcessDrawableArea() =
         this.ProcessMouseDrag()
@@ -117,13 +133,15 @@ type Canvas
         let struct (visibleStartX, visibleStartY, visibleEndX, visibleEndY) =
             this.CalculateVisibleRange()
 
-        let adjustedEndX = max (min visibleEndX (cols - 2)) 1
-        let adjustedEndY = max (min visibleEndY (rows - 2)) 1
+        let startCol = int visibleEndX
+        let startRow = int visibleEndY
+        let endCol = max (min startCol (cols - 2)) 1
+        let endRow = max (min startRow (rows - 2)) 1
 
-        for row = visibleStartX to adjustedEndY do
-            for col = visibleStartY to adjustedEndX do
-                let startX = col * this.CellSize + offsetX
-                let startY = row * this.CellSize + offsetY
+        for row = startRow to endRow do
+            for col = startCol to endCol do
+                let startX = float32 col * this.CellSize + offsetX
+                let startY = float32 row * this.CellSize + offsetY
                 let endX = startX + this.CellSize
                 let endY = startY + this.CellSize
 
@@ -133,20 +151,20 @@ type Canvas
                 if CanvasArea.IsRightPressedWithShift startX startY endX endY then
                     CanvasArea.makeDead row col this.Game
 
-    member this.MoveCameraRight(speed: int) =
+    member this.MoveCameraRight(speed: float32) =
         this.DrawingAreaX <- this.DrawingAreaX - speed
 
-    member this.MoveCameraLeft(speed: int) =
+    member this.MoveCameraLeft(speed: float32) =
         this.DrawingAreaX <- this.DrawingAreaX + speed
 
-    member this.MoveCameraUp(speed: int) =
+    member this.MoveCameraUp(speed: float32) =
         this.DrawingAreaY <- this.DrawingAreaY + speed
 
-    member this.MoveCameraDown(speed: int) =
+    member this.MoveCameraDown(speed: float32) =
         this.DrawingAreaY <- this.DrawingAreaY - speed
 
-    member this.ZoomIn(speed: int) =
+    member this.ZoomIn(speed: float32) =
         this.CellSize <- min (this.CellSize + speed) this.MaxCellSize
 
-    member this.ZoomOut(speed: int) =
+    member this.ZoomOut(speed: float32) =
         this.CellSize <- max (this.CellSize - speed) this.MinCellSize
