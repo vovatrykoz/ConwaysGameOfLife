@@ -121,9 +121,10 @@ type Canvas
             ()
         else
             let mouseDelta = Mouse.getDelta ()
+            let cellSizeInverse = 1.0f / this.CellSize
 
-            this.DrawingAreaX <- this.DrawingAreaX + mouseDelta.X / 8.0f
-            this.DrawingAreaY <- this.DrawingAreaY + mouseDelta.Y / 8.0f
+            this.DrawingAreaX <- this.DrawingAreaX + mouseDelta.X * cellSizeInverse
+            this.DrawingAreaY <- this.DrawingAreaY + mouseDelta.Y * cellSizeInverse
 
     member this.ProcessDrawableArea() =
         this.ProcessMouseDrag()

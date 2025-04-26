@@ -52,7 +52,7 @@ module Display =
             (canvas.X + canvas.Width + 5.0f)
             (canvas.Y + 100.0f)
             24
-            $"Camera:\nX: {-canvas.DrawingAreaX} Y: {-canvas.DrawingAreaY}"
+            $"Camera:\nX: {-canvas.DrawingAreaX:F2} Y: {-canvas.DrawingAreaY:F2}"
 
     let loadingScreen x y =
         for _ in 0..10 do

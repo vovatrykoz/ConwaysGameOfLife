@@ -3,6 +3,8 @@ namespace Conway.App.Raylib
 open Raylib_cs
 
 module Draw =
+    open System.Numerics
+
     let private buttonBorderRectangle x y size =
         Rectangle(float32 (x - 2), float32 (y - 2), float32 (size + 4), float32 (size + 4))
 
@@ -16,18 +18,15 @@ module Draw =
 
     let cell (x: float32) (y: float32) (width: float32) (height: float32) color =
         Raylib.DrawRectanglePro(
-            Rectangle(System.Numerics.Vector2(x * width, y * height), System.Numerics.Vector2(width, height)),
-            System.Numerics.Vector2.Zero,
+            Rectangle(Vector2(x * width, y * height), Vector2(width, height)),
+            Vector2.Zero,
             0.0f,
             Color.Black
         )
 
         Raylib.DrawRectanglePro(
-            Rectangle(
-                System.Numerics.Vector2(x * width + 1.0f, y * height + 1.0f),
-                System.Numerics.Vector2(width - 2.0f, height - 2.0f)
-            ),
-            System.Numerics.Vector2.Zero,
+            Rectangle(Vector2(x * width + 1.0f, y * height + 1.0f), Vector2(width - 2.0f, height - 2.0f)),
+            Vector2.Zero,
             0.0f,
             color
         )
