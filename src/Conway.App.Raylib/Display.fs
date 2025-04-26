@@ -45,6 +45,13 @@ module Display =
     let private renderFpsCounter (canvas: Canvas) fps =
         Draw.textBox (canvas.X + canvas.Width + 5) (canvas.Y + 50) 24 $"FPS {fps}"
 
+    let private renderCanvasFocusCoordinates (canvas: Canvas) =
+        Draw.textBox
+            (canvas.X + canvas.Width + 5)
+            (canvas.Y + 100)
+            24
+            $"Camera:\nX: {-canvas.DrawingAreaX} Y: {-canvas.DrawingAreaY}"
+
     let loadingScreen x y =
         for _ in 0..10 do
             Raylib.BeginDrawing()
@@ -67,6 +74,7 @@ module Display =
         renderControls controls
         renderGenerationCounter controls.Canvas game.Generation
         renderFpsCounter controls.Canvas fps
+        renderCanvasFocusCoordinates controls.Canvas
 
         Raylib.DrawTextureRec(
             texture.Texture,
