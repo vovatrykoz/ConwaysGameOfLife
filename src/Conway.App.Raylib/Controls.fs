@@ -13,6 +13,12 @@ type ControlManager(canvas: Canvas) =
 
     member val KeyActions: List<KeyboardKey * (unit -> unit)> = new List<KeyboardKey * (unit -> unit)>() with get, set
 
+    member val ShiftKeyActions: List<KeyboardKey * (unit -> unit)> =
+        new List<KeyboardKey * (unit -> unit)>() with get, set
+
+    member val CtrlKeyActions: List<KeyboardKey * (unit -> unit)> =
+        new List<KeyboardKey * (unit -> unit)>() with get, set
+
     member private this.ProcessButtons() =
         for button in this.Buttons do
             match button.IsActive with
@@ -43,9 +49,24 @@ type ControlManager(canvas: Canvas) =
                         this.ActivatedButton <- None
 
     member private this.ProcessKeyActions() =
-        for key, action in this.KeyActions do
-            if Keyboard.readKeyPress key then
-                action ()
+        if
+            Keyboard.keyIsDown KeyboardKey.LeftShift
+            || Keyboard.keyIsDown KeyboardKey.RightShift
+        then
+            for key, action in this.ShiftKeyActions do
+                if Keyboard.keyHasBeenPressedOnce key then
+                    action ()
+        else if
+            Keyboard.keyIsDown KeyboardKey.LeftControl
+            || Keyboard.keyIsDown KeyboardKey.RightControl
+        then
+            for key, action in this.CtrlKeyActions do
+                if Keyboard.keyHasBeenPressedOnce key then
+                    action ()
+        else
+            for key, action in this.KeyActions do
+                if Keyboard.keyHasBeenPressedOnce key then
+                    action ()
 
     member this.ReadInput() =
         this.ProcessButtons()

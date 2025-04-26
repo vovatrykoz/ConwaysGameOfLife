@@ -16,8 +16,12 @@ module private CanvasArea =
         // erase the history since the player has altered the board
         game.ClearHistory()
 
-    let IsPressedWith (startX: int) (startY: int) (endX: int) (endY: int) (mouseButton: MouseButton) =
-        if Mouse.readButtonPress mouseButton then
+    let IsPressedWithShift (startX: int) (startY: int) (endX: int) (endY: int) (mouseButton: MouseButton) =
+        if
+            (Keyboard.keyIsDown KeyboardKey.LeftShift
+             || Keyboard.keyIsDown KeyboardKey.RightShift)
+            && Mouse.readButtonPress mouseButton
+        then
             let mousePos = Mouse.getPosition ()
 
             if
@@ -32,11 +36,11 @@ module private CanvasArea =
         else
             false
 
-    let IsLeftPressed (startX: int) (startY: int) (endX: int) (endY: int) =
-        IsPressedWith startX startY endX endY MouseButton.Left
+    let IsLeftPressedWithShift (startX: int) (startY: int) (endX: int) (endY: int) =
+        IsPressedWithShift startX startY endX endY MouseButton.Left
 
-    let IsRightPressed (startX: int) (startY: int) (endX: int) (endY: int) =
-        IsPressedWith startX startY endX endY MouseButton.Right
+    let IsRightPressedWithShift (startX: int) (startY: int) (endX: int) (endY: int) =
+        IsPressedWithShift startX startY endX endY MouseButton.Right
 
 type Canvas
     (x: int, y: int, width: int, height: int, drawingX: int, drawingY: int, game: Game, cellSize: int, scale: int) =
@@ -112,10 +116,10 @@ type Canvas
                 let endX = startX + this.CellSize
                 let endY = startY + this.CellSize
 
-                if CanvasArea.IsLeftPressed startX startY endX endY then
+                if CanvasArea.IsLeftPressedWithShift startX startY endX endY then
                     CanvasArea.makeAlive row col this.Game
 
-                if CanvasArea.IsRightPressed startX startY endX endY then
+                if CanvasArea.IsRightPressedWithShift startX startY endX endY then
                     CanvasArea.makeDead row col this.Game
 
     member this.MoveCameraRight(speed: int) =

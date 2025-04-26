@@ -4,6 +4,6 @@ open Conway.App.Raylib.Aliases
 open Raylib_cs
 
 module Keyboard =
-    let readKeyDown key = raylibTrue (Raylib.IsKeyDown key)
+    let keyIsDown key = raylibTrue (Raylib.IsKeyDown key)
 
-    let readKeyPress key = raylibTrue (Raylib.IsKeyPressed key)
+    let keyHasBeenPressedOnce key = raylibTrue (Raylib.IsKeyPressed key)

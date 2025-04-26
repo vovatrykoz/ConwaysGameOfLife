@@ -62,7 +62,7 @@ type Button
             button.IsPressed <- false
             button.IsPressed
         | Some shortcut ->
-            if Keyboard.readKeyPress shortcut then
+            if Keyboard.keyHasBeenPressedOnce shortcut then
                 button.IsPressed <- true
 
                 match button.OnClick with
