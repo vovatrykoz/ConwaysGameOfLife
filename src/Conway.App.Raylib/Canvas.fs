@@ -152,8 +152,8 @@ type Canvas
         let struct (visibleStartX, visibleStartY, visibleEndX, visibleEndY) =
             this.CalculateVisibleRange()
 
-        let startCol = int visibleStartY
-        let startRow = int visibleStartX
+        let startCol = int visibleStartX
+        let startRow = int visibleStartY
         let endCol = max (min (int visibleEndX) (cols - 2)) 1
         let endRow = max (min (int visibleEndY) (rows - 2)) 1
 
