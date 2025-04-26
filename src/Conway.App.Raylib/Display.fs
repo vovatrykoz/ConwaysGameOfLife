@@ -39,8 +39,11 @@ module Display =
             | true -> Draw.button button
             | false -> ()
 
-    let private renderGenerationCounter generation =
-        Draw.textBox 1680 50 24 $"Generation {generation}"
+    let private renderGenerationCounter (canvas: Canvas) generation =
+        Draw.textBox (canvas.X + canvas.Width + 5) canvas.Y 24 $"Generation {generation}"
+
+    let private renderFpsCounter (canvas: Canvas) fps =
+        Draw.textBox (canvas.X + canvas.Width + 5) (canvas.Y + 50) 24 $"FPS {fps}"
 
     let loadingScreen x y =
         for _ in 0..10 do
@@ -51,7 +54,7 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let render (game: Game) (controls: ControlManager) texture =
+    let render (game: Game) (controls: ControlManager) texture fps =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.Blank
         renderBoardOnCanvas controls.Canvas game.State.Board
@@ -62,7 +65,8 @@ module Display =
         Raylib.ClearBackground Color.White
 
         renderControls controls
-        renderGenerationCounter game.Generation
+        renderGenerationCounter controls.Canvas game.Generation
+        renderFpsCounter controls.Canvas fps
 
         Raylib.DrawTextureRec(
             texture.Texture,

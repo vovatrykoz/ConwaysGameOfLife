@@ -3,6 +3,7 @@ open Conway.App.Raylib
 open Conway.App.Raylib.Aliases
 open Raylib_cs
 open System
+open System.Diagnostics
 open System.Threading
 
 let windowWidth = 1920
@@ -245,11 +246,27 @@ controlManager.KeyActions.AddRange keyboardActions
 gameUpdateLoop () |> Async.Start
 
 let renderTexture = Raylib.LoadRenderTexture(canvas.Width, canvas.Height)
+let mutable fps = 0.0
+let maxSamples = 60
+let frameTimes = Array.create maxSamples 0.0
+let mutable insertIndex = 0
+
+let stopwatch = Stopwatch.StartNew()
 
 while not (raylibTrue (Raylib.WindowShouldClose())) do
+    let frameStart = stopwatch.Elapsed.TotalSeconds
+
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.render game controlManager renderTexture
+    Display.render game controlManager renderTexture (int fps)
+
+    let frameEnd = stopwatch.Elapsed.TotalSeconds
+    let frameTime = frameEnd - frameStart
+
+    frameTimes[insertIndex] <- frameTime
+    insertIndex <- (insertIndex + 1) % maxSamples
+
+    fps <- 1.0 / (frameTimes |> Array.average)
 
 Raylib.UnloadRenderTexture renderTexture
 Display.close ()
