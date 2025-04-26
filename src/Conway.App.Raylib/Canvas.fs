@@ -113,7 +113,11 @@ type Canvas
         struct (startX, startY, endX, endY)
 
     member this.ProcessMouseDrag() =
-        if not (Mouse.buttonIsPressed MouseButton.Left) then
+        if
+            not (Mouse.buttonIsPressed MouseButton.Left)
+            || Keyboard.keyIsDown KeyboardKey.LeftShift
+            || Keyboard.keyIsDown KeyboardKey.LeftShift
+        then
             ()
         else
             let mouseDelta = Mouse.getDelta ()
@@ -133,10 +137,10 @@ type Canvas
         let struct (visibleStartX, visibleStartY, visibleEndX, visibleEndY) =
             this.CalculateVisibleRange()
 
-        let startCol = int visibleEndX
-        let startRow = int visibleEndY
-        let endCol = max (min startCol (cols - 2)) 1
-        let endRow = max (min startRow (rows - 2)) 1
+        let startCol = int visibleStartY
+        let startRow = int visibleStartX
+        let endCol = max (min (int visibleEndX) (cols - 2)) 1
+        let endRow = max (min (int visibleEndY) (rows - 2)) 1
 
         for row = startRow to endRow do
             for col = startCol to endCol do
