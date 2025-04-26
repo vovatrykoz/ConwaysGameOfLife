@@ -126,8 +126,22 @@ type Canvas
             this.DrawingAreaX <- this.DrawingAreaX + mouseDelta.X * cellSizeInverse
             this.DrawingAreaY <- this.DrawingAreaY + mouseDelta.Y * cellSizeInverse
 
+    member this.processMouseScroll() =
+        let mousePos = Mouse.position ()
+
+        if
+            mousePos.X >= this.X
+            && mousePos.X <= this.X + this.Width
+            && mousePos.Y >= this.Y
+            && mousePos.Y <= this.Y + this.Height
+        then
+            let mouseScrollAmount = Mouse.getScrollAmount ()
+            this.ZoomIn mouseScrollAmount.Y
+            this.ZoomOut mouseScrollAmount.X
+
     member this.ProcessDrawableArea() =
         this.ProcessMouseDrag()
+        this.processMouseScroll ()
 
         let offsetX = this.DrawingAreaX * this.CellSize
         let offsetY = this.DrawingAreaY * this.CellSize
