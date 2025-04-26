@@ -20,7 +20,7 @@ module private CanvasArea =
         if
             (Keyboard.keyIsDown KeyboardKey.LeftShift
              || Keyboard.keyIsDown KeyboardKey.RightShift)
-            && Mouse.readButtonPress mouseButton
+            && Mouse.buttonIsPressed mouseButton
         then
             let mousePos = Mouse.getPosition ()
 
@@ -96,7 +96,18 @@ type Canvas
 
         struct (startX, startY, endX, endY)
 
+    member this.ProcessMouseDrag() =
+        if not (Mouse.buttonIsPressed MouseButton.Left) then
+            ()
+        else
+            let mouseDelta = Mouse.getDelta ()
+
+            this.DrawingAreaX <- this.DrawingAreaX + int mouseDelta.X / 8
+            this.DrawingAreaY <- this.DrawingAreaY + int mouseDelta.Y / 8
+
     member this.ProcessDrawableArea() =
+        this.ProcessMouseDrag()
+
         let offsetX = this.DrawingAreaX * this.CellSize
         let offsetY = this.DrawingAreaY * this.CellSize
 

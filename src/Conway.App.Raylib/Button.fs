@@ -75,7 +75,7 @@ type Button
                 button.IsPressed
 
     static member isPressed(button: Button) =
-        if Mouse.readButtonPress MouseButton.Left then
+        if Mouse.buttonIsPressed MouseButton.Left then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
             let maxX = button.X + button.Size
@@ -99,7 +99,7 @@ type Button
             button.IsPressed
 
     static member isClicked(button: Button) =
-        if Mouse.readButtonClick MouseButton.Left then
+        if Mouse.buttonClicked MouseButton.Left then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
             let maxX = button.X + button.Size
