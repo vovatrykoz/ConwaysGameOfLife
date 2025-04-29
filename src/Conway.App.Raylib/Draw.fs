@@ -31,9 +31,9 @@ module Draw =
             color
         )
 
-    let livingCell x y width height = cell x y width height Color.Red
+    let inline livingCell x y width height = cell x y width height Color.Red
 
-    let deadCell x y width height = cell x y width height Color.Black
+    let inline deadCell x y width height = cell x y width height Color.Black
 
     let button (button: Button) =
         match button.IsActive with
@@ -51,5 +51,5 @@ module Draw =
                 Color.Black
             )
 
-    let textBox (x: float32) (y: float32) fontSize (text: string) =
+    let inline textBox (x: float32) (y: float32) fontSize (text: string) =
         Raylib.DrawText(text, int x, int y, fontSize, Color.Black)
