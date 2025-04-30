@@ -30,6 +30,21 @@ type ConwayGrid =
     member AdvanceToNextState: unit -> unit
 
     /// <summary>
+    /// Advances the grid to the next state according to Conway's Game of Life rules.
+    /// </summary>
+    member AdvanceToNextStateOther: unit -> unit
+
+    /// <summary>
+    /// Advances the grid to the next state according to Conway's Game of Life rules.
+    /// </summary>
+    member AdvanceToNextStateOtherUnsafe: unit -> unit
+
+    /// <summary>
+    /// Advances the grid to the next state according to Conway's Game of Life rules.
+    /// </summary>
+    member AdvanceToNextStateOtherUnsafeChunk: unit -> unit
+
+    /// <summary>
     /// Creates a grid with all cells dead.
     /// </summary>
     /// <param name="width">Grid width.</param>
