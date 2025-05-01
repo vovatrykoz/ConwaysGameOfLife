@@ -12,6 +12,7 @@ module Display =
 
     let init width height =
         Raylib.SetConfigFlags ConfigFlags.FullscreenMode
+        Raylib.SetTargetFPS 120
         Raylib.InitWindow(width, height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) (board: Cell[,]) =
