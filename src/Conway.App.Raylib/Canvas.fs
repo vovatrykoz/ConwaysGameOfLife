@@ -2,6 +2,7 @@ namespace Conway.App.Raylib
 
 open Conway.Core
 open Raylib_cs
+open System.Numerics
 
 module private CanvasArea =
     let makeAlive row col (game: Game) =
@@ -96,21 +97,21 @@ type Canvas
     member val Scale = scale with get, set
 
     member this.CalculateVisibleRange() =
-        let offsetX = this.DrawingAreaX * this.CellSize
-        let offsetY = this.DrawingAreaY * this.CellSize
+        let cellSize = this.CellSize
 
-        let activeWidth =
-            min ((this.Width - offsetX) / this.CellSize) (this.Width / this.CellSize)
+        let offsetX = this.DrawingAreaX * cellSize
+        let offsetY = this.DrawingAreaY * cellSize
 
-        let activeHeight =
-            min ((this.Height - offsetY) / this.CellSize) (this.Height / this.CellSize)
+        let activeWidth = min ((this.Width - offsetX) / cellSize) (this.Width / cellSize)
+
+        let activeHeight = min ((this.Height - offsetY) / cellSize) (this.Height / cellSize)
 
         let startX = max (1.0f - this.DrawingAreaX) 1.0f
         let startY = max (1.0f - this.DrawingAreaY) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
-        struct (startX, startY, endX, endY)
+        struct (Vector2(startX, startY), Vector2(endX, endY))
 
     member this.ProcessMouseDrag() =
         if
@@ -143,26 +144,35 @@ type Canvas
         this.ProcessMouseDrag()
         this.processMouseScroll ()
 
-        let offsetX = this.DrawingAreaX * this.CellSize
-        let offsetY = this.DrawingAreaY * this.CellSize
+        let cellSize = this.CellSize
+
+        let offsetX = this.DrawingAreaX * cellSize
+        let offsetY = this.DrawingAreaY * cellSize
 
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board
 
-        let struct (visibleStartX, visibleStartY, visibleEndX, visibleEndY) =
-            this.CalculateVisibleRange()
+        let struct (visibleStartPoint, visibleEndPoint) = this.CalculateVisibleRange()
 
-        let startCol = int visibleStartX
-        let startRow = int visibleStartY
-        let endCol = max (min (int visibleEndX) (cols - 2)) 1
-        let endRow = max (min (int visibleEndY) (rows - 2)) 1
+        let startCol = int visibleStartPoint.X
+        let startRow = int visibleStartPoint.Y
+        let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
+        let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
+
+        let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * cellSize
+        let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * cellSize
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let startX = float32 col * this.CellSize + offsetX
-                let startY = float32 row * this.CellSize + offsetY
-                let endX = startX + this.CellSize
-                let endY = startY + this.CellSize
+                let trueStartX = float32 col * cellSize + offsetX
+                let trueStartY = float32 row * cellSize + offsetY
+                let trueEndX = trueStartX + cellSize
+                let trueEndY = trueStartY + cellSize
+
+                let startX = max trueStartX this.X
+                let startY = max trueStartY this.Y
+                let endX = min (min (startX + cellSize) endBorderX) trueEndX
+                let endY = min (min (startY + cellSize) endBorderY) trueEndY
 
                 if CanvasArea.IsLeftPressedWithShift startX startY endX endY then
                     CanvasArea.makeAlive row col this.Game

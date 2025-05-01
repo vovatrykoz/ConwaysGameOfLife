@@ -3,6 +3,7 @@
 /// <summary>
 /// Represents the mode in which the game can run.
 /// </summary>
+[<Struct>]
 type GameMode =
     /// <summary>Run the game indefinitely.</summary>
     | Infinite

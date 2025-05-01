@@ -69,11 +69,11 @@ let mainLock = new ReaderWriterLockSlim()
 let mutable gameRunningState = Paused
 
 let gameUpdateLoop () =
+    let mutable shouldRun = false
+
     async {
         while true do
             do! Async.Sleep 34
-
-            let mutable shouldRun = false
 
             try
                 mainLock.EnterWriteLock()
@@ -258,7 +258,7 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.render game controlManager renderTexture (int fps)
+    Display.render game controlManager renderTexture (int fps) (Raylib.GetMousePosition())
 
     let frameEnd = stopwatch.Elapsed.TotalSeconds
     let frameTime = frameEnd - frameStart

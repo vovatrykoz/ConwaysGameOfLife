@@ -15,25 +15,29 @@ module Display =
         Raylib.InitWindow(width, height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) (board: Cell[,]) =
-        // Raylib.DrawRectangle(canvas.X, canvas.Y, canvas.Width, canvas.Height, Color.Black)
-
         let rows = Array2D.length1 board
         let cols = Array2D.length2 board
 
-        let struct (startX, startY, endX, endY) = canvas.CalculateVisibleRange()
-        let startRow = int startY
-        let startCol = int startX
-        let endRow = max (min (int endY) (rows - 2)) 1
-        let endCol = max (min (int endX) (cols - 2)) 1
+        let struct (visibleStartPoint, visibleEndPoint) = canvas.CalculateVisibleRange()
+        let startRow = int visibleStartPoint.Y
+        let startCol = int visibleStartPoint.X
+        let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
+        let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueX = float32 col + canvas.DrawingAreaX
-                let trueY = float32 row + canvas.DrawingAreaY
+                let trueX =
+                    max (float32 col + canvas.DrawingAreaX) (visibleStartPoint.X + canvas.DrawingAreaX)
+
+                let trueY =
+                    max (float32 row + canvas.DrawingAreaY) (visibleStartPoint.Y + canvas.DrawingAreaY)
+
+                let trueWidth = canvas.CellSize
+                let trueHeight = canvas.CellSize
 
                 match board[row, col].Status with
-                | Dead -> Draw.deadCell trueX trueY canvas.CellSize canvas.CellSize
-                | Alive -> Draw.livingCell trueX trueY canvas.CellSize canvas.CellSize
+                | Dead -> Draw.deadCell trueX trueY trueWidth trueHeight
+                | Alive -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =
         for button in controls.Buttons do
@@ -46,6 +50,9 @@ module Display =
 
     let private renderFpsCounter (canvas: Canvas) fps =
         Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 50.0f) 24 $"FPS {fps}"
+
+    let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
+        Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 150.0f) 24 $"X {mousePos.X} Y {mousePos.Y}"
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
         Draw.textBox
@@ -63,7 +70,7 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let render (game: Game) (controls: ControlManager) texture fps =
+    let render (game: Game) (controls: ControlManager) texture fps mousePos =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.Blank
         renderBoardOnCanvas controls.Canvas game.State.Board
@@ -76,6 +83,7 @@ module Display =
         renderControls controls
         renderGenerationCounter controls.Canvas game.Generation
         renderFpsCounter controls.Canvas fps
+        renderMousePos controls.Canvas mousePos
         renderCanvasFocusCoordinates controls.Canvas
 
         Raylib.DrawTextureRec(
