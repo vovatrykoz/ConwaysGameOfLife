@@ -4,7 +4,9 @@ open Microsoft.FSharp.NativeInterop
 open System
 open System.Threading.Tasks
 
-#nowarn "9"
+// Uses of this construct may result in the generation of unverifiable .NET IL code.
+// This warning can be disabled using '--nowarn:9' or '#nowarn "9"'
+#nowarn "9" // Warning appears due to the use of "NativePtr.get" and the board pointer down below
 
 type ConwayGrid private (startingGrid: Cell array2d) =
 
@@ -83,10 +85,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
     static member initFromPreset preset = preset |||> ConwayGrid.init
 
     [<CompiledName("CountLivingNeighbors")>]
-    static member private countLivingNeighbors row col (board: Cell array2d) =
-        let cols = Array2D.length2 board
-        use ptr = fixed &board.[0, 0]
-
+    static member private countLivingNeighbors row col cols (ptr: nativeptr<Cell>) =
         Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col - 1))))
         + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + col)))
         + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col + 1))))
@@ -98,7 +97,10 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col board currentCell =
-        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
+        let cols = Array2D.length2 board
+        use ptr = fixed &board.[0, 0]
+
+        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col cols ptr
 
         match livingNeighborsCount with
         | 2 -> Cell.create currentCell.Status
