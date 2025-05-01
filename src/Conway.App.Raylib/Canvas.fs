@@ -90,24 +90,23 @@ type Canvas
 
     member val Game = game with get, set
 
-    member val DrawingAreaX = -drawingX with get, set
+    member val CameraPosX = -drawingX with get, set
 
-    member val DrawingAreaY = -drawingY with get, set
+    member val CameraPosY = -drawingY with get, set
 
     member val Scale = scale with get, set
 
     member this.CalculateVisibleRange() =
         let cellSize = this.CellSize
 
-        let offsetX = this.DrawingAreaX * cellSize
-        let offsetY = this.DrawingAreaY * cellSize
+        let offsetX = this.CameraPosX * cellSize
+        let offsetY = this.CameraPosY * cellSize
 
         let activeWidth = min ((this.Width - offsetX) / cellSize) (this.Width / cellSize)
-
         let activeHeight = min ((this.Height - offsetY) / cellSize) (this.Height / cellSize)
 
-        let startX = max (1.0f - this.DrawingAreaX) 1.0f
-        let startY = max (1.0f - this.DrawingAreaY) 1.0f
+        let startX = max (1.0f - this.CameraPosX) 1.0f
+        let startY = max (1.0f - this.CameraPosY) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
@@ -124,8 +123,8 @@ type Canvas
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / this.CellSize
 
-            this.DrawingAreaX <- this.DrawingAreaX + mouseDelta.X * cellSizeInverse
-            this.DrawingAreaY <- this.DrawingAreaY + mouseDelta.Y * cellSizeInverse
+            this.CameraPosX <- this.CameraPosX + mouseDelta.X * cellSizeInverse
+            this.CameraPosY <- this.CameraPosY + mouseDelta.Y * cellSizeInverse
 
     member this.processMouseScroll() =
         let mousePos = Mouse.position ()
@@ -146,8 +145,8 @@ type Canvas
 
         let cellSize = this.CellSize
 
-        let offsetX = this.DrawingAreaX * cellSize
-        let offsetY = this.DrawingAreaY * cellSize
+        let offsetX = this.CameraPosX * cellSize
+        let offsetY = this.CameraPosY * cellSize
 
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board
@@ -181,16 +180,16 @@ type Canvas
                     CanvasArea.makeDead row col this.Game
 
     member this.MoveCameraRight(speed: float32) =
-        this.DrawingAreaX <- this.DrawingAreaX - speed
+        this.CameraPosX <- this.CameraPosX - speed
 
     member this.MoveCameraLeft(speed: float32) =
-        this.DrawingAreaX <- this.DrawingAreaX + speed
+        this.CameraPosX <- this.CameraPosX + speed
 
     member this.MoveCameraUp(speed: float32) =
-        this.DrawingAreaY <- this.DrawingAreaY + speed
+        this.CameraPosY <- this.CameraPosY + speed
 
     member this.MoveCameraDown(speed: float32) =
-        this.DrawingAreaY <- this.DrawingAreaY - speed
+        this.CameraPosY <- this.CameraPosY - speed
 
     member this.ZoomIn(speed: float32) =
         this.CellSize <- min (this.CellSize + speed) this.MaxCellSize
