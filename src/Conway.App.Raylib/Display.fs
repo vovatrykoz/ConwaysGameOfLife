@@ -28,12 +28,14 @@ module Display =
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueX = float32 col + canvas.DrawingAreaX
-                let trueY = float32 row + canvas.DrawingAreaY
+                let trueX = max (float32 col + canvas.DrawingAreaX) (startX + canvas.DrawingAreaX)
+                let trueY = max (float32 row + canvas.DrawingAreaY) (startY + canvas.DrawingAreaY)
+                let trueWidth = canvas.CellSize
+                let trueHeight = canvas.CellSize
 
                 match board[row, col].Status with
-                | Dead -> Draw.deadCell trueX trueY canvas.CellSize canvas.CellSize
-                | Alive -> Draw.livingCell trueX trueY canvas.CellSize canvas.CellSize
+                | Dead -> Draw.deadCell trueX trueY trueWidth trueHeight
+                | Alive -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =
         for button in controls.Buttons do
