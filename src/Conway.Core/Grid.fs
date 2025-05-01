@@ -1,9 +1,11 @@
 namespace Conway.Core
 
+open Microsoft.FSharp.NativeInterop
 open System
 open System.Threading.Tasks
 
-[<NoComparison>]
+#nowarn "9"
+
 type ConwayGrid private (startingGrid: Cell array2d) =
 
     private new(width: int, height: int) =
@@ -82,14 +84,17 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
     [<CompiledName("CountLivingNeighbors")>]
     static member private countLivingNeighbors row col (board: Cell array2d) =
-        Convert.ToInt32(Cell.isAlive board.[row - 1, col - 1])
-        + Convert.ToInt32(Cell.isAlive board.[row - 1, col])
-        + Convert.ToInt32(Cell.isAlive board.[row - 1, col + 1])
-        + Convert.ToInt32(Cell.isAlive board.[row, col - 1])
-        + Convert.ToInt32(Cell.isAlive board.[row, col + 1])
-        + Convert.ToInt32(Cell.isAlive board.[row + 1, col - 1])
-        + Convert.ToInt32(Cell.isAlive board.[row + 1, col])
-        + Convert.ToInt32(Cell.isAlive board.[row + 1, col + 1])
+        let cols = Array2D.length2 board
+        use ptr = fixed &board.[0, 0]
+
+        Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col - 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + col)))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col + 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col - 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col + 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col - 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + col)))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col + 1))))
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col board currentCell =
