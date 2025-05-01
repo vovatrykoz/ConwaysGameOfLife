@@ -185,23 +185,16 @@ type ConwayGrid private (startingGrid: Cell array2d) =
     [<CompiledName("CountLivingNeighborsUnsafe")>]
     static member private countLivingNeighborsUnsafe row col (board: Cell array2d) =
         let cols = Array2D.length2 board
-        let upLeft = (row - 1) * cols + (col - 1)
-        let up = (row - 1) * cols + col
-        let upRight = (row - 1) * cols + (col + 1)
-        let left = row * cols + (col - 1)
-        let right = row * cols + (col + 1)
-        let downLeft = (row + 1) * cols + (col - 1)
-        let down = (row + 1) * cols + col
-        let downRight = (row + 1) * cols + (col + 1)
+        use ptr = fixed &board.[0, 0]
 
-        FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess upLeft board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess up board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess upRight board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess left board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess right board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess downLeft board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess down board).Status
-        + FastHelpers.retype<CellStatus> (ConwayGrid.fastBoardAccess downRight board).Status
+        Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col - 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + col)))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col + 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col - 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col + 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col - 1))))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + col)))
+        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col + 1))))
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col board currentCell =
