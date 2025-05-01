@@ -15,21 +15,23 @@ module Display =
         Raylib.InitWindow(width, height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) (board: Cell[,]) =
-        // Raylib.DrawRectangle(canvas.X, canvas.Y, canvas.Width, canvas.Height, Color.Black)
-
         let rows = Array2D.length1 board
         let cols = Array2D.length2 board
 
-        let struct (startX, startY, endX, endY) = canvas.CalculateVisibleRange()
-        let startRow = int startY
-        let startCol = int startX
-        let endRow = max (min (int endY) (rows - 2)) 1
-        let endCol = max (min (int endX) (cols - 2)) 1
+        let struct (visibleStartPoint, visibleEndPoint) = canvas.CalculateVisibleRange()
+        let startRow = int visibleStartPoint.Y
+        let startCol = int visibleStartPoint.X
+        let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
+        let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueX = max (float32 col + canvas.DrawingAreaX) (startX + canvas.DrawingAreaX)
-                let trueY = max (float32 row + canvas.DrawingAreaY) (startY + canvas.DrawingAreaY)
+                let trueX =
+                    max (float32 col + canvas.DrawingAreaX) (visibleStartPoint.X + canvas.DrawingAreaX)
+
+                let trueY =
+                    max (float32 row + canvas.DrawingAreaY) (visibleStartPoint.Y + canvas.DrawingAreaY)
+
                 let trueWidth = canvas.CellSize
                 let trueHeight = canvas.CellSize
 
