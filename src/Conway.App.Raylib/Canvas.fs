@@ -161,8 +161,12 @@ type Canvas
             for col = startCol to endCol do
                 let startX = float32 col * this.CellSize + offsetX
                 let startY = float32 row * this.CellSize + offsetY
-                let endX = startX + this.CellSize
-                let endY = startY + this.CellSize
+
+                let endX =
+                    min (startX + this.CellSize) ((visibleEndX - visibleStartX) * this.CellSize)
+
+                let endY =
+                    min (startY + this.CellSize) ((visibleEndY - visibleStartY) * this.CellSize)
 
                 if CanvasArea.IsLeftPressedWithShift startX startY endX endY then
                     CanvasArea.makeAlive row col this.Game

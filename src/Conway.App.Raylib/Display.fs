@@ -47,6 +47,9 @@ module Display =
     let private renderFpsCounter (canvas: Canvas) fps =
         Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 50.0f) 24 $"FPS {fps}"
 
+    let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
+        Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 150.0f) 24 $"X {mousePos.X} Y {mousePos.Y}"
+
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
         Draw.textBox
             (canvas.X + canvas.Width + 5.0f)
@@ -63,7 +66,7 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let render (game: Game) (controls: ControlManager) texture fps =
+    let render (game: Game) (controls: ControlManager) texture fps mousePos =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.Blank
         renderBoardOnCanvas controls.Canvas game.State.Board
@@ -76,6 +79,7 @@ module Display =
         renderControls controls
         renderGenerationCounter controls.Canvas game.Generation
         renderFpsCounter controls.Canvas fps
+        renderMousePos controls.Canvas mousePos
         renderCanvasFocusCoordinates controls.Canvas
 
         Raylib.DrawTextureRec(
