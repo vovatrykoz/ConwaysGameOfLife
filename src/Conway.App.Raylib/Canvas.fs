@@ -90,23 +90,21 @@ type Canvas
 
     member val Game = game with get, set
 
-    member val CameraPosX = -drawingX with get, set
-
-    member val CameraPosY = -drawingY with get, set
+    member val Camera = Camera(-drawingX, -drawingY) with get, set
 
     member val Scale = scale with get, set
 
     member this.CalculateVisibleRange() =
         let cellSize = this.CellSize
 
-        let offsetX = this.CameraPosX * cellSize
-        let offsetY = this.CameraPosY * cellSize
+        let offsetX = this.Camera.X * cellSize
+        let offsetY = this.Camera.Y * cellSize
 
         let activeWidth = min ((this.Width - offsetX) / cellSize) (this.Width / cellSize)
         let activeHeight = min ((this.Height - offsetY) / cellSize) (this.Height / cellSize)
 
-        let startX = max (1.0f - this.CameraPosX) 1.0f
-        let startY = max (1.0f - this.CameraPosY) 1.0f
+        let startX = max (1.0f - this.Camera.X) 1.0f
+        let startY = max (1.0f - this.Camera.Y) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
@@ -123,8 +121,8 @@ type Canvas
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / this.CellSize
 
-            this.CameraPosX <- this.CameraPosX + mouseDelta.X * cellSizeInverse
-            this.CameraPosY <- this.CameraPosY + mouseDelta.Y * cellSizeInverse
+            this.Camera.X <- this.Camera.X + mouseDelta.X * cellSizeInverse
+            this.Camera.Y <- this.Camera.Y + mouseDelta.Y * cellSizeInverse
 
     member this.processMouseScroll() =
         let mousePos = Mouse.position ()
@@ -145,8 +143,8 @@ type Canvas
 
         let cellSize = this.CellSize
 
-        let offsetX = this.CameraPosX * cellSize
-        let offsetY = this.CameraPosY * cellSize
+        let offsetX = this.Camera.X * cellSize
+        let offsetY = this.Camera.Y * cellSize
 
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board
@@ -178,18 +176,6 @@ type Canvas
 
                 if CanvasArea.IsRightPressedWithShift startX startY endX endY then
                     CanvasArea.makeDead row col this.Game
-
-    member this.MoveCameraRight(speed: float32) =
-        this.CameraPosX <- this.CameraPosX - speed
-
-    member this.MoveCameraLeft(speed: float32) =
-        this.CameraPosX <- this.CameraPosX + speed
-
-    member this.MoveCameraUp(speed: float32) =
-        this.CameraPosY <- this.CameraPosY + speed
-
-    member this.MoveCameraDown(speed: float32) =
-        this.CameraPosY <- this.CameraPosY - speed
 
     member this.ZoomIn(speed: float32) =
         this.CellSize <- min (this.CellSize + speed) this.MaxCellSize

@@ -233,10 +233,10 @@ let controlManager = new ControlManager(canvas)
 controlManager.Buttons.AddRange buttons
 
 let keyboardActions = [|
-    KeyboardKey.W, (fun _ -> controlManager.Canvas.MoveCameraUp 1.0f)
-    KeyboardKey.A, (fun _ -> controlManager.Canvas.MoveCameraLeft 1.0f)
-    KeyboardKey.S, (fun _ -> controlManager.Canvas.MoveCameraDown 1.0f)
-    KeyboardKey.D, (fun _ -> controlManager.Canvas.MoveCameraRight 1.0f)
+    KeyboardKey.W, (fun _ -> controlManager.Canvas.Camera.MoveCameraUp 1.0f)
+    KeyboardKey.A, (fun _ -> controlManager.Canvas.Camera.MoveCameraLeft 1.0f)
+    KeyboardKey.S, (fun _ -> controlManager.Canvas.Camera.MoveCameraDown 1.0f)
+    KeyboardKey.D, (fun _ -> controlManager.Canvas.Camera.MoveCameraRight 1.0f)
     KeyboardKey.Z, (fun _ -> controlManager.Canvas.ZoomIn 5.0f)
     KeyboardKey.X, (fun _ -> controlManager.Canvas.ZoomOut 5.0f)
 |]
