@@ -183,10 +183,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         NativePtr.get ptr index
 
     [<CompiledName("CountLivingNeighborsUnsafe")>]
-    static member private countLivingNeighborsUnsafe row col (board: Cell array2d) =
-        let cols = Array2D.length2 board
-        use ptr = fixed &board.[0, 0]
-
+    static member private countLivingNeighborsUnsafe row col cols (ptr: nativeptr<Cell>) =
         Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col - 1))))
         + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + col)))
         + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col + 1))))
@@ -207,7 +204,9 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
     [<CompiledName("EvolveCellAtUnsafe")>]
     static member private evolveCellAtUnsafe row col board currentCell =
-        let livingNeighborsCount = ConwayGrid.countLivingNeighborsUnsafe row col board
+        let cols = Array2D.length2 board
+        use ptr = fixed &board.[0, 0]
+        let livingNeighborsCount = ConwayGrid.countLivingNeighborsUnsafe row col cols ptr
 
         match livingNeighborsCount with
         | 2 -> Cell.create currentCell.Status
