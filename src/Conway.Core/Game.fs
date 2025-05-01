@@ -1,5 +1,6 @@
 namespace Conway.Core
 
+[<Struct>]
 type GameMode =
     | Infinite
     | Limited of int

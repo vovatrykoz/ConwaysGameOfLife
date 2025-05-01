@@ -69,11 +69,11 @@ let mainLock = new ReaderWriterLockSlim()
 let mutable gameRunningState = Paused
 
 let gameUpdateLoop () =
+    let mutable shouldRun = false
+
     async {
         while true do
             do! Async.Sleep 34
-
-            let mutable shouldRun = false
 
             try
                 mainLock.EnterWriteLock()
