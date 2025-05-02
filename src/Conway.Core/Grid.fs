@@ -11,6 +11,9 @@ open System.Threading.Tasks
 [<Measure>]
 type CellStatus
 
+[<Measure>]
+type Neighbors = CellStatus
+
 type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     private new(width: int, height: int) =
@@ -106,8 +109,8 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col cols activePtr
 
         match livingNeighborsCount with
-        | 2<CellStatus> ->
+        | 2<Neighbors> ->
             let currentValue = NativePtr.get activePtr (row * cols + col)
             NativePtr.set passivePtr (row * cols + col) currentValue
-        | 3<CellStatus> -> NativePtr.set passivePtr (row * cols + col) 1<CellStatus>
+        | 3<Neighbors> -> NativePtr.set passivePtr (row * cols + col) 1<CellStatus>
         | _ -> NativePtr.set passivePtr (row * cols + col) 0<CellStatus>
