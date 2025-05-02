@@ -104,10 +104,11 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
         let rows = Array2D.length1 activeBuffer - 2
         let cols = Array2D.length2 activeBuffer - 2
 
-        use ptr = fixed &activeBuffer.[0, 0]
-
         let degreeOfParallelism = Environment.ProcessorCount
         let totalLength = rows * cols
+
+        use activePtr = fixed &activeBuffer.[0, 0]
+        use passivePtr = fixed &passiveBuffer.[0, 0]
 
         Parallel.For(
             0,
@@ -120,7 +121,7 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
                     let row = rowCol / cols + 1
                     let col = rowCol % cols + 1
 
-                    ConwayGrid.evolveCellAtUnsafe row col cols ptr
+                    ConwayGrid.evolveCellAtUnsafe row col cols activePtr passivePtr
         )
         |> ignore
 
