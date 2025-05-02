@@ -58,17 +58,8 @@ type Canvas
         drawingX: float32,
         drawingY: float32,
         game: Game,
-        cellSize: float32,
-        scale: int
+        cellSize: float32
     ) =
-
-    let maxCellSizeLimit = 50.0f
-
-    let minCellSizeLimit = 5.0f
-
-    let mutable currentMaxCellSize = maxCellSizeLimit
-
-    let mutable currentMinCellSize = minCellSizeLimit
 
     member val X = x with get, set
 
@@ -80,22 +71,12 @@ type Canvas
 
     member val CellSize = cellSize with get, set
 
-    member _.MaxCellSize
-        with get () = currentMaxCellSize
-        and set value = currentMaxCellSize <- min maxCellSizeLimit (max minCellSizeLimit value)
-
-    member _.MinCellSize
-        with get () = currentMinCellSize
-        and set value = currentMinCellSize <- min maxCellSizeLimit (max minCellSizeLimit value)
-
     member val Game = game with get, set
 
     member val Camera = Camera(-drawingX, -drawingY) with get, set
 
-    member val Scale = scale with get, set
-
     member this.CalculateVisibleRange() =
-        let cellSize = this.CellSize
+        let cellSize = this.CellSize * this.Camera.ZoomFactor
 
         let offsetX = this.Camera.X * cellSize
         let offsetY = this.Camera.Y * cellSize
@@ -119,7 +100,7 @@ type Canvas
             ()
         else
             let mouseDelta = Mouse.getDelta ()
-            let cellSizeInverse = 1.0f / this.CellSize
+            let cellSizeInverse = 1.0f / (this.CellSize * this.Camera.ZoomFactor)
 
             this.Camera.X <- this.Camera.X + mouseDelta.X * cellSizeInverse
             this.Camera.Y <- this.Camera.Y + mouseDelta.Y * cellSizeInverse
@@ -134,14 +115,14 @@ type Canvas
             && mousePos.Y <= this.Y + this.Height
         then
             let mouseScrollAmount = Mouse.getScrollAmount ()
-            this.ZoomIn mouseScrollAmount.Y
-            this.ZoomOut mouseScrollAmount.X
+            this.Camera.ZoomIn(mouseScrollAmount.Y * 0.1f)
+            this.Camera.ZoomOut(mouseScrollAmount.X * 0.1f)
 
     member this.ProcessDrawableArea() =
         this.ProcessMouseDrag()
         this.processMouseScroll ()
 
-        let cellSize = this.CellSize
+        let cellSize = this.CellSize * this.Camera.ZoomFactor
 
         let offsetX = this.Camera.X * cellSize
         let offsetY = this.Camera.Y * cellSize
@@ -176,9 +157,3 @@ type Canvas
 
                 if CanvasArea.IsRightPressedWithShift startX startY endX endY then
                     CanvasArea.makeDead row col this.Game
-
-    member this.ZoomIn(speed: float32) =
-        this.CellSize <- min (this.CellSize + speed) this.MaxCellSize
-
-    member this.ZoomOut(speed: float32) =
-        this.CellSize <- max (this.CellSize - speed) this.MinCellSize

@@ -33,8 +33,8 @@ module Display =
                 let trueY =
                     max (float32 row + canvas.Camera.Y) (visibleStartPoint.Y + canvas.Camera.Y)
 
-                let trueWidth = canvas.CellSize
-                let trueHeight = canvas.CellSize
+                let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
+                let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
 
                 match board[row, col] with
                 | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight

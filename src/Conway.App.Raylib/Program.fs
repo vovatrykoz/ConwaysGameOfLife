@@ -225,8 +225,7 @@ let canvas =
         focusAreaX,
         focusAreaY,
         game,
-        cellSize,
-        scale
+        cellSize
     )
 
 let controlManager = new ControlManager(canvas)
@@ -237,8 +236,8 @@ let keyboardActions = [|
     KeyboardKey.A, (fun _ -> controlManager.Canvas.Camera.MoveCameraLeft 1.0f)
     KeyboardKey.S, (fun _ -> controlManager.Canvas.Camera.MoveCameraDown 1.0f)
     KeyboardKey.D, (fun _ -> controlManager.Canvas.Camera.MoveCameraRight 1.0f)
-    KeyboardKey.Z, (fun _ -> controlManager.Canvas.ZoomIn 5.0f)
-    KeyboardKey.X, (fun _ -> controlManager.Canvas.ZoomOut 5.0f)
+    KeyboardKey.Z, (fun _ -> controlManager.Canvas.Camera.ZoomIn 0.2f)
+    KeyboardKey.X, (fun _ -> controlManager.Canvas.Camera.ZoomOut 0.2f)
 |]
 
 controlManager.KeyActions.AddRange keyboardActions
