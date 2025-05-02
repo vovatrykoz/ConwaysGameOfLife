@@ -166,8 +166,8 @@ type Canvas
                 let trueEndX = trueStartX + cellSize
                 let trueEndY = trueStartY + cellSize
 
-                let startX = max trueStartX this.X
-                let startY = max trueStartY this.Y
+                let startX = max trueStartX cellSize
+                let startY = max trueStartY cellSize
                 let endX = min (min (startX + cellSize) endBorderX) trueEndX
                 let endY = min (min (startY + cellSize) endBorderY) trueEndY
 
