@@ -10,7 +10,7 @@ type ConwayGrid =
     /// Initializes a new ConwayGrid with a predefined 2D array of cells.
     /// </summary>
     /// <param name="startingGrid">A 2D array representing the initial state of the grid.</param>
-    private new: startingGrid: Cell array2d -> ConwayGrid
+    private new: startingGrid: int<cellStatus> array2d -> ConwayGrid
 
     /// <summary>
     /// Initializes a new ConwayGrid with the specified dimensions. All cells are initially dead.
@@ -22,7 +22,7 @@ type ConwayGrid =
     /// <summary>
     /// Gets the current state of the board as a 2D array of cells.
     /// </summary>
-    member Board: Cell array2d
+    member Board: int<cellStatus> array2d
 
     /// <summary>
     /// Advances the grid to the next state according to Conway's Game of Life rules.
@@ -76,11 +76,11 @@ type ConwayGrid =
     /// <param name="height">Grid height.</param>
     /// <param name="initializer">Function to determine the initial value of each cell.</param>
     [<CompiledName("Init")>]
-    static member init: width: int -> height: int -> initializer: (int -> int -> Cell) -> ConwayGrid
+    static member init: width: int -> height: int -> initializer: (int -> int -> int<cellStatus>) -> ConwayGrid
 
     /// <summary>
     /// Initializes a grid from a preset containing dimensions and an initializer function.
     /// </summary>
     /// <param name="preset">A tuple of width, height, and initializer function.</param>
     [<CompiledName("InitFromPreset")>]
-    static member initFromPreset: preset: (int * int * (int -> int -> Cell)) -> ConwayGrid
+    static member initFromPreset: preset: (int * int * (int -> int -> int<cellStatus>)) -> ConwayGrid

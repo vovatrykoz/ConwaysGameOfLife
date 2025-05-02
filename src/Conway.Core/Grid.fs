@@ -10,10 +10,10 @@ module private FastHelpers =
     let retype<'T> (value: 'T) = (# "" value: int32 #)
 
 [<NoComparison>]
-type ConwayGrid private (startingGrid: Cell array2d) =
+type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
 
     private new(width: int, height: int) =
-        let initArr = Array2D.create (height + 2) (width + 2) Cell.dead
+        let initArr = Array2D.create (height + 2) (width + 2) 0<cellStatus>
 
         new ConwayGrid(initArr)
 
@@ -37,8 +37,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    passiveBuffer[row, col].Status <-
-                        ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
+                    passiveBuffer[row, col] <- ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
 
@@ -67,8 +66,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
                     let row = rowCol / cols + 1
                     let col = rowCol % cols + 1
 
-                    passiveBuffer[row, col].Status <-
-                        ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
+                    passiveBuffer[row, col] <- ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
 
@@ -83,13 +81,14 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let rows = Array2D.length1 activeBuffer - 2
         let cols = Array2D.length2 activeBuffer - 2
 
+        use ptr = fixed &activeBuffer.[0, 0]
+
         Parallel.For(
             1,
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    passiveBuffer[row, col].Status <-
-                        ConwayGrid.evolveCellAtUnsafe row col activeBuffer (activeBuffer[row, col])
+                    ConwayGrid.evolveCellAtUnsafe row col cols ptr
         )
         |> ignore
 
@@ -103,6 +102,8 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
         let rows = Array2D.length1 activeBuffer - 2
         let cols = Array2D.length2 activeBuffer - 2
+
+        use ptr = fixed &activeBuffer.[0, 0]
 
         let degreeOfParallelism = Environment.ProcessorCount
         let totalLength = rows * cols
@@ -118,8 +119,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
                     let row = rowCol / cols + 1
                     let col = rowCol % cols + 1
 
-                    passiveBuffer[row, col].Status <-
-                        ConwayGrid.evolveCellAtUnsafe row col activeBuffer (activeBuffer[row, col])
+                    ConwayGrid.evolveCellAtUnsafe row col cols ptr
         )
         |> ignore
 
@@ -133,9 +133,9 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Cell.dead
+                    0<cellStatus>
                 else
-                    Cell.living)
+                    1<cellStatus>)
 
         new ConwayGrid(initArr)
 
@@ -146,11 +146,11 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Cell.dead
+                    0<cellStatus>
                 else
                     let randomValue = random.Next(0, oddsOfLiving - 1)
 
-                    if randomValue = 0 then Cell.living else Cell.dead)
+                    if randomValue = 0 then 1<cellStatus> else 0<cellStatus>)
 
         new ConwayGrid(initArr)
 
@@ -159,7 +159,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Cell.dead
+                    0<cellStatus>
                 else
                     initializer (i - 1) (j - 1))
 
@@ -169,15 +169,15 @@ type ConwayGrid private (startingGrid: Cell array2d) =
     static member initFromPreset preset = preset |||> ConwayGrid.init
 
     [<CompiledName("CountLivingNeighbors")>]
-    static member private countLivingNeighbors row col (board: Cell array2d) =
-        Convert.ToInt32(Cell.isAlive board.[row - 1, col - 1])
-        + Convert.ToInt32(Cell.isAlive board.[row - 1, col])
-        + Convert.ToInt32(Cell.isAlive board.[row - 1, col + 1])
-        + Convert.ToInt32(Cell.isAlive board.[row, col - 1])
-        + Convert.ToInt32(Cell.isAlive board.[row, col + 1])
-        + Convert.ToInt32(Cell.isAlive board.[row + 1, col - 1])
-        + Convert.ToInt32(Cell.isAlive board.[row + 1, col])
-        + Convert.ToInt32(Cell.isAlive board.[row + 1, col + 1])
+    static member private countLivingNeighbors row col (board: int<cellStatus> array2d) =
+        board.[row - 1, col - 1]
+        + board.[row - 1, col]
+        + board.[row - 1, col + 1]
+        + board.[row, col - 1]
+        + board.[row, col + 1]
+        + board.[row + 1, col - 1]
+        + board.[row + 1, col]
+        + board.[row + 1, col + 1]
 
     [<MethodImpl(MethodImplOptions.AggressiveInlining)>]
     static member inline private fastBoardAccess index (board: Cell array2d) =
@@ -185,32 +185,30 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         NativePtr.get ptr index
 
     [<CompiledName("CountLivingNeighborsUnsafe")>]
-    static member private countLivingNeighborsUnsafe row col cols (ptr: nativeptr<Cell>) =
-        (NativePtr.get ptr ((row - 1) * cols + (col - 1))).Status
-        + (NativePtr.get ptr ((row - 1) * cols + (col))).Status
-        + (NativePtr.get ptr ((row - 1) * cols + (col + 1))).Status
-        + (NativePtr.get ptr (row * cols + (col - 1))).Status
-        + (NativePtr.get ptr (row * cols + (col + 1))).Status
-        + (NativePtr.get ptr ((row + 1) * cols + (col - 1))).Status
-        + (NativePtr.get ptr ((row + 1) * cols + col)).Status
-        + (NativePtr.get ptr ((row + 1) * cols + (col + 1))).Status
+    static member private countLivingNeighborsUnsafe row col cols (ptr: nativeptr<int<cellStatus>>) =
+        (NativePtr.get ptr ((row - 1) * cols + (col - 1)))
+        + (NativePtr.get ptr ((row - 1) * cols + (col)))
+        + (NativePtr.get ptr ((row - 1) * cols + (col + 1)))
+        + (NativePtr.get ptr (row * cols + (col - 1)))
+        + (NativePtr.get ptr (row * cols + (col + 1)))
+        + (NativePtr.get ptr ((row + 1) * cols + (col - 1)))
+        + (NativePtr.get ptr ((row + 1) * cols + col))
+        + (NativePtr.get ptr ((row + 1) * cols + (col + 1)))
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col board currentCell =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
-        | 2 -> currentCell.Status
-        | 3 -> 1<cellStatus>
+        | 2<cellStatus> -> currentCell
+        | 3<cellStatus> -> 1<cellStatus>
         | _ -> 0<cellStatus>
 
     [<CompiledName("EvolveCellAtUnsafe")>]
-    static member private evolveCellAtUnsafe row col board currentCell =
-        let cols = Array2D.length2 board
-        use ptr = fixed &board.[0, 0]
+    static member private evolveCellAtUnsafe row col cols ptr =
         let livingNeighborsCount = ConwayGrid.countLivingNeighborsUnsafe row col cols ptr
 
         match livingNeighborsCount with
-        | 2<cellStatus> -> currentCell.Status
-        | 3<cellStatus> -> 1<cellStatus>
-        | _ -> 0<cellStatus>
+        | 2<cellStatus> -> ()
+        | 3<cellStatus> -> NativePtr.set ptr (row * cols + col) 1<cellStatus>
+        | _ -> NativePtr.set ptr (row * cols + col) 0<cellStatus>

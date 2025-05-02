@@ -14,7 +14,7 @@ module Display =
         Raylib.SetConfigFlags ConfigFlags.FullscreenMode
         Raylib.InitWindow(width, height, "Conway's game of life")
 
-    let private renderBoardOnCanvas (canvas: Canvas) (board: Cell[,]) =
+    let private renderBoardOnCanvas (canvas: Canvas) (board: int<cellStatus>[,]) =
         let rows = Array2D.length1 board
         let cols = Array2D.length2 board
 
@@ -35,9 +35,9 @@ module Display =
                 let trueWidth = canvas.CellSize
                 let trueHeight = canvas.CellSize
 
-                match board[row, col].Status with
+                match board[row, col] with
                 | 0<cellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
-                | 1<cellStatus> -> Draw.livingCell trueX trueY trueWidth trueHeight
+                | _ -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =
         for button in controls.Buttons do
