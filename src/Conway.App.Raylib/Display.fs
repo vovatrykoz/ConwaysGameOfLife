@@ -36,8 +36,8 @@ module Display =
                 let trueHeight = canvas.CellSize
 
                 match board[row, col].Status with
-                | Dead -> Draw.deadCell trueX trueY trueWidth trueHeight
-                | Alive -> Draw.livingCell trueX trueY trueWidth trueHeight
+                | 0<cellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
+                | 1<cellStatus> -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =
         for button in controls.Buttons do

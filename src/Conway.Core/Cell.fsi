@@ -1,5 +1,8 @@
 namespace Conway.Core
 
+[<Measure>]
+type cellStatus
+
 /// <summary>
 /// Represents the possible states of a cell in Conway's Game of Life.
 /// </summary>
@@ -25,7 +28,7 @@ type Cell = {
     /// <summary>
     /// The current status of the cell (alive or dead).
     /// </summary>
-    Status: CellStatus
+    mutable Status: int<cellStatus>
 } with
 
     /// <summary>
@@ -46,7 +49,7 @@ type Cell = {
     /// <param name="status">The status to assign to the cell.</param>
     /// <returns>A new cell with the specified status.</returns>
     [<CompiledName("Create")>]
-    static member create: status: CellStatus -> Cell
+    static member create: status: int<cellStatus> -> Cell
 
     /// <summary>
     /// Determines whether the specified cell is alive.

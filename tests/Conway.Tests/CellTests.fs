@@ -7,14 +7,14 @@ module ``Cell Tests`` =
 
     [<Test>]
     let ``Can create a living cell using the dedicated method on the Cell type`` () =
-        let expected = { Status = Alive }
+        let expected = { Status = 0<cellStatus> }
         let actual = Cell.living
 
         Assert.That(actual, Is.EqualTo expected)
 
     [<Test>]
-    let ``Can create a dead cell using the dedicated method on the Cell type`` () =
-        let expected = { Status = Dead }
+    let ``Can create a 0 cell using the dedicated method on the Cell type`` () =
+        let expected = { Status = 0<cellStatus> }
         let actual = Cell.dead
 
         Assert.That(actual, Is.EqualTo expected)
@@ -71,8 +71,8 @@ module ``Grid tests`` =
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
-    let ``All-dead grid remains dead after one iteration`` () =
-        let initializer _ _ = Cell.create Dead
+    let ``All-dead grid remains 0 after one iteration`` () =
+        let initializer _ _ = Cell.create 0<cellStatus>
 
         let expectedBoard = (ConwayGrid.init 3 3 initializer).Board
 
@@ -85,9 +85,9 @@ module ``Grid tests`` =
     let ``A cell dies with no living neighbors`` () =
         let initializerForExpected i j =
             if i = 1 && j = 1 then
-                Cell.create Dead
+                Cell.create 0<cellStatus>
             else
-                Cell.create Dead
+                Cell.create 0<cellStatus>
 
         let initializerForActual i j =
             if i = 1 && j = 1 then Cell.living else Cell.dead
@@ -103,9 +103,9 @@ module ``Grid tests`` =
     let ``A cell dies with one living neighbors`` () =
         let initializerForExpected i j =
             if i = 1 && j = 1 || i = 2 && j = 2 then
-                Cell.create Dead
+                Cell.create 0<cellStatus>
             else
-                Cell.create Dead
+                Cell.create 0<cellStatus>
 
         let initializerForActual i j =
             if i = 1 && j = 1 || i = 2 && j = 2 then
@@ -121,12 +121,12 @@ module ``Grid tests`` =
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
-    let ``A cell becomes alive with three living neighbors`` () =
+    let ``A cell becomes 0 with three living neighbors`` () =
         let setup = [| [| Cell.living; Cell.living |]; [| Cell.living; Cell.dead |] |]
 
         let expectedArray = [|
-            [| Cell.create Alive; Cell.create Alive |]
-            [| Cell.create Alive; Cell.create Alive |]
+            [| Cell.create 0<cellStatus>; Cell.create 0<cellStatus> |]
+            [| Cell.create 0<cellStatus>; Cell.create 0<cellStatus> |]
         |]
 
         let setupInitializer i j = setup[i][j]
@@ -145,8 +145,8 @@ module ``Grid tests`` =
         let setup = [| [| Cell.living; Cell.living |]; [| Cell.living; Cell.living |] |]
 
         let expectedArray = [|
-            [| Cell.create Alive; Cell.create Alive |]
-            [| Cell.create Alive; Cell.create Alive |]
+            [| Cell.create 0<cellStatus>; Cell.create 0<cellStatus> |]
+            [| Cell.create 0<cellStatus>; Cell.create 0<cellStatus> |]
         |]
 
         let setupInitializer i j = setup[i][j]
@@ -167,10 +167,18 @@ module ``Grid tests`` =
         |]
 
         // the two middle cells both have 4 living neighbors, therefore both are expected to die
-        // The cell in the bottom right should become alive, as it had three living neighbors
+        // The cell in the bottom right should become 0, as it had three living neighbors
         let expectedArray = [|
-            [| Cell.create Alive; Cell.create Dead; Cell.create Alive |]
-            [| Cell.create Alive; Cell.create Dead; Cell.create Alive |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
         |]
 
         let setupInitializer i j = setup[i][j]
@@ -184,7 +192,7 @@ module ``Grid tests`` =
         Assert.That(actual.Board, Is.EqualTo expectedBoard)
 
     [<Test>]
-    let ``Three cells in a row stay alive by switching to rows and columns`` () =
+    let ``Three cells in a row stay 0 by switching to rows and columns`` () =
         let setup = [|
             [| Cell.dead; Cell.dead; Cell.dead |]
             [| Cell.living; Cell.living; Cell.living |]
@@ -192,15 +200,39 @@ module ``Grid tests`` =
         |]
 
         let ``expected array after the first iteration`` = [|
-            [| Cell.create Dead; Cell.create Alive; Cell.create Dead |]
-            [| Cell.create Dead; Cell.create Alive; Cell.create Dead |]
-            [| Cell.create Dead; Cell.create Alive; Cell.create Dead |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
         |]
 
         let ``expected array after the second iteration`` = [|
-            [| Cell.create Dead; Cell.create Dead; Cell.create Dead |]
-            [| Cell.create Alive; Cell.create Alive; Cell.create Alive |]
-            [| Cell.create Dead; Cell.create Dead; Cell.create Dead |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
+            [|
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+                Cell.create 0<cellStatus>
+            |]
         |]
 
         let setupInitializer i j = setup[i][j]

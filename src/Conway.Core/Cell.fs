@@ -1,5 +1,8 @@
 ﻿namespace Conway.Core
 
+[<Measure>]
+type cellStatus
+
 [<Struct>]
 type CellStatus =
     | Alive
@@ -7,20 +10,20 @@ type CellStatus =
 
 [<Struct; NoComparison>]
 type Cell = {
-    Status: CellStatus
+    mutable Status: int<cellStatus>
 } with
 
     [<CompiledName("Living")>]
-    static member living = { Status = Alive }
+    static member living = { Status = 1<cellStatus> }
 
     [<CompiledName("Dead")>]
-    static member dead = { Status = Dead }
+    static member dead = { Status = 0<cellStatus> }
 
     [<CompiledName("Create")>]
     static member create status = { Status = status }
 
     [<CompiledName("IsAlive")>]
-    static member inline isAlive cell = cell.Status = Alive
+    static member inline isAlive cell = cell.Status = 1<cellStatus>
 
     [<CompiledName("IsDead")>]
-    static member inline isDead cell = cell.Status = Dead
+    static member inline isDead cell = cell.Status = 0<cellStatus>

@@ -37,7 +37,8 @@ type ConwayGrid private (startingGrid: Cell array2d) =
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    passiveBuffer[row, col] <- ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
+                    passiveBuffer[row, col].Status <-
+                        ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
 
@@ -66,7 +67,8 @@ type ConwayGrid private (startingGrid: Cell array2d) =
                     let row = rowCol / cols + 1
                     let col = rowCol % cols + 1
 
-                    passiveBuffer[row, col] <- ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
+                    passiveBuffer[row, col].Status <-
+                        ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
 
@@ -86,7 +88,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    passiveBuffer[row, col] <-
+                    passiveBuffer[row, col].Status <-
                         ConwayGrid.evolveCellAtUnsafe row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
@@ -116,7 +118,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
                     let row = rowCol / cols + 1
                     let col = rowCol % cols + 1
 
-                    passiveBuffer[row, col] <-
+                    passiveBuffer[row, col].Status <-
                         ConwayGrid.evolveCellAtUnsafe row col activeBuffer (activeBuffer[row, col])
         )
         |> ignore
@@ -184,23 +186,23 @@ type ConwayGrid private (startingGrid: Cell array2d) =
 
     [<CompiledName("CountLivingNeighborsUnsafe")>]
     static member private countLivingNeighborsUnsafe row col cols (ptr: nativeptr<Cell>) =
-        Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col - 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + col)))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col + 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col - 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col + 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col - 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + col)))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col + 1))))
+        (NativePtr.get ptr ((row - 1) * cols + (col - 1))).Status
+        + (NativePtr.get ptr ((row - 1) * cols + (col))).Status
+        + (NativePtr.get ptr ((row - 1) * cols + (col + 1))).Status
+        + (NativePtr.get ptr (row * cols + (col - 1))).Status
+        + (NativePtr.get ptr (row * cols + (col + 1))).Status
+        + (NativePtr.get ptr ((row + 1) * cols + (col - 1))).Status
+        + (NativePtr.get ptr ((row + 1) * cols + col)).Status
+        + (NativePtr.get ptr ((row + 1) * cols + (col + 1))).Status
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col board currentCell =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
-        | 2 -> Cell.create currentCell.Status
-        | 3 -> Cell.living
-        | _ -> Cell.dead
+        | 2 -> currentCell.Status
+        | 3 -> 1<cellStatus>
+        | _ -> 0<cellStatus>
 
     [<CompiledName("EvolveCellAtUnsafe")>]
     static member private evolveCellAtUnsafe row col board currentCell =
@@ -209,6 +211,6 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let livingNeighborsCount = ConwayGrid.countLivingNeighborsUnsafe row col cols ptr
 
         match livingNeighborsCount with
-        | 2 -> Cell.create currentCell.Status
-        | 3 -> Cell.living
-        | _ -> Cell.dead
+        | 2<cellStatus> -> currentCell.Status
+        | 3<cellStatus> -> 1<cellStatus>
+        | _ -> 0<cellStatus>
