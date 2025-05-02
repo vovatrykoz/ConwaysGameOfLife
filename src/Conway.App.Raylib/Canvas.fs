@@ -6,13 +6,13 @@ open System.Numerics
 
 module private CanvasArea =
     let makeAlive row col (game: Game) =
-        game.State.Board[row, col] <- Cell.living
+        game.State.Board[row, col] <- 1<CellStatus>
 
         // erase the history since the player has altered the board
         game.ClearHistory()
 
     let makeDead row col (game: Game) =
-        game.State.Board[row, col] <- Cell.dead
+        game.State.Board[row, col] <- 0<CellStatus>
 
         // erase the history since the player has altered the board
         game.ClearHistory()

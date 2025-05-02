@@ -8,10 +8,13 @@ open System.Threading.Tasks
 // This warning can be disabled using '--nowarn:9' or '#nowarn "9"'
 #nowarn "9" // Warning appears due to the use of "NativePtr.get" and the board pointer down below
 
-type ConwayGrid private (startingGrid: Cell array2d) =
+[<Measure>]
+type CellStatus
+
+type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     private new(width: int, height: int) =
-        let initArr = Array2D.create (height + 2) (width + 2) Cell.dead
+        let initArr = Array2D.create (height + 2) (width + 2) 0<CellStatus>
 
         new ConwayGrid(initArr)
 
@@ -30,12 +33,15 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let rows = Array2D.length1 activeBuffer
         let cols = Array2D.length2 activeBuffer
 
+        use activePtr = fixed &activeBuffer.[0, 0]
+        use passivePtr = fixed &passiveBuffer.[0, 0]
+
         Parallel.For(
             1,
             rows - 1,
             fun row ->
                 for col in 1 .. cols - 2 do
-                    passiveBuffer[row, col] <- ConwayGrid.evolveCellAt row col activeBuffer (activeBuffer[row, col])
+                    ConwayGrid.evolveCellAt row col cols activePtr passivePtr
         )
         |> ignore
 
@@ -49,9 +55,9 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Cell.dead
+                    0<CellStatus>
                 else
-                    Cell.living)
+                    1<CellStatus>)
 
         new ConwayGrid(initArr)
 
@@ -62,11 +68,11 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Cell.dead
+                    0<CellStatus>
                 else
                     let randomValue = random.Next(0, oddsOfLiving - 1)
 
-                    if randomValue = 0 then Cell.living else Cell.dead)
+                    if randomValue = 0 then 1<CellStatus> else 0<CellStatus>)
 
         new ConwayGrid(initArr)
 
@@ -75,7 +81,7 @@ type ConwayGrid private (startingGrid: Cell array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Cell.dead
+                    0<CellStatus>
                 else
                     initializer (i - 1) (j - 1))
 
@@ -85,24 +91,23 @@ type ConwayGrid private (startingGrid: Cell array2d) =
     static member initFromPreset preset = preset |||> ConwayGrid.init
 
     [<CompiledName("CountLivingNeighbors")>]
-    static member private countLivingNeighbors row col cols (ptr: nativeptr<Cell>) =
-        Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col - 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + col)))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row - 1) * cols + (col + 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col - 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr (row * cols + (col + 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col - 1))))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + col)))
-        + Convert.ToInt32(Cell.isAlive (NativePtr.get ptr ((row + 1) * cols + (col + 1))))
+    static member private countLivingNeighbors row col cols (ptr: nativeptr<int<CellStatus>>) =
+        NativePtr.get ptr ((row - 1) * cols + (col - 1))
+        + NativePtr.get ptr ((row - 1) * cols + col)
+        + NativePtr.get ptr ((row - 1) * cols + (col + 1))
+        + NativePtr.get ptr (row * cols + (col - 1))
+        + NativePtr.get ptr (row * cols + (col + 1))
+        + NativePtr.get ptr ((row + 1) * cols + (col - 1))
+        + NativePtr.get ptr ((row + 1) * cols + col)
+        + NativePtr.get ptr ((row + 1) * cols + (col + 1))
 
     [<CompiledName("EvolveCellAt")>]
-    static member private evolveCellAt row col board currentCell =
-        let cols = Array2D.length2 board
-        use ptr = fixed &board.[0, 0]
-
-        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col cols ptr
+    static member private evolveCellAt row col cols activePtr passivePtr =
+        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col cols activePtr
 
         match livingNeighborsCount with
-        | 2 -> Cell.create currentCell.Status
-        | 3 -> Cell.living
-        | _ -> Cell.dead
+        | 2<CellStatus> ->
+            let currentValue = NativePtr.get activePtr (row * cols + col)
+            NativePtr.set passivePtr (row * cols + col) currentValue
+        | 3<CellStatus> -> NativePtr.set passivePtr (row * cols + col) 1<CellStatus>
+        | _ -> NativePtr.set passivePtr (row * cols + col) 0<CellStatus>
