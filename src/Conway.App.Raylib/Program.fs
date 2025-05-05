@@ -216,10 +216,8 @@ let cellSize = 25.0f
 let widthOffset = cellSize * 12.0f
 let heightOffset = cellSize * 2.0f
 
-let focusAreaX = 500.0f
-let focusAreaY = 500.0f
-
-let scale = 1
+let cameraPosX = 500.0f
+let cameraPosY = 500.0f
 
 let canvas =
     new Canvas(
@@ -227,8 +225,8 @@ let canvas =
         canvasY,
         float32 windowWidth - widthOffset,
         float32 windowHeight - heightOffset,
-        focusAreaX,
-        focusAreaY,
+        cameraPosX,
+        cameraPosY,
         game,
         cellSize
     )
@@ -245,7 +243,15 @@ let keyboardActions = [|
     KeyboardKey.X, (fun _ -> controlManager.Canvas.Camera.ZoomOut 0.2f)
 |]
 
+let keyboardShiftActions = [|
+    KeyboardKey.W, (fun _ -> controlManager.Canvas.Camera.MoveCameraUp 5.0f)
+    KeyboardKey.A, (fun _ -> controlManager.Canvas.Camera.MoveCameraLeft 5.0f)
+    KeyboardKey.S, (fun _ -> controlManager.Canvas.Camera.MoveCameraDown 5.0f)
+    KeyboardKey.D, (fun _ -> controlManager.Canvas.Camera.MoveCameraRight 5.0f)
+|]
+
 controlManager.KeyActions.AddRange keyboardActions
+controlManager.ShiftKeyActions.AddRange keyboardShiftActions
 
 gameUpdateLoop () |> Async.Start
 
