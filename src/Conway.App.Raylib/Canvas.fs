@@ -16,9 +16,7 @@ type Canvas
         cellSize: float32
     ) =
 
-    member val X = x with get, set
-
-    member val Y = y with get, set
+    member val Position = Vector2(x, y) with get, set
 
     member val Width = width with get, set
 
@@ -33,14 +31,14 @@ type Canvas
     member this.CalculateVisibleRange() =
         let cellSize = this.CellSize * this.Camera.ZoomFactor
 
-        let offsetX = this.Camera.X * cellSize
-        let offsetY = this.Camera.Y * cellSize
+        let offsetX = this.Camera.Position.X * cellSize
+        let offsetY = this.Camera.Position.Y * cellSize
 
         let activeWidth = min ((this.Width - offsetX) / cellSize) (this.Width / cellSize)
         let activeHeight = min ((this.Height - offsetY) / cellSize) (this.Height / cellSize)
 
-        let startX = max (1.0f - this.Camera.X) 1.0f
-        let startY = max (1.0f - this.Camera.Y) 1.0f
+        let startX = max (1.0f - this.Camera.Position.X) 1.0f
+        let startY = max (1.0f - this.Camera.Position.Y) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
@@ -57,17 +55,22 @@ type Canvas
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / (this.CellSize * this.Camera.ZoomFactor)
 
-            this.Camera.X <- this.Camera.X + mouseDelta.X * cellSizeInverse
-            this.Camera.Y <- this.Camera.Y + mouseDelta.Y * cellSizeInverse
+            let newCameraPosition =
+                Vector2(
+                    this.Camera.Position.X + mouseDelta.X * cellSizeInverse,
+                    this.Camera.Position.Y + mouseDelta.Y * cellSizeInverse
+                )
+
+            this.Camera.Position <- newCameraPosition
 
     member this.processMouseScroll() =
         let mousePos = Mouse.position ()
 
         if
-            mousePos.X >= this.X
-            && mousePos.X <= this.X + this.Width
-            && mousePos.Y >= this.Y
-            && mousePos.Y <= this.Y + this.Height
+            mousePos.X >= this.Position.X
+            && mousePos.X <= this.Position.X + this.Width
+            && mousePos.Y >= this.Position.Y
+            && mousePos.Y <= this.Position.Y + this.Height
         then
             let mouseScrollAmount = Mouse.getScrollAmount ()
             this.Camera.ZoomIn(mouseScrollAmount.Y * 0.1f)
@@ -79,8 +82,8 @@ type Canvas
 
         let cellSize = this.CellSize * this.Camera.ZoomFactor
 
-        let offsetX = this.Camera.X * cellSize
-        let offsetY = this.Camera.Y * cellSize
+        let offsetX = this.Camera.Position.X * cellSize
+        let offsetY = this.Camera.Position.Y * cellSize
 
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board

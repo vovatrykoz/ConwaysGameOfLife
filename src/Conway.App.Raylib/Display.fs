@@ -28,10 +28,10 @@ module Display =
         for row = startRow to endRow do
             for col = startCol to endCol do
                 let trueX =
-                    max (float32 col + canvas.Camera.X) (visibleStartPoint.X + canvas.Camera.X)
+                    max (float32 col + canvas.Camera.Position.X) (visibleStartPoint.X + canvas.Camera.Position.X)
 
                 let trueY =
-                    max (float32 row + canvas.Camera.Y) (visibleStartPoint.Y + canvas.Camera.Y)
+                    max (float32 row + canvas.Camera.Position.Y) (visibleStartPoint.Y + canvas.Camera.Position.Y)
 
                 let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
                 let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
@@ -47,20 +47,24 @@ module Display =
             | false -> ()
 
     let private renderGenerationCounter (canvas: Canvas) generation =
-        Draw.textBox (canvas.X + canvas.Width + 5.0f) canvas.Y 24 $"Generation {generation}"
+        Draw.textBox (canvas.Position.X + canvas.Width + 5.0f) canvas.Position.Y 24 $"Generation {generation}"
 
     let private renderFpsCounter (canvas: Canvas) fps =
-        Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 50.0f) 24 $"FPS {fps}"
+        Draw.textBox (canvas.Position.X + canvas.Width + 5.0f) (canvas.Position.Y + 50.0f) 24 $"FPS {fps}"
 
     let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
-        Draw.textBox (canvas.X + canvas.Width + 5.0f) (canvas.Y + 150.0f) 24 $"X {mousePos.X} Y {mousePos.Y}"
+        Draw.textBox
+            (canvas.Position.X + canvas.Width + 5.0f)
+            (canvas.Position.Y + 150.0f)
+            24
+            $"X {mousePos.X} Y {mousePos.Y}"
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
         Draw.textBox
-            (canvas.X + canvas.Width + 5.0f)
-            (canvas.Y + 100.0f)
+            (canvas.Position.X + canvas.Width + 5.0f)
+            (canvas.Position.Y + 100.0f)
             24
-            $"Camera:\nX: {-canvas.Camera.X:F2} Y: {-canvas.Camera.Y:F2}"
+            $"Camera:\nX: {-canvas.Camera.Position.X:F2} Y: {-canvas.Camera.Position.Y:F2}"
 
     let loadingScreen x y =
         for _ in 0..10 do
