@@ -157,7 +157,6 @@ let resetCallback () =
         | Limited _ -> ()
         | Paused -> game.State <- startingState
 
-        game.ClearHistory()
     finally
         mainLock.ExitReadLock()
 
@@ -170,7 +169,6 @@ let clearCallback () =
         | Limited _ -> ()
         | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
 
-        game.ClearHistory()
     finally
         mainLock.ExitReadLock()
 
