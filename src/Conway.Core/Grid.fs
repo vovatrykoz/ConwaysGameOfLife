@@ -11,6 +11,9 @@ open System.Threading.Tasks
 [<Measure>]
 type CellStatus
 
+// This is just to improve the readability of the match ... with expression in the evolveCellAt member
+// Shouldn't really be used outside of that part or similar match ... with expressions
+// CellStatus should always be preferred
 [<Measure>]
 type Neighbors = CellStatus
 
@@ -107,10 +110,11 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col cols activePtr passivePtr =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col cols activePtr
+        let index = row * cols + col
 
         match livingNeighborsCount with
         | 2<Neighbors> ->
-            let currentValue = NativePtr.get activePtr (row * cols + col)
-            NativePtr.set passivePtr (row * cols + col) currentValue
-        | 3<Neighbors> -> NativePtr.set passivePtr (row * cols + col) 1<CellStatus>
-        | _ -> NativePtr.set passivePtr (row * cols + col) 0<CellStatus>
+            let currentValue = NativePtr.get activePtr index
+            NativePtr.set passivePtr index currentValue
+        | 3<Neighbors> -> NativePtr.set passivePtr index 1<CellStatus>
+        | _ -> NativePtr.set passivePtr index 0<CellStatus>
