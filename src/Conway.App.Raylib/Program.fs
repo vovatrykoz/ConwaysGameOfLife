@@ -75,32 +75,29 @@ let mainLock = new ReaderWriterLockSlim()
 
 let mutable gameRunningState = Paused
 
-let gameUpdateLoop () =
-    let mutable shouldRun = false
+let canvasX = 25.0f
+let canvasY = 25.0f
+let cellSize = 25.0f
 
-    async {
-        while true do
-            do! Async.Sleep sleepTime
+let widthOffset = cellSize * 12.0f
+let heightOffset = cellSize * 2.0f
 
-            shouldRun <-
-                try
-                    mainLock.EnterWriteLock()
+let cameraPosX = 500.0f
+let cameraPosY = 500.0f
 
-                    match gameRunningState with
-                    | Infinite -> true
-                    | Limited x when x > 1 ->
-                        gameRunningState <- Limited(x - 1)
-                        true
-                    | Limited _ ->
-                        gameRunningState <- Paused
-                        true
-                    | Paused -> false
-                finally
-                    mainLock.ExitWriteLock()
+let canvas =
+    new Canvas(
+        canvasX,
+        canvasY,
+        float32 windowWidth - widthOffset,
+        float32 windowHeight - heightOffset,
+        cameraPosX,
+        cameraPosY,
+        game,
+        cellSize
+    )
 
-            if shouldRun then
-                game.RunOneStep()
-    }
+let controlManager = new ControlManager(canvas)
 
 let toggleGame () =
     try
@@ -208,30 +205,6 @@ let clearButton =
     |> Button.onUpdateCallback updateOnRun
 
 let buttons = [| toggleButton; advanceButton; resetButton; clearButton |]
-
-let canvasX = 25.0f
-let canvasY = 25.0f
-let cellSize = 25.0f
-
-let widthOffset = cellSize * 12.0f
-let heightOffset = cellSize * 2.0f
-
-let cameraPosX = 500.0f
-let cameraPosY = 500.0f
-
-let canvas =
-    new Canvas(
-        canvasX,
-        canvasY,
-        float32 windowWidth - widthOffset,
-        float32 windowHeight - heightOffset,
-        cameraPosX,
-        cameraPosY,
-        game,
-        cellSize
-    )
-
-let controlManager = new ControlManager(canvas)
 controlManager.Buttons.AddRange buttons
 
 let keyboardActions = [|
@@ -252,6 +225,33 @@ let keyboardShiftActions = [|
 
 controlManager.KeyActions.AddRange keyboardActions
 controlManager.ShiftKeyActions.AddRange keyboardShiftActions
+
+let gameUpdateLoop () =
+    let mutable shouldRun = false
+
+    async {
+        while true do
+            do! Async.Sleep sleepTime
+
+            shouldRun <-
+                try
+                    mainLock.EnterWriteLock()
+
+                    match gameRunningState with
+                    | Infinite -> true
+                    | Limited x when x > 1 ->
+                        gameRunningState <- Limited(x - 1)
+                        true
+                    | Limited _ ->
+                        gameRunningState <- Paused
+                        true
+                    | Paused -> false
+                finally
+                    mainLock.ExitWriteLock()
+
+            if shouldRun then
+                game.RunOneStep()
+    }
 
 gameUpdateLoop () |> Async.Start
 
