@@ -96,6 +96,10 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset preset = preset |||> ConwayGrid.init
 
+    [<CompiledName("CopyFrom")>]
+    static member copyFrom(otherGrid: ConwayGrid) =
+        new ConwayGrid(Array2D.copy otherGrid.Board)
+
     [<CompiledName("CountLivingNeighbors")>]
     static member private countLivingNeighbors row col cols (ptr: nativeptr<int<CellStatus>>) =
         NativePtr.get ptr ((row - 1) * cols + (col - 1))

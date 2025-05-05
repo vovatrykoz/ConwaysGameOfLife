@@ -67,6 +67,8 @@ let oddsOfGettingLivingCell = 5
 let startingState =
     ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
 
+let startingStateBackup = ConwayGrid.copyFrom startingState
+
 let game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
@@ -155,7 +157,7 @@ let resetCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- startingState
+        | Paused -> game.State <- ConwayGrid.copyFrom startingStateBackup
 
     finally
         mainLock.ExitReadLock()

@@ -72,3 +72,10 @@ type ConwayGrid =
     /// <param name="preset">A tuple of width, height, and initializer function.</param>
     [<CompiledName("InitFromPreset")>]
     static member initFromPreset: preset: (int * int * (int -> int -> int<CellStatus>)) -> ConwayGrid
+
+    /// <summary>
+    /// Deep copies the state of the provided grid
+    /// </summary>
+    /// <param name="otherGrid">Grid to copy from.</param>
+    [<CompiledName("CopyFrom")>]
+    static member copyFrom: otherGrid: ConwayGrid -> ConwayGrid
