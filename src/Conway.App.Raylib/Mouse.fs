@@ -4,21 +4,21 @@ open Conway.App.Raylib.Aliases
 open Raylib_cs
 
 module Mouse =
-    let position () = Raylib.GetMousePosition()
+    let inline position () = Raylib.GetMousePosition()
 
-    let getDelta () = Raylib.GetMouseDelta()
+    let inline getDelta () = Raylib.GetMouseDelta()
 
-    let getScrollAmount () = Raylib.GetMouseWheelMoveV()
+    let inline getScrollAmount () = Raylib.GetMouseWheelMoveV()
 
-    let buttonClicked key =
+    let inline buttonClicked key =
         raylibTrue (Raylib.IsMouseButtonPressed key)
 
-    let buttonIsPressed key =
+    let inline buttonIsPressed key =
         raylibTrue (Raylib.IsMouseButtonDown key)
 
-    let buttonIsUp key = raylibTrue (Raylib.IsMouseButtonUp key)
+    let inline buttonIsUp key = raylibTrue (Raylib.IsMouseButtonUp key)
 
-    let buttonHasBeenReleased key =
+    let inline buttonHasBeenReleased key =
         raylibTrue (Raylib.IsMouseButtonReleased key)
 
-    let getPosition () = Raylib.GetMousePosition()
+    let inline getPosition () = Raylib.GetMousePosition()

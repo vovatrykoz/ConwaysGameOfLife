@@ -5,7 +5,7 @@ open Raylib_cs
 module Draw =
     open System.Numerics
 
-    let private buttonBorderRectangle x y size =
+    let inline private buttonBorderRectangle x y size =
         Rectangle(float32 (x - 2), float32 (y - 2), float32 (size + 4), float32 (size + 4))
 
     let inline private calculateBorderSize buttonSize = float32 buttonSize / 12.5f

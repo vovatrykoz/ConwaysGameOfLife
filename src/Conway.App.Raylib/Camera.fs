@@ -15,13 +15,13 @@ type Camera(x: float32, y: float32) =
 
     member val MinZoomFactor = 0.2f with get, set
 
-    member this.MoveCameraRight(speed: float32) = _position.X <- _position.X - speed
+    member _.MoveCameraRight(speed: float32) = _position.X <- _position.X - speed
 
-    member this.MoveCameraLeft(speed: float32) = _position.X <- _position.X + speed
+    member _.MoveCameraLeft(speed: float32) = _position.X <- _position.X + speed
 
-    member this.MoveCameraUp(speed: float32) = _position.Y <- _position.Y + speed
+    member _.MoveCameraUp(speed: float32) = _position.Y <- _position.Y + speed
 
-    member this.MoveCameraDown(speed: float32) = _position.Y <- _position.Y - speed
+    member _.MoveCameraDown(speed: float32) = _position.Y <- _position.Y - speed
 
     member this.ZoomIn(speed: float32) =
         this.ZoomFactor <- min (this.ZoomFactor + speed) this.MaxZoomFactor

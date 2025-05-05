@@ -30,7 +30,6 @@ type Canvas
 
     member this.CalculateVisibleRange() =
         let cellSize = this.CellSize * this.Camera.ZoomFactor
-
         let offset = this.Camera.Position * cellSize
 
         let activeWidth = min ((this.Width - offset.X) / cellSize) (this.Width / cellSize)
@@ -55,10 +54,7 @@ type Canvas
         else
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / (this.CellSize * this.Camera.ZoomFactor)
-
-            let newCameraPosition = (this.Camera.Position + mouseDelta) * cellSizeInverse
-
-            this.Camera.Position <- newCameraPosition
+            this.Camera.Position <- (this.Camera.Position + mouseDelta) * cellSizeInverse
 
     member this.processMouseScroll() =
         let mousePos = Mouse.position ()
