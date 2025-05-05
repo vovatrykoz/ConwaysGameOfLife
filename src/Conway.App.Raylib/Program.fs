@@ -82,10 +82,10 @@ let gameUpdateLoop () =
         while true do
             do! Async.Sleep sleepTime
 
-            try
-                mainLock.EnterWriteLock()
+            shouldRun <-
+                try
+                    mainLock.EnterWriteLock()
 
-                shouldRun <-
                     match gameRunningState with
                     | Infinite -> true
                     | Limited x when x > 1 ->
@@ -95,8 +95,8 @@ let gameUpdateLoop () =
                         gameRunningState <- Paused
                         true
                     | Paused -> false
-            finally
-                mainLock.ExitWriteLock()
+                finally
+                    mainLock.ExitWriteLock()
 
             if shouldRun then
                 game.RunOneStep()
