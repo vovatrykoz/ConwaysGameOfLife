@@ -155,7 +155,7 @@ let resetCallback () =
         match gameRunningState with
         | Infinite
         | Limited _ -> ()
-        | Paused -> game.State <- ConwayGrid.createDead gridWidth gridHeight
+        | Paused -> game.State <- startingState
 
         game.ClearHistory()
     finally

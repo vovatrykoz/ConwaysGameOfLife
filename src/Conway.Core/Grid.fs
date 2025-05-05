@@ -46,7 +46,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
             1,
             rows - 1,
             fun row ->
-                for col in 1 .. cols - 2 do
+                for col in 1 .. (cols - 2) do
                     ConwayGrid.evolveCellAt row col cols activePtr passivePtr
         )
         |> ignore
