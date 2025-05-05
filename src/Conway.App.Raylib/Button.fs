@@ -16,19 +16,19 @@ type Button
         shortcut: option<KeyboardKey>
     ) =
 
-    let mutable isCurrentlyPressed = false
+    let mutable _isCurrentlyPressed = false
 
-    let mutable isCurrentlyClicked = false
+    let mutable _isCurrentlyClicked = false
 
-    let mutable isActive = isActive
+    let mutable _isActive = isActive
 
     member _.IsPressed
-        with get () = isCurrentlyPressed
-        and private set value = isCurrentlyPressed <- value
+        with get () = _isCurrentlyPressed
+        and private set value = _isCurrentlyPressed <- value
 
     member _.IsClicked
-        with get () = isCurrentlyClicked
-        and private set value = isCurrentlyClicked <- value
+        with get () = _isCurrentlyClicked
+        and private set value = _isCurrentlyClicked <- value
 
     member val X = x with get, set
 
@@ -39,12 +39,12 @@ type Button
     member val Text = text with get, set
 
     member _.IsActive
-        with get () = isActive
+        with get () = _isActive
         and set value =
             if not value then
-                isCurrentlyPressed <- false
+                _isCurrentlyPressed <- false
 
-            isActive <- value
+            _isActive <- value
 
     member val IsVisible = isVisible with get, set
 

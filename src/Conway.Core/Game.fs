@@ -7,19 +7,19 @@ type GameMode =
     | Paused
 
 type Game(initialState: ConwayGrid) =
-    let mutable internalState = initialState
+    let mutable _internalState = initialState
 
-    let mutable generation = 1
+    let mutable _generation = 1
 
     member _.State
-        with get () = internalState
+        with get () = _internalState
         and set newState =
-            internalState <- newState
-            generation <- 1
+            _internalState <- newState
+            _generation <- 1
 
     member _.Generation
-        with get () = generation
-        and private set newValue = generation <- newValue
+        with get () = _generation
+        and private set newValue = _generation <- newValue
 
     member this.Run(mode: GameMode) =
         match mode with
