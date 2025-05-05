@@ -10,6 +10,7 @@
     <Compile Include="Mouse.fs" />
     <Compile Include="Button.fs" />
     <Compile Include="Camera.fs" />
+    <Compile Include="GameArea.fs" />
     <Compile Include="Canvas.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
