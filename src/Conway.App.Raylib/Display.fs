@@ -28,10 +28,10 @@ module Display =
         for row = startRow to endRow do
             for col = startCol to endCol do
                 let trueX =
-                    max (float32 col + canvas.Camera.Position.X) (visibleStartPoint.X + canvas.Camera.Position.X)
+                    max (float32 col - canvas.Camera.Position.X) (visibleStartPoint.X - canvas.Camera.Position.X)
 
                 let trueY =
-                    max (float32 row + canvas.Camera.Position.Y) (visibleStartPoint.Y + canvas.Camera.Position.Y)
+                    max (float32 row - canvas.Camera.Position.Y) (visibleStartPoint.Y - canvas.Camera.Position.Y)
 
                 let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
                 let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
@@ -64,7 +64,7 @@ module Display =
             (canvas.Position.X + canvas.Width + 5.0f)
             (canvas.Position.Y + 100.0f)
             24
-            $"Camera:\nX: {-canvas.Camera.Position.X:F2} Y: {-canvas.Camera.Position.Y:F2}"
+            $"Camera:\nX: {canvas.Camera.Position.X:F2} Y: {canvas.Camera.Position.Y:F2}"
 
     let loadingScreen x y =
         for _ in 0..10 do

@@ -26,7 +26,7 @@ type Canvas
 
     member val Game = game with get, set
 
-    member val Camera = Camera(-drawingX, -drawingY) with get, set
+    member val Camera = Camera(drawingX, drawingY) with get, set
 
     member this.CalculateVisibleRange() =
         let cellSize = this.CellSize * this.Camera.ZoomFactor
@@ -34,11 +34,11 @@ type Canvas
         let offsetX = this.Camera.Position.X * cellSize
         let offsetY = this.Camera.Position.Y * cellSize
 
-        let activeWidth = min ((this.Width - offsetX) / cellSize) (this.Width / cellSize)
-        let activeHeight = min ((this.Height - offsetY) / cellSize) (this.Height / cellSize)
+        let activeWidth = min ((this.Width + offsetX) / cellSize) (this.Width / cellSize)
+        let activeHeight = min ((this.Height + offsetY) / cellSize) (this.Height / cellSize)
 
-        let startX = max (1.0f - this.Camera.Position.X) 1.0f
-        let startY = max (1.0f - this.Camera.Position.Y) 1.0f
+        let startX = max (1.0f + this.Camera.Position.X) 1.0f
+        let startY = max (1.0f + this.Camera.Position.Y) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
@@ -61,8 +61,8 @@ type Canvas
 
             this.Camera.Position <-
                 Vector2(
-                    this.Camera.Position.X + mouseDelta.X * cellSizeInverse,
-                    this.Camera.Position.Y + mouseDelta.Y * cellSizeInverse
+                    this.Camera.Position.X - mouseDelta.X * cellSizeInverse,
+                    this.Camera.Position.Y - mouseDelta.Y * cellSizeInverse
                 )
 
     member this.processMouseScroll() =
@@ -102,8 +102,8 @@ type Canvas
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueStartX = float32 col * cellSize + offsetX
-                let trueStartY = float32 row * cellSize + offsetY
+                let trueStartX = float32 col * cellSize - offsetX
+                let trueStartY = float32 row * cellSize - offsetY
                 let trueEndX = trueStartX + cellSize
                 let trueEndY = trueStartY + cellSize
 
