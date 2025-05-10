@@ -34,14 +34,17 @@ type Canvas
         let horizontalCellCount = this.Width * visibleCellSizeReciprocal
         let verticalCellCount = this.Height * visibleCellSizeReciprocal
 
-        let camX = this.Camera.Position.X
-        let camY = this.Camera.Position.Y
+        let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
+        let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
 
-        let visibleWidth = min (horizontalCellCount + camX) horizontalCellCount
-        let visibleHeigh = min (verticalCellCount + camY) verticalCellCount
+        let upperLeftCornerX = this.Camera.Position.X - halfWidth
+        let upperLeftCornerY = this.Camera.Position.Y - halfHeight
 
-        let startX = max (1.0f + camX) 1.0f
-        let startY = max (1.0f + camY) 1.0f
+        let visibleWidth = min (horizontalCellCount + upperLeftCornerX) horizontalCellCount
+        let visibleHeigh = min (verticalCellCount + upperLeftCornerY) verticalCellCount
+
+        let startX = max (1.0f + upperLeftCornerX) 1.0f
+        let startY = max (1.0f + upperLeftCornerY) 1.0f
         let endX = startX + visibleWidth
         let endY = startY + visibleHeigh
 
@@ -62,11 +65,7 @@ type Canvas
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / (this.CellSize * this.Camera.ZoomFactor)
 
-            this.Camera.Position <-
-                Vector2(
-                    this.Camera.Position.X - mouseDelta.X * cellSizeInverse,
-                    this.Camera.Position.Y - mouseDelta.Y * cellSizeInverse
-                )
+            this.Camera.Position <- this.Camera.Position - mouseDelta * cellSizeInverse
 
     member this.processMouseScroll() =
         let mousePos = Mouse.position ()
@@ -96,17 +95,21 @@ type Canvas
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
 
         let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
+        let visibleCellSizeReciprocal = 1.0f / visibleCellSize
 
-        let offsetX = this.Camera.Position.X * visibleCellSize
-        let offsetY = this.Camera.Position.Y * visibleCellSize
+        let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
+        let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
+
+        let upperLeftCornerX = this.Camera.Position.X - halfWidth
+        let upperLeftCornerY = this.Camera.Position.Y - halfHeight
 
         let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * visibleCellSize
         let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * visibleCellSize
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueStartX = float32 col * visibleCellSize - offsetX
-                let trueStartY = float32 row * visibleCellSize - offsetY
+                let trueStartX = float32 col * visibleCellSize - upperLeftCornerX
+                let trueStartY = float32 row * visibleCellSize - upperLeftCornerY
                 let trueEndX = trueStartX + visibleCellSize
                 let trueEndY = trueStartY + visibleCellSize
 

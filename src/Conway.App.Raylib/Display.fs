@@ -28,10 +28,21 @@ module Display =
         let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
         let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
 
+        let visibleCellSizeReciprocal = 1.0f / trueHeight
+
+        let halfWidth = canvas.Width * 0.5f
+        let halfHeight = canvas.Height * 0.5f
+
+        let upperLeftCornerX =
+            canvas.Camera.Position.X - halfWidth * visibleCellSizeReciprocal
+
+        let upperLeftCornerY =
+            canvas.Camera.Position.Y - halfHeight * visibleCellSizeReciprocal
+
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueX = max (float32 col) visibleStartPoint.X - canvas.Camera.Position.X
-                let trueY = max (float32 row) visibleStartPoint.Y - canvas.Camera.Position.Y
+                let trueX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
+                let trueY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
 
                 match board[row, col] with
                 | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
