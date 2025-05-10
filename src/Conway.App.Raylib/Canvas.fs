@@ -45,13 +45,17 @@ type Canvas
         struct (Vector2(startX, startY), Vector2(endX, endY))
 
     member this.ProcessMouseDrag() =
+        let mousePos = Mouse.position ()
+
         if
-            not (Mouse.buttonIsPressed MouseButton.Left)
-            || Keyboard.keyIsDown KeyboardKey.LeftShift
-            || Keyboard.keyIsDown KeyboardKey.LeftShift
+            mousePos.X >= this.Position.X
+            && mousePos.X <= this.Position.X + this.Width
+            && mousePos.Y >= this.Position.Y
+            && mousePos.Y <= this.Position.Y + this.Height
+            && Mouse.buttonIsPressed MouseButton.Left
+            && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
+            && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
         then
-            ()
-        else
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / (this.CellSize * this.Camera.ZoomFactor)
 
