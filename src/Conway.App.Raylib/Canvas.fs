@@ -30,15 +30,18 @@ type Canvas
 
     member this.CalculateVisibleRange() =
         let cellSize = this.CellSize * this.Camera.ZoomFactor
+        let cellSizeReciprocal = 1.0f / cellSize
+        let widthDivByCellSize = this.Width * cellSizeReciprocal
+        let heightDivByCellSize = this.Height * cellSizeReciprocal
 
-        let offsetX = this.Camera.Position.X * cellSize
-        let offsetY = this.Camera.Position.Y * cellSize
+        let camX = this.Camera.Position.X
+        let camY = this.Camera.Position.Y
 
-        let activeWidth = min ((this.Width + offsetX) / cellSize) (this.Width / cellSize)
-        let activeHeight = min ((this.Height + offsetY) / cellSize) (this.Height / cellSize)
+        let activeWidth = min (widthDivByCellSize + camX) widthDivByCellSize
+        let activeHeight = min (heightDivByCellSize + camY) heightDivByCellSize
 
-        let startX = max (1.0f + this.Camera.Position.X) 1.0f
-        let startY = max (1.0f + this.Camera.Position.Y) 1.0f
+        let startX = max (1.0f + camX) 1.0f
+        let startY = max (1.0f + camY) 1.0f
         let endX = startX + activeWidth
         let endY = startY + activeHeight
 
