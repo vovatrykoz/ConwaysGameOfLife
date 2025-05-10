@@ -29,21 +29,21 @@ type Canvas
     member val Camera = Camera(drawingX, drawingY) with get, set
 
     member this.CalculateVisibleRange() =
-        let cellSize = this.CellSize * this.Camera.ZoomFactor
-        let cellSizeReciprocal = 1.0f / cellSize
-        let widthDivByCellSize = this.Width * cellSizeReciprocal
-        let heightDivByCellSize = this.Height * cellSizeReciprocal
+        let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
+        let visibleCellSizeReciprocal = 1.0f / visibleCellSize
+        let horizontalCellCount = this.Width * visibleCellSizeReciprocal
+        let verticalCellCount = this.Height * visibleCellSizeReciprocal
 
         let camX = this.Camera.Position.X
         let camY = this.Camera.Position.Y
 
-        let activeWidth = min (widthDivByCellSize + camX) widthDivByCellSize
-        let activeHeight = min (heightDivByCellSize + camY) heightDivByCellSize
+        let visibleWidth = min (horizontalCellCount + camX) horizontalCellCount
+        let visibleHeigh = min (verticalCellCount + camY) verticalCellCount
 
         let startX = max (1.0f + camX) 1.0f
         let startY = max (1.0f + camY) 1.0f
-        let endX = startX + activeWidth
-        let endY = startY + activeHeight
+        let endX = startX + visibleWidth
+        let endY = startY + visibleHeigh
 
         struct (Vector2(startX, startY), Vector2(endX, endY))
 
@@ -85,11 +85,6 @@ type Canvas
         this.ProcessMouseDrag()
         this.processMouseScroll ()
 
-        let cellSize = this.CellSize * this.Camera.ZoomFactor
-
-        let offsetX = this.Camera.Position.X * cellSize
-        let offsetY = this.Camera.Position.Y * cellSize
-
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board
 
@@ -100,20 +95,25 @@ type Canvas
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
 
-        let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * cellSize
-        let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * cellSize
+        let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
+
+        let offsetX = this.Camera.Position.X * visibleCellSize
+        let offsetY = this.Camera.Position.Y * visibleCellSize
+
+        let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * visibleCellSize
+        let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * visibleCellSize
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueStartX = float32 col * cellSize - offsetX
-                let trueStartY = float32 row * cellSize - offsetY
-                let trueEndX = trueStartX + cellSize
-                let trueEndY = trueStartY + cellSize
+                let trueStartX = float32 col * visibleCellSize - offsetX
+                let trueStartY = float32 row * visibleCellSize - offsetY
+                let trueEndX = trueStartX + visibleCellSize
+                let trueEndY = trueStartY + visibleCellSize
 
-                let startX = max trueStartX cellSize
-                let startY = max trueStartY cellSize
-                let endX = min (min (startX + cellSize) endBorderX) trueEndX
-                let endY = min (min (startY + cellSize) endBorderY) trueEndY
+                let startX = max trueStartX visibleCellSize
+                let startY = max trueStartY visibleCellSize
+                let endX = min (min (startX + visibleCellSize) endBorderX) trueEndX
+                let endY = min (min (startY + visibleCellSize) endBorderY) trueEndY
 
                 if GameArea.IsLeftPressedWithShift startX startY endX endY then
                     GameArea.makeAlive row col this.Game
