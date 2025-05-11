@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="IConwayCodec.fs" />
+    <Compile Include="IConwayCodec.fs" /><Compile Include="ByteCodec.fs" />
   </ItemGroup>
 
   <ItemGroup>
