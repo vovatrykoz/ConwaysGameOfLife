@@ -25,16 +25,21 @@ module Display =
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
+        let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
+        let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
+
+        let visibleCellSizeReciprocal = 1.0f / trueHeight
+
+        let halfWidth = canvas.Width * 0.5f * visibleCellSizeReciprocal
+        let halfHeight = canvas.Height * 0.5f * visibleCellSizeReciprocal
+
+        let upperLeftCornerX = canvas.Camera.Position.X - halfWidth
+        let upperLeftCornerY = canvas.Camera.Position.Y - halfHeight
+
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueX =
-                    max (float32 col + canvas.Camera.Position.X) (visibleStartPoint.X + canvas.Camera.Position.X)
-
-                let trueY =
-                    max (float32 row + canvas.Camera.Position.Y) (visibleStartPoint.Y + canvas.Camera.Position.Y)
-
-                let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
-                let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
+                let trueX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
+                let trueY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
 
                 match board[row, col] with
                 | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
@@ -64,7 +69,7 @@ module Display =
             (canvas.Position.X + canvas.Width + 5.0f)
             (canvas.Position.Y + 100.0f)
             24
-            $"Camera:\nX: {-canvas.Camera.Position.X:F2} Y: {-canvas.Camera.Position.Y:F2}"
+            $"Camera:\nX: {canvas.Camera.Position.X:F2} Y: {canvas.Camera.Position.Y:F2}"
 
     let loadingScreen x y =
         for _ in 0..10 do

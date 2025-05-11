@@ -26,40 +26,50 @@ type Canvas
 
     member val Game = game with get, set
 
-    member val Camera = Camera(-drawingX, -drawingY) with get, set
+    member val Camera = Camera(drawingX, drawingY) with get, set
 
     member this.CalculateVisibleRange() =
-        let cellSize = this.CellSize * this.Camera.ZoomFactor
+        let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
+        let visibleCellSizeReciprocal = 1.0f / visibleCellSize
+        let horizontalCellCount = this.Width * visibleCellSizeReciprocal
+        let verticalCellCount = this.Height * visibleCellSizeReciprocal
 
-        let offsetX = this.Camera.Position.X * cellSize
-        let offsetY = this.Camera.Position.Y * cellSize
+        let camX = this.Camera.Position.X
+        let camY = this.Camera.Position.Y
 
-        let activeWidth = min ((this.Width - offsetX) / cellSize) (this.Width / cellSize)
-        let activeHeight = min ((this.Height - offsetY) / cellSize) (this.Height / cellSize)
+        let halfWidth = horizontalCellCount * 0.5f
+        let halfHeight = verticalCellCount * 0.5f
 
-        let startX = max (1.0f - this.Camera.Position.X) 1.0f
-        let startY = max (1.0f - this.Camera.Position.Y) 1.0f
-        let endX = startX + activeWidth
-        let endY = startY + activeHeight
+        let upperLeftCornerX = camX - halfWidth
+        let upperLeftCornerY = camY - halfHeight
+
+        let startX = max (1.0f + upperLeftCornerX) 1.0f
+        let startY = max (1.0f + upperLeftCornerY) 1.0f
+
+        let visibleWidth = min (halfWidth + camX) horizontalCellCount - 1.0f
+        let visibleHeigh = min (halfHeight + camY) verticalCellCount - 1.0f
+
+        let endX = startX + visibleWidth
+        let endY = startY + visibleHeigh
 
         struct (Vector2(startX, startY), Vector2(endX, endY))
 
     member this.ProcessMouseDrag() =
+        let mousePos = Mouse.position ()
+
         if
-            not (Mouse.buttonIsPressed MouseButton.Left)
-            || Keyboard.keyIsDown KeyboardKey.LeftShift
-            || Keyboard.keyIsDown KeyboardKey.LeftShift
+            mousePos.X >= this.Position.X
+            && mousePos.X <= this.Position.X + this.Width
+            && mousePos.Y >= this.Position.Y
+            && mousePos.Y <= this.Position.Y + this.Height
+            && Mouse.buttonIsPressed MouseButton.Left
+            && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
+            && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
         then
-            ()
-        else
             let mouseDelta = Mouse.getDelta ()
             let cellSizeInverse = 1.0f / (this.CellSize * this.Camera.ZoomFactor)
 
-            this.Camera.Position <-
-                Vector2(
-                    this.Camera.Position.X + mouseDelta.X * cellSizeInverse,
-                    this.Camera.Position.Y + mouseDelta.Y * cellSizeInverse
-                )
+            this.Camera.Position <- this.Camera.Position - mouseDelta * cellSizeInverse
 
     member this.processMouseScroll() =
         let mousePos = Mouse.position ()
@@ -78,11 +88,6 @@ type Canvas
         this.ProcessMouseDrag()
         this.processMouseScroll ()
 
-        let cellSize = this.CellSize * this.Camera.ZoomFactor
-
-        let offsetX = this.Camera.Position.X * cellSize
-        let offsetY = this.Camera.Position.Y * cellSize
-
         let rows = Array2D.length1 this.Game.State.Board
         let cols = Array2D.length2 this.Game.State.Board
 
@@ -93,20 +98,29 @@ type Canvas
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
 
-        let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * cellSize
-        let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * cellSize
+        let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
+        let visibleCellSizeReciprocal = 1.0f / visibleCellSize
+
+        let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
+        let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
+
+        let upperLeftCorner =
+            Vector2(this.Camera.Position.X - halfWidth, this.Camera.Position.Y - halfHeight)
+
+        let distanceToBorder = (visibleEndPoint - upperLeftCorner) * visibleCellSize
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueStartX = float32 col * cellSize + offsetX
-                let trueStartY = float32 row * cellSize + offsetY
-                let trueEndX = trueStartX + cellSize
-                let trueEndY = trueStartY + cellSize
+                let trueStartX = (float32 col - upperLeftCorner.X) * visibleCellSize
+                let trueStartY = (float32 row - upperLeftCorner.Y) * visibleCellSize
+                let trueEndX = trueStartX + visibleCellSize
+                let trueEndY = trueStartY + visibleCellSize
 
-                let startX = max trueStartX cellSize
-                let startY = max trueStartY cellSize
-                let endX = min (min (startX + cellSize) endBorderX) trueEndX
-                let endY = min (min (startY + cellSize) endBorderY) trueEndY
+                let startX = max trueStartX visibleCellSize
+                let startY = max trueStartY visibleCellSize
+
+                let endX = min (min (startX + visibleCellSize) distanceToBorder.X) trueEndX
+                let endY = min (min (startY + visibleCellSize) distanceToBorder.Y) trueEndY
 
                 if GameArea.IsLeftPressedWithShift startX startY endX endY then
                     GameArea.makeAlive row col this.Game
