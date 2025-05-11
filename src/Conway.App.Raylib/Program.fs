@@ -113,9 +113,8 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Infinite
-        | Limited _ -> ()
         | Paused -> game.RunOneStep()
+        | _ -> ()
     finally
         mainLock.ExitReadLock()
 
@@ -150,9 +149,8 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Infinite
-        | Limited _ -> ()
         | Paused -> game.ResetState()
+        | _ -> ()
 
     finally
         mainLock.ExitReadLock()
@@ -162,9 +160,8 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Infinite
-        | Limited _ -> ()
         | Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | _ -> ()
 
     finally
         mainLock.ExitReadLock()
