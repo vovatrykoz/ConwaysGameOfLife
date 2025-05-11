@@ -100,8 +100,8 @@ type Canvas
         let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
         let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
 
-        let upperLeftCornerX = this.Camera.Position.X - halfWidth
-        let upperLeftCornerY = this.Camera.Position.Y - halfHeight
+        let upperLeftCornerX = (this.Camera.Position.X - halfWidth) * visibleCellSize
+        let upperLeftCornerY = (this.Camera.Position.Y - halfHeight) * visibleCellSize
 
         let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * visibleCellSize
         let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * visibleCellSize
