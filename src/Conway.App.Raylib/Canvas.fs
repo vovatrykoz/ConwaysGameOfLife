@@ -40,8 +40,11 @@ type Canvas
         let upperLeftCornerX = this.Camera.Position.X - halfWidth
         let upperLeftCornerY = this.Camera.Position.Y - halfHeight
 
-        let visibleWidth = min (horizontalCellCount + upperLeftCornerX) horizontalCellCount
-        let visibleHeigh = min (verticalCellCount + upperLeftCornerY) verticalCellCount
+        let visibleWidth =
+            min (horizontalCellCount + upperLeftCornerX) horizontalCellCount - 1.0f
+
+        let visibleHeigh =
+            min (verticalCellCount + upperLeftCornerY) verticalCellCount - 1.0f
 
         let startX = max (1.0f + upperLeftCornerX) 1.0f
         let startY = max (1.0f + upperLeftCornerY) 1.0f
@@ -115,8 +118,16 @@ type Canvas
 
                 let startX = max trueStartX visibleCellSize
                 let startY = max trueStartY visibleCellSize
-                let endX = min (min (startX + visibleCellSize) endBorderX) trueEndX
-                let endY = min (min (startY + visibleCellSize) endBorderY) trueEndY
+
+                let endX =
+                    min
+                        (min (startX + visibleCellSize) (visibleEndPoint.X * visibleCellSize - upperLeftCornerX))
+                        trueEndX
+
+                let endY =
+                    min
+                        (min (startY + visibleCellSize) (visibleEndPoint.Y * visibleCellSize - upperLeftCornerY))
+                        trueEndY
 
                 if GameArea.IsLeftPressedWithShift startX startY endX endY then
                     GameArea.makeAlive row col this.Game
