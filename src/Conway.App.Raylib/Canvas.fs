@@ -88,8 +88,8 @@ type Canvas
         this.ProcessMouseDrag()
         this.processMouseScroll ()
 
-        let rows = Array2D.length1 this.Game.State.Board
-        let cols = Array2D.length2 this.Game.State.Board
+        let rows = Array2D.length1 this.Game.CurrentState.Board
+        let cols = Array2D.length2 this.Game.CurrentState.Board
 
         let struct (visibleStartPoint, visibleEndPoint) = this.CalculateVisibleRange()
 

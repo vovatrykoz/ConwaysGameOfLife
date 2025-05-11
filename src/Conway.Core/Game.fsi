@@ -26,7 +26,12 @@ type Game =
     /// <summary>
     /// Gets or sets the current state of the game grid.
     /// </summary>
-    member State: ConwayGrid with get, set
+    member CurrentState: ConwayGrid with get, set
+
+    /// <summary>
+    /// Gets the initial state of the grid.
+    /// </summary>
+    member InitialState: ConwayGrid with get
 
     /// <summary>
     /// Gets the current generation number.
@@ -47,4 +52,9 @@ type Game =
     /// <summary>
     /// Clears the game's history and resets the generation counter.
     /// </summary>
-    member ClearHistory: unit -> unit
+    member ResetState: unit -> unit
+
+    /// <summary>
+    /// Clears the game's history and remembers the current state as the "clear" state.
+    /// </summary>
+    member ResetGenerationCounter: unit -> unit

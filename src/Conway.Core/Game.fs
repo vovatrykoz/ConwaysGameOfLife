@@ -7,15 +7,20 @@ type GameMode =
     | Paused
 
 type Game(initialState: ConwayGrid) =
+    let mutable _initialState = ConwayGrid.copyFrom initialState
+
     let mutable _internalState = initialState
 
     let mutable _generation = 1
 
-    member _.State
+    member _.CurrentState
         with get () = _internalState
         and set newState =
             _internalState <- newState
+            _initialState <- ConwayGrid.copyFrom newState
             _generation <- 1
+
+    member _.InitialState = _initialState
 
     member _.Generation
         with get () = _generation
@@ -25,14 +30,19 @@ type Game(initialState: ConwayGrid) =
         match mode with
         | Infinite ->
             while true do
-                this.State.AdvanceToNextState()
+                this.CurrentState.AdvanceToNextState()
                 this.Generation <- this.Generation + 1
         | Limited steps ->
             for _ = 1 to steps do
-                this.State.AdvanceToNextState()
+                this.CurrentState.AdvanceToNextState()
                 this.Generation <- this.Generation + 1
         | Paused -> ()
 
     member this.RunOneStep() = this.Run(Limited 1)
 
-    member this.ClearHistory() = this.Generation <- 1
+    member this.ResetState() =
+        this.CurrentState <- ConwayGrid.copyFrom _initialState
+
+    member this.ResetGenerationCounter() =
+        _initialState <- ConwayGrid.copyFrom this.CurrentState
+        _generation <- 1

@@ -5,16 +5,16 @@ open Raylib_cs
 
 module internal GameArea =
     let makeAlive row col (game: Game) =
-        game.State.Board[row, col] <- 1<CellStatus>
+        game.CurrentState.Board[row, col] <- 1<CellStatus>
 
         // erase the history since the player has altered the board
-        game.ClearHistory()
+        game.ResetGenerationCounter()
 
     let makeDead row col (game: Game) =
-        game.State.Board[row, col] <- 0<CellStatus>
+        game.CurrentState.Board[row, col] <- 0<CellStatus>
 
         // erase the history since the player has altered the board
-        game.ClearHistory()
+        game.ResetGenerationCounter()
 
     let IsPressedWithShift
         (startX: float32)
