@@ -34,20 +34,21 @@ type Canvas
         let horizontalCellCount = this.Width * visibleCellSizeReciprocal
         let verticalCellCount = this.Height * visibleCellSizeReciprocal
 
-        let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
-        let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
+        let camX = this.Camera.Position.X
+        let camY = this.Camera.Position.Y
 
-        let upperLeftCornerX = this.Camera.Position.X - halfWidth
-        let upperLeftCornerY = this.Camera.Position.Y - halfHeight
+        let halfWidth = horizontalCellCount * 0.5f
+        let halfHeight = verticalCellCount * 0.5f
 
-        let visibleWidth =
-            min (horizontalCellCount + upperLeftCornerX) horizontalCellCount - 1.0f
-
-        let visibleHeigh =
-            min (verticalCellCount + upperLeftCornerY) verticalCellCount - 1.0f
+        let upperLeftCornerX = camX - halfWidth
+        let upperLeftCornerY = camY - halfHeight
 
         let startX = max (1.0f + upperLeftCornerX) 1.0f
         let startY = max (1.0f + upperLeftCornerY) 1.0f
+
+        let visibleWidth = min (halfWidth + camX) horizontalCellCount - 1.0f
+        let visibleHeigh = min (halfHeight + camY) verticalCellCount - 1.0f
+
         let endX = startX + visibleWidth
         let endY = startY + visibleHeigh
 
@@ -103,31 +104,23 @@ type Canvas
         let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
         let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
 
-        let upperLeftCornerX = (this.Camera.Position.X - halfWidth) * visibleCellSize
-        let upperLeftCornerY = (this.Camera.Position.Y - halfHeight) * visibleCellSize
+        let upperLeftCorner =
+            Vector2(this.Camera.Position.X - halfWidth, this.Camera.Position.Y - halfHeight)
 
-        let endBorderX = (visibleEndPoint.X - visibleStartPoint.X) * visibleCellSize
-        let endBorderY = (visibleEndPoint.Y - visibleStartPoint.Y) * visibleCellSize
+        let distanceToBorder = (visibleEndPoint - upperLeftCorner) * visibleCellSize
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueStartX = float32 col * visibleCellSize - upperLeftCornerX
-                let trueStartY = float32 row * visibleCellSize - upperLeftCornerY
+                let trueStartX = (float32 col - upperLeftCorner.X) * visibleCellSize
+                let trueStartY = (float32 row - upperLeftCorner.Y) * visibleCellSize
                 let trueEndX = trueStartX + visibleCellSize
                 let trueEndY = trueStartY + visibleCellSize
 
                 let startX = max trueStartX visibleCellSize
                 let startY = max trueStartY visibleCellSize
 
-                let endX =
-                    min
-                        (min (startX + visibleCellSize) (visibleEndPoint.X * visibleCellSize - upperLeftCornerX))
-                        trueEndX
-
-                let endY =
-                    min
-                        (min (startY + visibleCellSize) (visibleEndPoint.Y * visibleCellSize - upperLeftCornerY))
-                        trueEndY
+                let endX = min (min (startX + visibleCellSize) distanceToBorder.X) trueEndX
+                let endY = min (min (startY + visibleCellSize) distanceToBorder.Y) trueEndY
 
                 if GameArea.IsLeftPressedWithShift startX startY endX endY then
                     GameArea.makeAlive row col this.Game

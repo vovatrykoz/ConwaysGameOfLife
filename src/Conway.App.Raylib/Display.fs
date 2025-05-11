@@ -30,14 +30,11 @@ module Display =
 
         let visibleCellSizeReciprocal = 1.0f / trueHeight
 
-        let halfWidth = canvas.Width * 0.5f
-        let halfHeight = canvas.Height * 0.5f
+        let halfWidth = canvas.Width * 0.5f * visibleCellSizeReciprocal
+        let halfHeight = canvas.Height * 0.5f * visibleCellSizeReciprocal
 
-        let upperLeftCornerX =
-            canvas.Camera.Position.X - halfWidth * visibleCellSizeReciprocal
-
-        let upperLeftCornerY =
-            canvas.Camera.Position.Y - halfHeight * visibleCellSizeReciprocal
+        let upperLeftCornerX = canvas.Camera.Position.X - halfWidth
+        let upperLeftCornerY = canvas.Camera.Position.Y - halfHeight
 
         for row = startRow to endRow do
             for col = startCol to endCol do
