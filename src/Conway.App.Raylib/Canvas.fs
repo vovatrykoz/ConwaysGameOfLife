@@ -10,8 +10,8 @@ type Canvas
         y: float32,
         width: float32,
         height: float32,
-        drawingX: float32,
-        drawingY: float32,
+        camPosX: float32,
+        camPosY: float32,
         game: Game,
         cellSize: float32
     ) =
@@ -26,7 +26,7 @@ type Canvas
 
     member val Game = game with get, set
 
-    member val Camera = Camera(drawingX, drawingY) with get, set
+    member val Camera = Camera(camPosX, camPosY) with get, set
 
     member this.CalculateVisibleRange() =
         let visibleCellSize = this.CellSize * this.Camera.ZoomFactor

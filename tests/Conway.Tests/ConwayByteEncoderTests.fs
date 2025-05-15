@@ -4,7 +4,7 @@ open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
 
-module ``Binary Canvas File Saver Tests`` =
+module ``Conway Byte Encoder Tests`` =
 
     [<Test>]
     let ``Can correctly encode grid dimensions`` () =
