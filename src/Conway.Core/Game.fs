@@ -42,8 +42,9 @@ type Game(initialState: ConwayGrid) =
 
     member this.RunOneStep() = this.Run(Limited 1)
 
-    member this.ResetState() =
-        this.CurrentState <- ConwayGrid.copyFrom _initialState
+    member _.ResetState() =
+        _internalState <- ConwayGrid.copyFrom _initialState
+        _generation <- 1
 
     member this.ResetGenerationCounter() =
         _initialState <- ConwayGrid.copyFrom this.CurrentState
