@@ -1,8 +1,6 @@
-namespace Conway.App.Raylib.File
+namespace Conway.Encoding
 
-open System.Runtime.CompilerServices
-
-[<IsReadOnly; Struct>]
+[<Struct>]
 type BitVector8 private (b: byte) =
     member _.Byte = b
 

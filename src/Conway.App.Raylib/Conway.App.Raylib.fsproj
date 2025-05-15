@@ -14,7 +14,6 @@
     <Compile Include="Canvas.fs" />
     <Compile Include=".\File\ICavnasFileOpener.fs" />
     <Compile Include=".\File\ICavnasFileSaver.fs" />
-    <Compile Include=".\File\BitVector8.fs" />
     <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
@@ -23,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Conway.Core\Conway.Core.fsproj" />
+    <ProjectReference Include="..\Conway.Encoding\Conway.Encoding.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="7.0.1" />

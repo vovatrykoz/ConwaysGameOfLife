@@ -1,6 +1,6 @@
 namespace Conway.Tests
 
-open Conway.App.Raylib.File
+open Conway.Encoding
 open NUnit.Framework
 
 module ``8-bit Bit Vector Tests`` =
