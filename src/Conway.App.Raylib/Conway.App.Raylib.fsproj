@@ -14,6 +14,7 @@
     <Compile Include="Canvas.fs" />
     <Compile Include=".\File\ICavnasFileOpener.fs" />
     <Compile Include=".\File\ICavnasFileSaver.fs" />
+    <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="Display.fs" />
