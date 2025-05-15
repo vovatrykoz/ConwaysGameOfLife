@@ -19,11 +19,15 @@ type BinaryCanvasFileSaver(encoder: IConwayByteEncoder) =
         |> Array.append encodedPositionY
         |> Array.append encodedPositionX
 
+    member this.EncodeCanvasData(canvas: Canvas) =
+        let gameDataEncoded = this.Encoder.Encode canvas.Game
+        let cameraDataEncoded = this.EncodeCameraData canvas.Camera
+
+        Array.append gameDataEncoded cameraDataEncoded
+
     interface ICanvasFileSaver with
         member this.Save (canvas: Canvas) (path: string) : Result<Option<string>, string> =
-            let gameDataEncoded = this.Encoder.Encode canvas.Game
-            let cameraDataEncoded = this.EncodeCameraData canvas.Camera
-            let completeEncoding = Array.append gameDataEncoded cameraDataEncoded
+            let completeEncoding = this.EncodeCanvasData canvas
 
             try
                 File.WriteAllBytes(path, completeEncoding)
