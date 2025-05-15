@@ -20,7 +20,9 @@ type Game(initialState: ConwayGrid) =
             _initialState <- ConwayGrid.copyFrom newState
             _generation <- 1
 
-    member _.InitialState = _initialState
+    member _.InitialState
+        with get () = _initialState
+        and private set newValue = _initialState <- newValue
 
     member _.Generation
         with get () = _generation

@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CellTests.fs" />
-    <Compile Include="BinaryCodecTests.fs" />
+    <Compile Include="BinaryCanvasFileSaverTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
