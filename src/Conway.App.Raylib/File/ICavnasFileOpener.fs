@@ -8,5 +8,6 @@ type CanvasWrapper = {
     OptionalMessage: Option<string>
 }
 
+[<Interface>]
 type ICanvasFileOpener =
     abstract member Open: path: string -> Result<CanvasWrapper, string>

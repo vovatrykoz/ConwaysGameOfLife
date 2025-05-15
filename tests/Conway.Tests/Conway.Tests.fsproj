@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CellTests.fs" />
+    <Compile Include="BitVector8Tests.fs" />
     <Compile Include="BinaryCanvasFileSaverTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -19,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Conway.Core\Conway.Core.fsproj" />
+    <ProjectReference Include="..\..\src\Conway.App.Raylib\Conway.App.Raylib.fsproj" />
   </ItemGroup>
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
