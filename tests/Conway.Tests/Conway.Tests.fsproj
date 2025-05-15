@@ -8,7 +8,7 @@
   <ItemGroup>
     <Compile Include="CellTests.fs" />
     <Compile Include="BitVector8Tests.fs" />
-    <Compile Include="ConwayByteEncoderTests.fs" />
+    <Compile Include="ConwayByteEncoderTests.fs" /><Compile Include="ConwayByteDecoderTests.fs" />
     <Compile Include="BinaryCanvasFileSaverTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
