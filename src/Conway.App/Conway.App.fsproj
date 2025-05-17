@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Preset.fs" />
+    <Compile Include="RaylibTypeConverter.fs" />
+    <Compile Include="Keyboard.fs" />
+    <Compile Include="Mouse.fs" />
+    <Compile Include="Button.fs" />
+    <Compile Include="Camera.fs" />
+    <Compile Include="GameArea.fs" />
+    <Compile Include="Canvas.fs" />
+    <Compile Include=".\File\ICavnasFileOpener.fs" />
+    <Compile Include=".\File\ICavnasFileSaver.fs" />
+    <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
+    <Compile Include="Controls.fs" />
+    <Compile Include="Draw.fs" />
+    <Compile Include="Display.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Conway.Core\Conway.Core.fsproj" />
+    <ProjectReference Include="..\Conway.Encoding\Conway.Encoding.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Raylib-cs" Version="7.0.1" />
+  </ItemGroup>
+  <PropertyGroup>
+    <WarningLevel>5</WarningLevel>
+    <AnalysisLevel>5</AnalysisLevel>
+  </PropertyGroup>
+</Project>
