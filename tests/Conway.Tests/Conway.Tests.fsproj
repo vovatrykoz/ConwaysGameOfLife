@@ -8,7 +8,8 @@
   <ItemGroup>
     <Compile Include="CellTests.fs" />
     <Compile Include="BitVector8Tests.fs" />
-    <Compile Include="ConwayByteEncoderTests.fs" /><Compile Include="ConwayByteDecoderTests.fs" />
+    <Compile Include="ConwayByteEncoderTests.fs" />
+    <Compile Include="ConwayByteDecoderTests.fs" />
     <Compile Include="BinaryCanvasFileSaverTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -21,7 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Conway.Core\Conway.Core.fsproj" />
-    <ProjectReference Include="..\..\src\Conway.App.Raylib\Conway.App.Raylib.fsproj" />
+    <ProjectReference Include="..\..\src\Conway.App\Conway.App.fsproj" />
     <ProjectReference Include="..\..\src\Conway.Encoding\Conway.Encoding.fsproj" />
   </ItemGroup>
   <PropertyGroup>

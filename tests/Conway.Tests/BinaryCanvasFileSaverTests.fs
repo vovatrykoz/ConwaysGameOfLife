@@ -1,12 +1,12 @@
 namespace Conway.Tests
 
-open Conway.App.Raylib.File
+open Conway.App.File
 open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
 
 module ``Binary Canvas File Saver Tests`` =
-    open Conway.App.Raylib
+    open Conway.App
 
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =
