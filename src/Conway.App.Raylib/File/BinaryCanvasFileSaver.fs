@@ -32,5 +32,31 @@ type BinaryCanvasFileSaver(encoder: IConwayByteEncoder) =
             try
                 File.WriteAllBytes(path, completeEncoding)
                 Ok(Some $"File saved at {path}")
-            with _ ->
-                Error "Could not save the file"
+            with
+            | :? ArgumentNullException as argNullEx ->
+                Error $"Could not save the file. {argNullEx.ParamName} was null or empty"
+            | :? ArgumentException ->
+                if String.IsNullOrEmpty path then
+                    Error $"{nameof path} was empty"
+                else if String.IsNullOrWhiteSpace path then
+                    Error $"{nameof path} consisted of whitespaces only"
+                else
+                    let invalidCharSet = Path.GetInvalidPathChars() |> Set.ofSeq
+
+                    let invalidChars =
+                        path |> Seq.filter (fun c -> Set.contains c invalidCharSet) |> Seq.toArray
+
+                    Error $"{nameof path} contained the following invalid characters: {invalidChars}"
+            | :? PathTooLongException -> Error $"The provided {nameof path} was too long: {path}"
+            | :? DirectoryNotFoundException -> Error $"The provided {nameof path} was not found: {path}"
+            | :? IOException -> Error $"An I/O error occurred while opening the file at {path}"
+            | :? Security.SecurityException -> Error $"The caller does not have enough permissions to save the file"
+            | :? UnauthorizedAccessException ->
+                Error
+                    $"Access to the file at {path} was denied. This could be because:
+                    (1) the caller does not have the required permission 
+                    (2) {path} is a directory or 
+                    (3) file is readonly or 
+                    (4) file is hidden or 
+                    (5) operation is not supported on the current platform"
+            | :? NotSupportedException -> Error $"The provided {nameof path} has an invalid format: {path}"
