@@ -12,7 +12,7 @@ type ConwayByteDecoder() =
 
     static member val ColumnValueFirstByteIndex = 4 with get
 
-    static member val GridFirstByteIndex = 8 with get
+    static member val GridFirstByteIndex = 12 with get
 
     member _.DecodeDimensions(bytes: ReadOnlySpan<byte>) =
         let rowSlice = bytes.Slice(ConwayByteDecoder.RowValueFirstByteIndex, sizeof<int32>)
