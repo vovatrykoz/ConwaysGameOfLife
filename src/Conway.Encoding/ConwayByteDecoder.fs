@@ -5,7 +5,6 @@ open System
 open System.Collections.Generic
 
 type ConwayByteDecoder() =
-    static member val NumberOfBytesInInt32 = sizeof<int> with get
 
     static member val BitsInByte = 8 with get
 
@@ -16,11 +15,10 @@ type ConwayByteDecoder() =
     static member val GridFirstByteIndex = 8 with get
 
     member _.DecodeDimensions(bytes: ReadOnlySpan<byte>) =
-        let rowSlice =
-            bytes.Slice(ConwayByteDecoder.RowValueFirstByteIndex, ConwayByteDecoder.NumberOfBytesInInt32)
+        let rowSlice = bytes.Slice(ConwayByteDecoder.RowValueFirstByteIndex, sizeof<int32>)
 
         let colSlice =
-            bytes.Slice(ConwayByteDecoder.ColumnValueFirstByteIndex, ConwayByteDecoder.NumberOfBytesInInt32)
+            bytes.Slice(ConwayByteDecoder.ColumnValueFirstByteIndex, sizeof<int32>)
 
         let rows = BitConverter.ToInt32 rowSlice
         let cols = BitConverter.ToInt32 colSlice
@@ -49,4 +47,13 @@ type ConwayByteDecoder() =
         ConwayGrid.init rows cols initializer
 
     interface IConwayByteDecoder with
-        member this.Decode(bytes: byte array) = failwith "Not implemented"
+        member this.Decode(bytes: byte array) =
+            let grid = this.DecodeGrid(ReadOnlySpan bytes)
+            let rows, cols = this.DecodeDimensions bytes
+            let totalCells = rows * cols
+            let totalBytes = totalCells / ConwayByteDecoder.BitsInByte
+            let generationOffset = totalBytes + ConwayByteDecoder.GridFirstByteIndex
+            let generationSlice = ReadOnlySpan(bytes).Slice(generationOffset, sizeof<int32>)
+            let generationCounter = BitConverter.ToInt32 generationSlice
+
+            Game grid

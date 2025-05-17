@@ -58,3 +58,6 @@ type Game =
     /// Clears the game's history and remembers the current state as the "clear" state.
     /// </summary>
     member ResetGenerationCounter: unit -> unit
+
+    [<CompiledName("CreateFrom")>]
+    static member createFrom: currentState: ConwayGrid -> initialState: ConwayGrid -> generationCounter: int -> Game
