@@ -23,7 +23,7 @@ type BinaryCanvasFileSaver(encoder: IConwayByteEncoder) =
         let gameDataEncoded = this.Encoder.Encode canvas.Game
         let cameraDataEncoded = this.EncodeCameraData canvas.Camera
 
-        Array.append gameDataEncoded cameraDataEncoded
+        Array.append cameraDataEncoded gameDataEncoded
 
     interface ICanvasFileSaver with
         member this.Save (canvas: Canvas) (path: string) : Result<Option<string>, string> =

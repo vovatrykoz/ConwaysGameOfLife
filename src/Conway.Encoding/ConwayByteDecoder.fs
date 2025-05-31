@@ -49,11 +49,5 @@ type ConwayByteDecoder() =
     interface IConwayByteDecoder with
         member this.Decode(bytes: byte array) =
             let grid = this.DecodeGrid(ReadOnlySpan bytes)
-            let rows, cols = this.DecodeDimensions bytes
-            let totalCells = rows * cols
-            let totalBytes = totalCells / ConwayByteDecoder.BitsInByte
-            let generationOffset = totalBytes + ConwayByteDecoder.GridFirstByteIndex
-            let generationSlice = ReadOnlySpan(bytes).Slice(generationOffset, sizeof<int32>)
-            let generationCounter = BitConverter.ToInt32 generationSlice
 
             Game grid

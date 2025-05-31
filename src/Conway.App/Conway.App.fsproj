@@ -12,9 +12,10 @@
     <Compile Include="Camera.fs" />
     <Compile Include="GameArea.fs" />
     <Compile Include="Canvas.fs" />
-    <Compile Include=".\File\ICavnasFileOpener.fs" />
+    <Compile Include=".\File\ICanvasFileLoader.fs" />
     <Compile Include=".\File\ICavnasFileSaver.fs" />
     <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
+    <Compile Include=".\File\BinaryCanvasFileLoader.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="Display.fs" />

@@ -2,14 +2,16 @@ namespace Conway.App
 
 open System.Numerics
 
-type Camera(x: float32, y: float32) =
+type Camera(x: float32, y: float32, zoomFactor: float32) =
     let mutable _position = Vector2(x, y)
+
+    new(x: float32, y: float32) = Camera(x, y, 1.0f)
 
     member _.Position
         with get () = _position
         and set newPosition = _position <- newPosition
 
-    member val ZoomFactor = 1.0f with get, set
+    member val ZoomFactor = zoomFactor with get, set
 
     member val MaxZoomFactor = 2.0f with get, set
 
