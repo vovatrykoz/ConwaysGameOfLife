@@ -1,4 +1,4 @@
-module Conway.Tests
+namespace Conway.Tests
 
 open Conway.Core
 open NUnit.Framework

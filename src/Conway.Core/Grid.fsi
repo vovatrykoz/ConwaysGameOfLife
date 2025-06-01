@@ -9,18 +9,6 @@ type CellStatus
 /// </summary>
 [<Class>]
 type ConwayGrid =
-    /// <summary>
-    /// Initializes a new ConwayGrid with a predefined 2D array of cells.
-    /// </summary>
-    /// <param name="startingGrid">A 2D array representing the initial state of the grid.</param>
-    private new: startingGrid: int<CellStatus> array2d -> ConwayGrid
-
-    /// <summary>
-    /// Initializes a new ConwayGrid with the specified dimensions. All cells are initially dead.
-    /// </summary>
-    /// <param name="width">The number of columns in the grid.</param>
-    /// <param name="height">The number of rows in the grid.</param>
-    private new: width: int * height: int -> ConwayGrid
 
     /// <summary>
     /// Gets the current state of the board as a 2D array of cells.
