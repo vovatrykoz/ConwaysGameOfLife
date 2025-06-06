@@ -166,9 +166,21 @@ let clearCallback () =
     finally
         mainLock.ExitReadLock()
 
-let toggleButton =
+let saveButton =
     Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 300)
+    |> Button.position (windowWidth - 200) (windowHeight - 400)
+    |> Button.size 50
+    |> Button.text "Save"
+
+let loadButton =
+    Button.create
+    |> Button.position (windowWidth - 100) (windowHeight - 400)
+    |> Button.size 50
+    |> Button.text "Load"
+
+let runButton =
+    Button.create
+    |> Button.position (windowWidth - 200) (windowHeight - 200)
     |> Button.size 50
     |> Button.onClickCallback toggleGame
     |> Button.onUpdateCallback update
@@ -199,7 +211,7 @@ let clearButton =
     |> Button.onClickCallback clearCallback
     |> Button.onUpdateCallback updateOnRun
 
-let buttons = [| toggleButton; advanceButton; resetButton; clearButton |]
+let buttons = [| runButton; advanceButton; resetButton; clearButton; saveButton; loadButton |]
 controlManager.Buttons.AddRange buttons
 
 let keyboardActions = [|
