@@ -6,9 +6,9 @@ open System
 open System.Diagnostics
 open System.Threading
 
-let windowWidth = 1920
+let windowWidth = 1024
 
-let windowHeight = 1080
+let windowHeight = 768
 
 Display.init windowWidth windowHeight
 
@@ -97,6 +97,30 @@ let canvas =
 
 let controlManager = new ControlManager(canvas)
 
+let openFile () =
+    Gtk.Application.Init()
+
+    let dialog =
+        new Gtk.FileChooserDialog(
+            "Open File",
+            null,
+            Gtk.FileChooserAction.Open,
+            [| "Cancel", Gtk.ResponseType.Cancel; "Open", Gtk.ResponseType.Accept |]
+        )
+
+    dialog.SetDefaultSize(800, 600)
+
+    let response = dialog.Run()
+
+    if response = int Gtk.ResponseType.Accept then
+        let filename = dialog.Filename
+        printfn "Selected file: %s" filename
+    else
+        printfn "No file selected."
+
+    dialog.Destroy()
+    Gtk.Application.Quit()
+
 let toggleGame () =
     try
         mainLock.EnterWriteLock()
@@ -166,6 +190,18 @@ let clearCallback () =
     finally
         mainLock.ExitReadLock()
 
+let fullscreenUpdate () =
+    if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Y) then
+        if raylibTrue (Raylib.IsWindowFullscreen()) then
+            Raylib.SetWindowSize(windowWidth, windowHeight)
+        else
+            let monitor = Raylib.GetCurrentMonitor()
+            let monitorWidth = Raylib.GetMonitorWidth monitor
+            let monitorHeight = Raylib.GetMonitorHeight monitor
+            Raylib.SetWindowSize(monitorWidth, monitorHeight)
+
+        Raylib.ToggleFullscreen()
+
 let saveButton =
     Button.create
     |> Button.position (windowWidth - 200) (windowHeight - 400)
@@ -177,6 +213,7 @@ let loadButton =
     |> Button.position (windowWidth - 100) (windowHeight - 400)
     |> Button.size 50
     |> Button.text "Load"
+    |> Button.onClickCallback openFile
 
 let runButton =
     Button.create
@@ -282,7 +319,6 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     frameTimes[insertIndex] <- frameTime
     insertIndex <- (insertIndex + 1) % maxSamples
-
     fps <- 1.0 / (frameTimes |> Array.average)
 
 Raylib.UnloadRenderTexture renderTexture
