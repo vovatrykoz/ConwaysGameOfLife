@@ -33,5 +33,30 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                     Camera = camera
                     OptionalMessage = None
                 }
-            with _ ->
-                Error "Something went wrong"
+            with
+            | :? ArgumentNullException as argNullEx ->
+                Error $"Could not open the file. {argNullEx.ParamName} was null or empty"
+            | :? ArgumentException ->
+                if String.IsNullOrEmpty path then
+                    Error $"{nameof path} was empty"
+                else if String.IsNullOrWhiteSpace path then
+                    Error $"{nameof path} consisted of whitespaces only"
+                else
+                    let invalidCharSet = Path.GetInvalidPathChars() |> Set.ofSeq
+
+                    let invalidChars =
+                        path |> Seq.filter (fun c -> Set.contains c invalidCharSet) |> Seq.toArray
+
+                    Error $"{nameof path} contained the following invalid characters: {invalidChars}"
+            | :? PathTooLongException -> Error $"The provided {nameof path} was too long: {path}"
+            | :? DirectoryNotFoundException -> Error $"The provided {nameof path} was not found: {path}"
+            | :? IOException -> Error $"An I/O error occurred while opening the file at {path}"
+            | :? Security.SecurityException -> Error $"The caller does not have enough permissions to open the file"
+            | :? UnauthorizedAccessException ->
+                Error
+                    $"Access to the file at {path} was denied. This could be due to one of the following:
+                    (1) the caller does not have the required permission
+                    (2) {path} is a directory
+                    (3) operation is not supported on the current platform"
+            | :? NotSupportedException -> Error $"The provided {nameof path} has an invalid format: {path}"
+            | _ -> Error "Something went wrong. Please try again"

@@ -53,10 +53,11 @@ type BinaryCanvasFileSaver(encoder: IConwayByteEncoder) =
             | :? Security.SecurityException -> Error $"The caller does not have enough permissions to save the file"
             | :? UnauthorizedAccessException ->
                 Error
-                    $"Access to the file at {path} was denied. This could be because:
-                    (1) the caller does not have the required permission 
-                    (2) {path} is a directory or 
-                    (3) file is readonly or 
-                    (4) file is hidden or 
+                    $"Access to the file at {path} was denied. This could be due to one of the following:
+                    (1) the caller does not have the required permission
+                    (2) {path} is a directory
+                    (3) file is readonly
+                    (4) file is hidden
                     (5) operation is not supported on the current platform"
             | :? NotSupportedException -> Error $"The provided {nameof path} has an invalid format: {path}"
+            | _ -> Error "Something went wrong. Please try again"
