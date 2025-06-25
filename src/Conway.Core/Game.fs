@@ -7,7 +7,7 @@ type GameMode =
     | Paused
 
 type Game(initialState: ConwayGrid) =
-    let mutable _initialState = ConwayGrid.copyFrom initialState
+    let mutable _initialState = ConwayGrid.zopyFrom initialState
 
     let mutable _internalState = initialState
 
