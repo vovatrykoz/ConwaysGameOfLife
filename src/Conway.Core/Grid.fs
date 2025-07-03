@@ -31,7 +31,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     member this.Board = this.Buffers[this.ActiveBufferIndex]
 
-    [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
+    [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
     static member inline private countLivingNeighbors
         rowAbove
         rowCurrent
