@@ -2,6 +2,7 @@ namespace Conway.Core
 
 open Microsoft.FSharp.NativeInterop
 open System
+open System.Runtime.CompilerServices
 open System.Threading.Tasks
 
 // Uses of this construct may result in the generation of unverifiable .NET IL code.
@@ -38,6 +39,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
         let rows = Array2D.length1 activeBuffer
         let cols = Array2D.length2 activeBuffer
+        let lastCol = cols - 2
 
         use activePtr = fixed &activeBuffer.[0, 0]
         use passivePtr = fixed &passiveBuffer.[0, 0]
@@ -46,7 +48,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
             1,
             rows - 1,
             fun row ->
-                for col in 1 .. (cols - 2) do
+                for col in 1..lastCol do
                     ConwayGrid.evolveCellAt row col cols activePtr passivePtr
         )
         |> ignore
@@ -100,20 +102,32 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
     static member copyFrom(otherGrid: ConwayGrid) =
         new ConwayGrid(Array2D.copy otherGrid.Board)
 
-    [<CompiledName("CountLivingNeighbors")>]
-    static member private countLivingNeighbors row col cols (ptr: nativeptr<int<CellStatus>>) =
-        NativePtr.get ptr ((row - 1) * cols + (col - 1))
-        + NativePtr.get ptr ((row - 1) * cols + col)
-        + NativePtr.get ptr ((row - 1) * cols + (col + 1))
-        + NativePtr.get ptr (row * cols + (col - 1))
-        + NativePtr.get ptr (row * cols + (col + 1))
-        + NativePtr.get ptr ((row + 1) * cols + (col - 1))
-        + NativePtr.get ptr ((row + 1) * cols + col)
-        + NativePtr.get ptr ((row + 1) * cols + (col + 1))
+    [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
+    static member private countLivingNeighbors
+        rowAbove
+        rowCurrent
+        rowBelow
+        colCurrent
+        (ptr: nativeptr<int<CellStatus>>)
+        =
+        NativePtr.get ptr (rowAbove + (colCurrent - 1))
+        + NativePtr.get ptr (rowAbove + colCurrent)
+        + NativePtr.get ptr (rowAbove + (colCurrent + 1))
+        + NativePtr.get ptr (rowCurrent + (colCurrent - 1))
+        + NativePtr.get ptr (rowCurrent + (colCurrent + 1))
+        + NativePtr.get ptr (rowBelow + (colCurrent - 1))
+        + NativePtr.get ptr (rowBelow + colCurrent)
+        + NativePtr.get ptr (rowBelow + (colCurrent + 1))
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col cols activePtr passivePtr =
-        let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col cols activePtr
+        let rowAbove = (row - 1) * cols
+        let rowCurrent = row * cols
+        let rowBelow = (row + 1) * cols
+
+        let livingNeighborsCount =
+            ConwayGrid.countLivingNeighbors rowAbove rowCurrent rowBelow col activePtr
+
         let index = row * cols + col
 
         match livingNeighborsCount with
