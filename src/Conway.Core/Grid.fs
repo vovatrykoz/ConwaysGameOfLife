@@ -186,16 +186,22 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
         use ptr = fixed &board.[0, 0]
         NativePtr.get ptr index
 
-    [<CompiledName("CountLivingNeighborsUnsafe")>]
-    static member private countLivingNeighborsUnsafe row col cols (ptr: nativeptr<int<cellStatus>>) =
-        (NativePtr.get ptr ((row - 1) * cols + (col - 1)))
-        + (NativePtr.get ptr ((row - 1) * cols + (col)))
-        + (NativePtr.get ptr ((row - 1) * cols + (col + 1)))
-        + (NativePtr.get ptr (row * cols + (col - 1)))
-        + (NativePtr.get ptr (row * cols + (col + 1)))
-        + (NativePtr.get ptr ((row + 1) * cols + (col - 1)))
-        + (NativePtr.get ptr ((row + 1) * cols + col))
-        + (NativePtr.get ptr ((row + 1) * cols + (col + 1)))
+    [<CompiledName("CountLivingNeighborsUnsafe"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    static member inline private countLivingNeighborsUnsafe
+        rowAbove
+        rowCurrent
+        rowBelow
+        col
+        (ptr: nativeptr<int<cellStatus>>)
+        =
+        NativePtr.get ptr (rowAbove + (col - 1))
+        + NativePtr.get ptr (rowAbove + col)
+        + NativePtr.get ptr (rowAbove + (col + 1))
+        + NativePtr.get ptr (rowCurrent + (col - 1))
+        + NativePtr.get ptr (rowCurrent + (col + 1))
+        + NativePtr.get ptr (rowBelow + (col - 1))
+        + NativePtr.get ptr (rowBelow + col)
+        + NativePtr.get ptr (rowBelow + (col + 1))
 
     [<CompiledName("EvolveCellAt")>]
     static member private evolveCellAt row col board currentCell =
@@ -208,12 +214,18 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
 
     [<CompiledName("EvolveCellAtUnsafe")>]
     static member private evolveCellAtUnsafe row col cols activePtr passivePtr =
+        let rowAbove = (row - 1) * cols
+        let rowCurrent = row * cols
+        let rowBelow = (row + 1) * cols
+
         let livingNeighborsCount =
-            ConwayGrid.countLivingNeighborsUnsafe row col cols activePtr
+            ConwayGrid.countLivingNeighborsUnsafe rowAbove rowCurrent rowBelow col activePtr
+
+        let index = row * cols + col
 
         match livingNeighborsCount with
         | 2<cellStatus> ->
-            let currentValue = NativePtr.get activePtr (row * cols + col)
-            NativePtr.set passivePtr (row * cols + col) currentValue
-        | 3<cellStatus> -> NativePtr.set passivePtr (row * cols + col) 1<cellStatus>
-        | _ -> NativePtr.set passivePtr (row * cols + col) 0<cellStatus>
+            let currentValue = NativePtr.get activePtr index
+            NativePtr.set passivePtr index currentValue
+        | 3<cellStatus> -> NativePtr.set passivePtr index 1<cellStatus>
+        | _ -> NativePtr.set passivePtr index 0<cellStatus>

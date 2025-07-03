@@ -6,6 +6,7 @@ type GameMode =
     | Limited of int
     | Paused
 
+[<Class>]
 type Game(initialState: ConwayGrid) =
     let mutable internalState = initialState
 
