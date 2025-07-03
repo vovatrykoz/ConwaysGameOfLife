@@ -72,61 +72,6 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
 
         this.ActiveBufferIndex <- passiveIndex
 
-    member this.AdvanceToNextStateOtherUnsafe() =
-        let activeIndex = this.ActiveBufferIndex
-        let passiveIndex = (activeIndex + 1) % this.Buffers.Length
-        let activeBuffer = this.Buffers[activeIndex]
-        let passiveBuffer = this.Buffers[passiveIndex]
-
-        let rows = Array2D.length1 activeBuffer - 2
-        let cols = Array2D.length2 activeBuffer - 2
-
-        use activePtr = fixed &activeBuffer.[0, 0]
-        use passivePtr = fixed &passiveBuffer.[0, 0]
-
-        Parallel.For(
-            1,
-            rows - 1,
-            fun row ->
-                for col in 1 .. cols - 2 do
-                    ConwayGrid.evolveCellAtUnsafe row col cols activePtr passivePtr
-        )
-        |> ignore
-
-        this.ActiveBufferIndex <- passiveIndex
-
-    member this.AdvanceToNextStateOtherUnsafeChunk() =
-        let activeIndex = this.ActiveBufferIndex
-        let passiveIndex = (activeIndex + 1) % this.Buffers.Length
-        let activeBuffer = this.Buffers[activeIndex]
-        let passiveBuffer = this.Buffers[passiveIndex]
-
-        let rows = Array2D.length1 activeBuffer - 2
-        let cols = Array2D.length2 activeBuffer - 2
-
-        let degreeOfParallelism = Environment.ProcessorCount
-        let totalLength = rows * cols
-
-        use activePtr = fixed &activeBuffer.[0, 0]
-        use passivePtr = fixed &passiveBuffer.[0, 0]
-
-        Parallel.For(
-            0,
-            degreeOfParallelism,
-            fun workerId ->
-                let max = totalLength * (workerId + 1) / degreeOfParallelism
-                let startIndex = totalLength * workerId / degreeOfParallelism
-
-                for rowCol in startIndex .. (max - 1) do
-                    let row = rowCol / cols + 1
-                    let col = rowCol % cols + 1
-
-                    ConwayGrid.evolveCellAtUnsafe row col cols activePtr passivePtr
-        )
-        |> ignore
-
-        this.ActiveBufferIndex <- passiveIndex
-
     [<CompiledName("CreateDead")>]
     static member createDead width height = new ConwayGrid(width, height)
 
@@ -204,7 +149,7 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
         + NativePtr.get ptr (rowBelow + (col + 1))
 
     [<CompiledName("EvolveCellAt")>]
-    static member private evolveCellAt row col board currentCell =
+    static member evolveCellAt row col board currentCell =
         let livingNeighborsCount = ConwayGrid.countLivingNeighbors row col board
 
         match livingNeighborsCount with
@@ -212,16 +157,15 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
         | 3<cellStatus> -> 1<cellStatus>
         | _ -> 0<cellStatus>
 
-    [<CompiledName("EvolveCellAtUnsafe")>]
-    static member private evolveCellAtUnsafe row col cols activePtr passivePtr =
+    [<CompiledName("EvolveCellAtUnsafe"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    static member inline private evolveCellAtUnsafe row col cols activePtr passivePtr =
         let rowAbove = (row - 1) * cols
         let rowCurrent = row * cols
         let rowBelow = (row + 1) * cols
+        let index = row * cols + col
 
         let livingNeighborsCount =
             ConwayGrid.countLivingNeighborsUnsafe rowAbove rowCurrent rowBelow col activePtr
-
-        let index = row * cols + col
 
         match livingNeighborsCount with
         | 2<cellStatus> ->
@@ -229,3 +173,59 @@ type ConwayGrid private (startingGrid: int<cellStatus> array2d) =
             NativePtr.set passivePtr index currentValue
         | 3<cellStatus> -> NativePtr.set passivePtr index 1<cellStatus>
         | _ -> NativePtr.set passivePtr index 0<cellStatus>
+
+    member this.AdvanceToNextStateOtherUnsafe() =
+        let activeIndex = this.ActiveBufferIndex
+        let passiveIndex = (activeIndex + 1) % this.Buffers.Length
+        let activeBuffer = this.Buffers[activeIndex]
+        let passiveBuffer = this.Buffers[passiveIndex]
+
+        let rows = Array2D.length1 activeBuffer - 2
+        let cols = Array2D.length2 activeBuffer - 2
+        let lastCol = cols - 2
+
+        use activePtr = fixed &activeBuffer.[0, 0]
+        use passivePtr = fixed &passiveBuffer.[0, 0]
+
+        Parallel.For(
+            1,
+            rows - 1,
+            fun row ->
+                for col in 1..lastCol do
+                    ConwayGrid.evolveCellAtUnsafe row col cols activePtr passivePtr
+        )
+        |> ignore
+
+        this.ActiveBufferIndex <- passiveIndex
+
+    member this.AdvanceToNextStateOtherUnsafeChunk() =
+        let activeIndex = this.ActiveBufferIndex
+        let passiveIndex = (activeIndex + 1) % this.Buffers.Length
+        let activeBuffer = this.Buffers[activeIndex]
+        let passiveBuffer = this.Buffers[passiveIndex]
+
+        let rows = Array2D.length1 activeBuffer - 2
+        let cols = Array2D.length2 activeBuffer - 2
+
+        let degreeOfParallelism = Environment.ProcessorCount
+        let totalLength = rows * cols
+
+        use activePtr = fixed &activeBuffer.[0, 0]
+        use passivePtr = fixed &passiveBuffer.[0, 0]
+
+        Parallel.For(
+            0,
+            degreeOfParallelism,
+            fun workerId ->
+                let max = totalLength * (workerId + 1) / degreeOfParallelism
+                let startIndex = totalLength * workerId / degreeOfParallelism
+
+                for rowCol in startIndex .. (max - 1) do
+                    let row = rowCol / cols + 1
+                    let col = rowCol % cols + 1
+
+                    ConwayGrid.evolveCellAtUnsafe row col cols activePtr passivePtr
+        )
+        |> ignore
+
+        this.ActiveBufferIndex <- passiveIndex
