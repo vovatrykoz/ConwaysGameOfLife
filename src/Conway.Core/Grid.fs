@@ -71,12 +71,12 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         let activeBuffer = this.Buffers[activeIndex]
         let passiveBuffer = this.Buffers[passiveIndex]
 
-        use activePtr = fixed &activeBuffer.[0, 0]
-        use passivePtr = fixed &passiveBuffer.[0, 0]
-
         let rows = Array2D.length1 activeBuffer
         let cols = Array2D.length2 activeBuffer
         let lastCol = cols - 2
+
+        use activePtr = fixed &activeBuffer.[0, 0]
+        use passivePtr = fixed &passiveBuffer.[0, 0]
 
         Parallel.For(
             1,
