@@ -23,10 +23,19 @@ let gridWidth =
     if Array.length args >= 2 then
         try
             let result = int args[1]
+
+            if result < 0 then
+                raise (
+                    new ArgumentException $"The width cannot be negative. The parsed width value is equal to {result}"
+                )
+
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid width to: {result}")
             result
-        with _ ->
+        with (ex: Exception) ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
+
+            let exceptionString = ex.ToString().Replace("\n", "\n\t")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {defaultGridWidth}")
             defaultGridWidth
     else
@@ -42,9 +51,18 @@ let gridHeight =
         try
             let result = int args[2]
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
+
+            if result < 0 then
+                raise (
+                    new ArgumentException $"The height cannot be negative. The parsed height value is equal to {result}"
+                )
+
             result
-        with _ ->
+        with (ex: Exception) ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[2]}")
+
+            let exceptionString = ex.ToString().Replace("\n", "\n\t")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
 
             defaultGridHeight
