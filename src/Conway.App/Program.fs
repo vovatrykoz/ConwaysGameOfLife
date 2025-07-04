@@ -247,7 +247,7 @@ let gameUpdateLoop () =
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(int canvas.Width, int canvas.Height)
+let renderTexture = Raylib.LoadRenderTexture(windowWidth, windowHeight)
 let mutable fps = 0.0
 let maxSamples = 60
 let frameTimes = Array.create maxSamples 0.0
