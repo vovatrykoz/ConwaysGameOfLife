@@ -1,11 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    
-    
     <Compile Include="Grid.fsi" />
     <Compile Include="Grid.fs" />
     <Compile Include="Game.fsi" />
@@ -14,5 +12,9 @@
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>5</AnalysisLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+      <PublishAot>true</PublishAot>
+      <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 </Project>
