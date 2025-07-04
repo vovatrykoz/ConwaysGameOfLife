@@ -3,14 +3,8 @@
 /// <summary>
 /// Represents the mode in which the game can run.
 /// </summary>
-[<Struct>]
-type GameMode =
-    /// <summary>Run the game indefinitely.</summary>
-    | Infinite
-    /// <summary>Run the game for a limited number of steps.</summary>
-    | Limited of int
-    /// <summary>Pause the game.</summary>
-    | Paused
+[<Measure>]
+type GameMode
 
 /// <summary>
 /// Represents the Game of Life engine, maintaining state and progression logic.
@@ -42,7 +36,7 @@ type Game =
     /// Starts running the game using the specified game mode.
     /// </summary>
     /// <param name="mode">The mode in which to run the game.</param>
-    member Run: GameMode -> unit
+    member Run: int<GameMode> -> unit
 
     /// <summary>
     /// Advances the game by one generation step.

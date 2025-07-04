@@ -1,10 +1,7 @@
 namespace Conway.Core
 
-[<Struct>]
-type GameMode =
-    | Infinite
-    | Limited of int
-    | Paused
+[<Measure>]
+type GameMode
 
 type Game(initialState: ConwayGrid) =
     let mutable _initialState = ConwayGrid.copyFrom initialState
@@ -28,19 +25,19 @@ type Game(initialState: ConwayGrid) =
         with get () = _generation
         and private set newValue = _generation <- newValue
 
-    member this.Run(mode: GameMode) =
+    member this.Run(mode: int<GameMode>) =
         match mode with
-        | Infinite ->
+        | 2<GameMode> ->
             while true do
                 this.CurrentState.AdvanceToNextState()
                 this.Generation <- this.Generation + 1
-        | Limited steps ->
-            for _ = 1 to steps do
-                this.CurrentState.AdvanceToNextState()
-                this.Generation <- this.Generation + 1
-        | Paused -> ()
+        | 1<GameMode> ->
+            this.CurrentState.AdvanceToNextState()
+            this.Generation <- this.Generation + 1
+        | 0<GameMode>
+        | _ -> ()
 
-    member this.RunOneStep() = this.Run(Limited 1)
+    member this.RunOneStep() = this.Run 1<GameMode>
 
     member _.ResetState() =
         _internalState <- ConwayGrid.copyFrom _initialState

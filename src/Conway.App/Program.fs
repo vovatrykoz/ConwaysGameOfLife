@@ -14,8 +14,8 @@ Display.init windowWidth windowHeight
 
 Display.loadingScreen (float32 (windowWidth / 2)) (float32 (windowHeight / 2))
 
-let defaultGridWidth = 1000
-let defaultGridHeight = 1000
+let defaultGridWidth = 10000
+let defaultGridHeight = 10000
 
 let args = Environment.GetCommandLineArgs()
 
@@ -71,7 +71,7 @@ let game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
 
-let mutable gameRunningState = Paused
+let mutable gameRunningState = 0<GameMode>
 
 let canvasX = 25.0f
 let canvasY = 25.0f
@@ -103,8 +103,8 @@ let toggleGame () =
 
         gameRunningState <-
             match gameRunningState with
-            | Paused -> Infinite
-            | _ -> Paused
+            | 0<GameMode> -> 2<GameMode>
+            | _ -> 0<GameMode>
     finally
         mainLock.ExitWriteLock()
 
@@ -113,7 +113,7 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.RunOneStep()
+        | 0<GameMode> -> game.RunOneStep()
         | _ -> ()
     finally
         mainLock.ExitReadLock()
@@ -123,7 +123,7 @@ let update (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> button.Text <- "Run"
+        | 0<GameMode> -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
     finally
         mainLock.ExitReadLock()
@@ -133,7 +133,7 @@ let updateOnRun (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> button.IsActive <- true
+        | 0<GameMode> -> button.IsActive <- true
         | _ -> button.IsActive <- false
     finally
         mainLock.ExitReadLock()
@@ -149,7 +149,7 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.ResetState()
+        | 0<GameMode> -> game.ResetState()
         | _ -> ()
 
     finally
@@ -160,7 +160,7 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | 0<GameMode> -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
         | _ -> ()
 
     finally
@@ -233,14 +233,11 @@ let gameUpdateLoop () =
                     mainLock.EnterWriteLock()
 
                     match gameRunningState with
-                    | Infinite -> true
-                    | Limited x when x > 1 ->
-                        gameRunningState <- Limited(x - 1)
+                    | 2<GameMode> -> true
+                    | 1<GameMode> ->
+                        gameRunningState <- 0<GameMode>
                         true
-                    | Limited _ ->
-                        gameRunningState <- Paused
-                        true
-                    | Paused -> false
+                    | _ -> false
                 finally
                     mainLock.ExitWriteLock()
 
