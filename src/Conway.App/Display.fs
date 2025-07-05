@@ -11,7 +11,7 @@ module Display =
         Rectangle(posVec, Vector2(width, -height))
 
     let init width height =
-        Raylib.SetConfigFlags ConfigFlags.FullscreenMode
+        // Raylib.SetConfigFlags ConfigFlags.FullscreenMode
         Raylib.SetTargetFPS 120
         Raylib.InitWindow(width, height, "Conway's game of life")
 
@@ -104,4 +104,4 @@ module Display =
 
         Raylib.EndDrawing()
 
-    let close () = Raylib.CloseWindow()
+    let inline close () = Raylib.CloseWindow()

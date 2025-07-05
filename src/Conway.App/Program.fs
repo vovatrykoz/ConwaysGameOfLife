@@ -1,4 +1,5 @@
-﻿open Conway.Core
+
+open Conway.Core
 open Conway.App
 open Conway.App.Aliases
 open Raylib_cs
@@ -6,9 +7,9 @@ open System
 open System.Diagnostics
 open System.Threading
 
-let windowWidth = 1920
+let windowWidth = 1024
 
-let windowHeight = 1080
+let windowHeight = 768
 
 Display.init windowWidth windowHeight
 
@@ -23,19 +24,10 @@ let gridWidth =
     if Array.length args >= 2 then
         try
             let result = int args[1]
-
-            if result < 0 then
-                raise (
-                    new ArgumentException $"The width cannot be negative. The parsed width value is equal to {result}"
-                )
-
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid width to: {result}")
             result
-        with (ex: Exception) ->
+        with _ ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
-
-            let exceptionString = ex.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {defaultGridWidth}")
             defaultGridWidth
     else
@@ -51,18 +43,9 @@ let gridHeight =
         try
             let result = int args[2]
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
-
-            if result < 0 then
-                raise (
-                    new ArgumentException $"The height cannot be negative. The parsed height value is equal to {result}"
-                )
-
             result
-        with (ex: Exception) ->
+        with _ ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[2]}")
-
-            let exceptionString = ex.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
 
             defaultGridHeight
@@ -89,7 +72,7 @@ let game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
 
-let mutable gameRunningState = 0<GameMode>
+let mutable gameRunningState = Paused
 
 let canvasX = 25.0f
 let canvasY = 25.0f
@@ -115,14 +98,38 @@ let canvas =
 
 let controlManager = new ControlManager(canvas)
 
+let openFile () =
+    Gtk.Application.Init()
+
+    let dialog =
+        new Gtk.FileChooserDialog(
+            "Open File",
+            null,
+            Gtk.FileChooserAction.Open,
+            [| "Cancel", Gtk.ResponseType.Cancel; "Open", Gtk.ResponseType.Accept |]
+        )
+
+    dialog.SetDefaultSize(800, 600)
+
+    let response = dialog.Run()
+
+    if response = int Gtk.ResponseType.Accept then
+        let filename = dialog.Filename
+        printfn "Selected file: %s" filename
+    else
+        printfn "No file selected."
+
+    dialog.Destroy()
+    Gtk.Application.Quit()
+
 let toggleGame () =
     try
         mainLock.EnterWriteLock()
 
         gameRunningState <-
             match gameRunningState with
-            | 0<GameMode> -> 2<GameMode>
-            | _ -> 0<GameMode>
+            | Paused -> Infinite
+            | _ -> Paused
     finally
         mainLock.ExitWriteLock()
 
@@ -131,7 +138,7 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> game.RunOneStep()
+        | Paused -> game.RunOneStep()
         | _ -> ()
     finally
         mainLock.ExitReadLock()
@@ -141,7 +148,7 @@ let update (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> button.Text <- "Run"
+        | Paused -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
     finally
         mainLock.ExitReadLock()
@@ -151,7 +158,7 @@ let updateOnRun (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> button.IsActive <- true
+        | Paused -> button.IsActive <- true
         | _ -> button.IsActive <- false
     finally
         mainLock.ExitReadLock()
@@ -167,7 +174,7 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> game.ResetState()
+        | Paused -> game.ResetState()
         | _ -> ()
 
     finally
@@ -178,15 +185,40 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
         | _ -> ()
 
     finally
         mainLock.ExitReadLock()
 
-let toggleButton =
+let fullscreenUpdate () =
+    if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Y) then
+        if raylibTrue (Raylib.IsWindowFullscreen()) then
+            Raylib.SetWindowSize(windowWidth, windowHeight)
+        else
+            let monitor = Raylib.GetCurrentMonitor()
+            let monitorWidth = Raylib.GetMonitorWidth monitor
+            let monitorHeight = Raylib.GetMonitorHeight monitor
+            Raylib.SetWindowSize(monitorWidth, monitorHeight)
+
+        Raylib.ToggleFullscreen()
+
+let saveButton =
     Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 300)
+    |> Button.position (windowWidth - 200) (windowHeight - 400)
+    |> Button.size 50
+    |> Button.text "Save"
+
+let loadButton =
+    Button.create
+    |> Button.position (windowWidth - 100) (windowHeight - 400)
+    |> Button.size 50
+    |> Button.text "Load"
+    |> Button.onClickCallback openFile
+
+let runButton =
+    Button.create
+    |> Button.position (windowWidth - 200) (windowHeight - 200)
     |> Button.size 50
     |> Button.onClickCallback toggleGame
     |> Button.onUpdateCallback update
@@ -217,7 +249,7 @@ let clearButton =
     |> Button.onClickCallback clearCallback
     |> Button.onUpdateCallback updateOnRun
 
-let buttons = [| toggleButton; advanceButton; resetButton; clearButton |]
+let buttons = [| runButton; advanceButton; resetButton; clearButton; saveButton; loadButton |]
 controlManager.Buttons.AddRange buttons
 
 let keyboardActions = [|
@@ -251,11 +283,14 @@ let gameUpdateLoop () =
                     mainLock.EnterWriteLock()
 
                     match gameRunningState with
-                    | 2<GameMode> -> true
-                    | 1<GameMode> ->
-                        gameRunningState <- 0<GameMode>
+                    | Infinite -> true
+                    | Limited x when x > 1 ->
+                        gameRunningState <- Limited(x - 1)
                         true
-                    | _ -> false
+                    | Limited _ ->
+                        gameRunningState <- Paused
+                        true
+                    | Paused -> false
                 finally
                     mainLock.ExitWriteLock()
 
@@ -265,7 +300,7 @@ let gameUpdateLoop () =
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(windowWidth, windowHeight)
+let renderTexture = Raylib.LoadRenderTexture(int canvas.Width, int canvas.Height)
 let mutable fps = 0.0
 let maxSamples = 60
 let frameTimes = Array.create maxSamples 0.0
@@ -285,7 +320,6 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     frameTimes[insertIndex] <- frameTime
     insertIndex <- (insertIndex + 1) % maxSamples
-
     fps <- 1.0 / (frameTimes |> Array.average)
 
 Raylib.UnloadRenderTexture renderTexture

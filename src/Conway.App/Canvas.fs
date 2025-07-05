@@ -71,7 +71,7 @@ type Canvas
 
             this.Camera.Position <- this.Camera.Position - mouseDelta * cellSizeInverse
 
-    member this.processMouseScroll() =
+    member this.ProcessMouseScroll() =
         let mousePos = Mouse.position ()
 
         if
@@ -86,7 +86,7 @@ type Canvas
 
     member this.ProcessDrawableArea() =
         this.ProcessMouseDrag()
-        this.processMouseScroll ()
+        this.ProcessMouseScroll()
 
         let rows = Array2D.length1 this.Game.CurrentState.Board
         let cols = Array2D.length2 this.Game.CurrentState.Board
