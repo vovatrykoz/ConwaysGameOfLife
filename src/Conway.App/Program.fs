@@ -1,6 +1,8 @@
-open Conway.Core
 open Conway.App
 open Conway.App.Aliases
+open Conway.App.File
+open Conway.Core
+open Conway.Encoding
 open Raylib_cs
 open System
 open System.Diagnostics
@@ -107,6 +109,18 @@ let saveFile () =
             Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory")
             Directory.CreateDirectory saveFilesPath |> ignore
             Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
+
+        let newFile = "./Saves/Test.cgol"
+        let encoder = new ConwayByteEncoder()
+        let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
+
+        Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to {newFile}")
+        let result = (fileSaver :> ICanvasFileSaver).Save canvas newFile
+
+        match result with
+        | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+        | Error errorMessage ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error: {errorMessage}")
     with ex ->
         let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
 
@@ -123,6 +137,28 @@ let openFile () =
             Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory")
             Directory.CreateDirectory saveFilesPath |> ignore
             Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
+
+        let newFile = "./Saves/Test.cgol"
+        let decoder = new ConwayByteDecoder()
+        let fileSaver = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
+
+        Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {newFile}")
+        let result = (fileSaver :> ICanvasFileLoader).Load newFile
+
+        match result with
+        | Ok canvasWrapper ->
+            Raylib.TraceLog(TraceLogLevel.Info, "Test file loaded successfully")
+
+            match canvasWrapper.OptionalMessage with
+            | None -> ()
+            | Some message -> Raylib.TraceLog(TraceLogLevel.Info, message)
+
+            Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
+            controlManager.Canvas.Game <- canvasWrapper.Game
+            controlManager.Canvas.Camera <- canvasWrapper.Camera
+            Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
+        | Error errorMessage ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not load the file due to the following error: {errorMessage}")
     with ex ->
         let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
 

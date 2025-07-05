@@ -50,7 +50,7 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                     Error $"{nameof path} contained the following invalid characters: {invalidChars}"
             | :? PathTooLongException -> Error $"The provided {nameof path} was too long: {path}"
             | :? DirectoryNotFoundException -> Error $"The provided {nameof path} was not found: {path}"
-            | :? IOException -> Error $"An I/O error occurred while opening the file at {path}"
+            | :? IOException -> Error $"An I/O error occurred while opening the file at {path}. Does the file exist?"
             | :? Security.SecurityException -> Error $"The caller does not have enough permissions to open the file"
             | :? UnauthorizedAccessException ->
                 Error
