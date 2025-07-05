@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Need to explicitly tell git to not ignore anything inside the Conway.App directory
+# It is getting ignored because of the "*.app" rule above
+!/src/Conway.App/
