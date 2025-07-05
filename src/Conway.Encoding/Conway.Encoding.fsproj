@@ -12,4 +12,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Conway.Core\Conway.Core.fsproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <OptimizationPreference>Speed</OptimizationPreference>
+  </PropertyGroup>
 </Project>

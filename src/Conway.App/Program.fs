@@ -1,4 +1,5 @@
-﻿open Conway.Core
+
+open Conway.Core
 open Conway.App
 open Conway.App.Aliases
 open Raylib_cs

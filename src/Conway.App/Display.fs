@@ -82,19 +82,18 @@ module Display =
 
     let render (game: Game) (controls: ControlManager) texture fps mousePos =
         Raylib.BeginTextureMode texture
-        Raylib.ClearBackground Color.Blank
-        renderBoardOnCanvas controls.Canvas game.CurrentState.Board
-
-        Raylib.EndTextureMode()
-
-        Raylib.BeginDrawing()
         Raylib.ClearBackground Color.White
 
+        renderBoardOnCanvas controls.Canvas game.CurrentState.Board
         renderControls controls
         renderGenerationCounter controls.Canvas game.Generation
         renderFpsCounter controls.Canvas fps
         renderMousePos controls.Canvas mousePos
         renderCanvasFocusCoordinates controls.Canvas
+
+        Raylib.EndTextureMode()
+
+        Raylib.BeginDrawing()
 
         Raylib.DrawTextureRec(
             texture.Texture,

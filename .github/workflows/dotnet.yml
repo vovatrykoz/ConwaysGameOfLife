@@ -11,6 +11,7 @@ on:
 
 jobs:
   build:
+    name: dotnet CI workflow
 
     runs-on: ubuntu-latest
 
