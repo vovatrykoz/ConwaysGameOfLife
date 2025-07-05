@@ -2,7 +2,6 @@ namespace Conway.Encoding
 
 open Conway.Core
 open System
-open System.Collections.Generic
 
 type ConwayByteDecoder() =
 

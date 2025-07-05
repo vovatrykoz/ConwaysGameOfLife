@@ -71,7 +71,7 @@ let oddsOfGettingLivingCell = 5
 let startingState =
     ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
 
-let game = new Game(startingState)
+let mutable game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
 
@@ -154,8 +154,15 @@ let openFile () =
             | Some message -> Raylib.TraceLog(TraceLogLevel.Info, message)
 
             Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
-            controlManager.Canvas.Game <- canvasWrapper.Game
-            controlManager.Canvas.Camera <- canvasWrapper.Camera
+
+            game <-
+                Game.createFrom
+                    canvasWrapper.Game.CurrentState
+                    canvasWrapper.Game.InitialState
+                    canvasWrapper.Game.Generation
+
+            canvas.Game <- game
+            canvas.Camera <- canvasWrapper.Camera
             Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
         | Error errorMessage ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not load the file due to the following error: {errorMessage}")

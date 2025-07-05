@@ -48,8 +48,8 @@ type Game(initialState: ConwayGrid) =
         _generation <- 1
 
     [<CompiledName("CreateFrom")>]
-    static member createFrom (currentState: ConwayGrid) (initialState: ConwayGrid) generationCounter =
-        let newGame = Game(ConwayGrid.copyFrom currentState)
+    static member createFrom (currentState: ConwayGrid) (initialState: ConwayGrid) (generationCounter: int) =
+        let newGame = new Game(ConwayGrid.copyFrom currentState)
         newGame.InitialState <- ConwayGrid.copyFrom initialState
         newGame.Generation <- generationCounter
         newGame
