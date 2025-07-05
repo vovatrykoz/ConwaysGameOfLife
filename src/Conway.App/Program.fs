@@ -1,4 +1,3 @@
-
 open Conway.Core
 open Conway.App
 open Conway.App.Aliases
@@ -72,7 +71,7 @@ let game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
 
-let mutable gameRunningState = Paused
+let mutable gameRunningState = 0<GameMode>
 
 let canvasX = 25.0f
 let canvasY = 25.0f
@@ -99,28 +98,49 @@ let canvas =
 let controlManager = new ControlManager(canvas)
 
 let openFile () =
-    Gtk.Application.Init()
+    try
+        try
+            Gtk.Application.Init()
 
-    let dialog =
-        new Gtk.FileChooserDialog(
-            "Open File",
-            null,
-            Gtk.FileChooserAction.Open,
-            [| "Cancel", Gtk.ResponseType.Cancel; "Open", Gtk.ResponseType.Accept |]
-        )
+            let dialog =
+                new Gtk.FileChooserDialog(
+                    "Open File",
+                    null,
+                    Gtk.FileChooserAction.Open,
+                    [| "Cancel", Gtk.ResponseType.Cancel; "Open", Gtk.ResponseType.Accept |]
+                )
 
-    dialog.SetDefaultSize(800, 600)
+            dialog.SetDefaultSize(800, 600)
+            let currentDir = Environment.CurrentDirectory
+            let result = dialog.SetCurrentFolder currentDir
 
-    let response = dialog.Run()
+            if not result then
+                Raylib.TraceLog(
+                    TraceLogLevel.Info,
+                    $"Failed to set the dialogue folder to {currentDir}. Using default directory path"
+                )
+            else
+                Raylib.TraceLog(
+                    TraceLogLevel.Info,
+                    $"Current directory for the open file dialogue is set to {currentDir}"
+                )
 
-    if response = int Gtk.ResponseType.Accept then
-        let filename = dialog.Filename
-        printfn "Selected file: %s" filename
-    else
-        printfn "No file selected."
+            let response = dialog.Run()
 
-    dialog.Destroy()
-    Gtk.Application.Quit()
+            if response = int Gtk.ResponseType.Accept then
+                let filename = dialog.Filename
+                Raylib.TraceLog(TraceLogLevel.Info, $"Selected file: {filename}")
+            else
+                Raylib.TraceLog(TraceLogLevel.Info, $"No file selected")
+
+            dialog.Destroy()
+        with ex ->
+            let exceptionMessage = ex.ToString().Replace("\n", "\n\t")
+            let stackString = ex.StackTrace.ToString().Replace("\n", "\n\t")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Error occured:\n\t{exceptionMessage}")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Stack trace:\n\t{stackString}")
+    finally
+        Gtk.Application.Quit()
 
 let toggleGame () =
     try
@@ -128,8 +148,8 @@ let toggleGame () =
 
         gameRunningState <-
             match gameRunningState with
-            | Paused -> Infinite
-            | _ -> Paused
+            | 0<GameMode> -> 2<GameMode>
+            | _ -> 0<GameMode>
     finally
         mainLock.ExitWriteLock()
 
@@ -138,7 +158,7 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.RunOneStep()
+        | 0<GameMode> -> game.RunOneStep()
         | _ -> ()
     finally
         mainLock.ExitReadLock()
@@ -148,7 +168,7 @@ let update (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> button.Text <- "Run"
+        | 0<GameMode> -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
     finally
         mainLock.ExitReadLock()
@@ -158,7 +178,7 @@ let updateOnRun (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> button.IsActive <- true
+        | 0<GameMode> -> button.IsActive <- true
         | _ -> button.IsActive <- false
     finally
         mainLock.ExitReadLock()
@@ -174,7 +194,7 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.ResetState()
+        | 0<GameMode> -> game.ResetState()
         | _ -> ()
 
     finally
@@ -185,7 +205,7 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | 0<GameMode> -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
         | _ -> ()
 
     finally
@@ -208,6 +228,7 @@ let saveButton =
     |> Button.position (windowWidth - 200) (windowHeight - 400)
     |> Button.size 50
     |> Button.text "Save"
+    |> Button.onUpdateCallback updateOnRun
 
 let loadButton =
     Button.create
@@ -215,6 +236,7 @@ let loadButton =
     |> Button.size 50
     |> Button.text "Load"
     |> Button.onClickCallback openFile
+    |> Button.onUpdateCallback updateOnRun
 
 let runButton =
     Button.create
@@ -283,14 +305,12 @@ let gameUpdateLoop () =
                     mainLock.EnterWriteLock()
 
                     match gameRunningState with
-                    | Infinite -> true
-                    | Limited x when x > 1 ->
-                        gameRunningState <- Limited(x - 1)
+                    | 2<GameMode> -> true
+                    | 1<GameMode> ->
+                        gameRunningState <- 0<GameMode>
                         true
-                    | Limited _ ->
-                        gameRunningState <- Paused
-                        true
-                    | Paused -> false
+                    | 0<GameMode>
+                    | _ -> false
                 finally
                     mainLock.ExitWriteLock()
 
@@ -300,7 +320,7 @@ let gameUpdateLoop () =
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(int canvas.Width, int canvas.Height)
+let renderTexture = Raylib.LoadRenderTexture(windowWidth, windowWidth)
 let mutable fps = 0.0
 let maxSamples = 60
 let frameTimes = Array.create maxSamples 0.0
