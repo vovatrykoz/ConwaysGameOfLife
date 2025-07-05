@@ -59,7 +59,8 @@ let gridHeight =
 let sleepTime =
     if gridHeight <= 2000 || gridWidth <= 2000 then 34
     else if gridHeight <= 5000 || gridWidth <= 5000 then 16
-    else 0
+    else if gridHeight <= 8000 || gridWidth <= 8000 then 8
+    else 4
 
 // 1 in 5 odds that a cell is living
 let oddsOfGettingLivingCell = 5
