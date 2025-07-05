@@ -3,12 +3,14 @@ namespace Conway.Core
 [<Measure>]
 type GameMode
 
-type Game(initialState: ConwayGrid) =
+type Game(initialState: ConwayGrid, generation: int) =
     let mutable _initialState = ConwayGrid.copyFrom initialState
 
     let mutable _internalState = initialState
 
-    let mutable _generation = 1
+    let mutable _generation = generation
+
+    new(initialState: ConwayGrid) = new Game(initialState, 1)
 
     member _.CurrentState
         with get () = _internalState

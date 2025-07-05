@@ -18,6 +18,12 @@ type Game =
     new: initialState: ConwayGrid -> Game
 
     /// <summary>
+    /// Initializes a new instance of the Game class with the given initial grid state and a generation.
+    /// </summary>
+    /// <param name="initialState">The starting state of the game grid.</param>
+    new: initialState: ConwayGrid * generation: int -> Game
+
+    /// <summary>
     /// Gets or sets the current state of the game grid.
     /// </summary>
     member CurrentState: ConwayGrid with get, set
