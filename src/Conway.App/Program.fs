@@ -4,6 +4,7 @@ open Conway.App.Aliases
 open Raylib_cs
 open System
 open System.Diagnostics
+open System.IO
 open System.Threading
 
 let windowWidth = 1024
@@ -98,50 +99,37 @@ let canvas =
 
 let controlManager = new ControlManager(canvas)
 
+let saveFile () =
+    try
+        let saveFilesPath = Environment.CurrentDirectory + "/Saves"
+
+        if not (Directory.Exists saveFilesPath) then
+            Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory")
+            Directory.CreateDirectory saveFilesPath |> ignore
+            Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
+    with ex ->
+        let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
+
+        Raylib.TraceLog(
+            TraceLogLevel.Error,
+            $"Failed to create a directory with the following error: {excepionMessage}"
+        )
+
 let openFile () =
     try
-        try
-            Gtk.Application.Init()
+        let saveFilesPath = Environment.CurrentDirectory + "/Saves"
 
-            let dialog =
-                new Gtk.FileChooserDialog(
-                    "Open File",
-                    null,
-                    Gtk.FileChooserAction.Open,
-                    [| "Cancel", Gtk.ResponseType.Cancel; "Open", Gtk.ResponseType.Accept |]
-                )
+        if not (Directory.Exists saveFilesPath) then
+            Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory")
+            Directory.CreateDirectory saveFilesPath |> ignore
+            Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
+    with ex ->
+        let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
 
-            dialog.SetDefaultSize(800, 600)
-            let currentDir = Environment.CurrentDirectory
-            let result = dialog.SetCurrentFolder currentDir
-
-            if not result then
-                Raylib.TraceLog(
-                    TraceLogLevel.Info,
-                    $"Failed to set the dialogue folder to {currentDir}. Using default directory path"
-                )
-            else
-                Raylib.TraceLog(
-                    TraceLogLevel.Info,
-                    $"Current directory for the open file dialogue is set to {currentDir}"
-                )
-
-            let response = dialog.Run()
-
-            if response = int Gtk.ResponseType.Accept then
-                let filename = dialog.Filename
-                Raylib.TraceLog(TraceLogLevel.Info, $"Selected file: {filename}")
-            else
-                Raylib.TraceLog(TraceLogLevel.Info, $"No file selected")
-
-            dialog.Destroy()
-        with ex ->
-            let exceptionMessage = ex.ToString().Replace("\n", "\n\t")
-            let stackString = ex.StackTrace.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Error occured:\n\t{exceptionMessage}")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Stack trace:\n\t{stackString}")
-    finally
-        Gtk.Application.Quit()
+        Raylib.TraceLog(
+            TraceLogLevel.Error,
+            $"Failed to create a directory with the following error: {excepionMessage}"
+        )
 
 let toggleGame () =
     try
@@ -229,6 +217,7 @@ let saveButton =
     |> Button.position (windowWidth - 200) (windowHeight - 400)
     |> Button.size 50
     |> Button.text "Save"
+    |> Button.onClickCallback saveFile
     |> Button.onUpdateCallback updateOnRun
 
 let loadButton =
