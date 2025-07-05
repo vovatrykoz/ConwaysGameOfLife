@@ -106,7 +106,7 @@ let saveFile () =
         let saveFilesPath = Environment.CurrentDirectory + "/Saves"
 
         if not (Directory.Exists saveFilesPath) then
-            Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory")
+            Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory...")
             Directory.CreateDirectory saveFilesPath |> ignore
             Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
@@ -114,7 +114,7 @@ let saveFile () =
         let encoder = new ConwayByteEncoder()
         let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
 
-        Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to {newFile}")
+        Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to {newFile} ...")
         let result = (fileSaver :> ICanvasFileSaver).Save canvas newFile
 
         match result with
@@ -134,7 +134,7 @@ let openFile () =
         let saveFilesPath = Environment.CurrentDirectory + "/Saves"
 
         if not (Directory.Exists saveFilesPath) then
-            Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory")
+            Raylib.TraceLog(TraceLogLevel.Info, "Creating a save files directory...")
             Directory.CreateDirectory saveFilesPath |> ignore
             Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
@@ -142,7 +142,7 @@ let openFile () =
         let decoder = new ConwayByteDecoder()
         let fileSaver = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
 
-        Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {newFile}")
+        Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {newFile} ...")
         let result = (fileSaver :> ICanvasFileLoader).Load newFile
 
         match result with

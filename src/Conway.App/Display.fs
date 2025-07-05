@@ -60,9 +60,9 @@ module Display =
     let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
         Draw.textBox
             (canvas.Position.X + canvas.Width + 5.0f)
-            (canvas.Position.Y + 150.0f)
+            (canvas.Position.Y + 170.0f)
             24
-            $"X {mousePos.X} Y {mousePos.Y}"
+            $"Mouse:\nX {mousePos.X} Y {mousePos.Y}"
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
         Draw.textBox
@@ -80,7 +80,7 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let render (game: Game) (controls: ControlManager) texture fps mousePos =
+    let render (game: Game) (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
