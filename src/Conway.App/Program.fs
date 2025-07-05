@@ -75,7 +75,7 @@ let mutable game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
 
-let mutable gameRunningState = 0<GameMode>
+let mutable gameRunningState = GameRunMode.Paused
 
 let canvasX = 25.0f
 let canvasY = 25.0f
@@ -180,8 +180,8 @@ let toggleGame () =
 
         gameRunningState <-
             match gameRunningState with
-            | 0<GameMode> -> 2<GameMode>
-            | _ -> 0<GameMode>
+            | GameRunMode.Paused -> GameRunMode.Infinite
+            | _ -> GameRunMode.Paused
     finally
         mainLock.ExitWriteLock()
 
@@ -190,7 +190,7 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> game.RunOneStep()
+        | GameRunMode.Paused -> game.RunOneStep()
         | _ -> ()
     finally
         mainLock.ExitReadLock()
@@ -200,7 +200,7 @@ let update (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> button.Text <- "Run"
+        | GameRunMode.Paused -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
     finally
         mainLock.ExitReadLock()
@@ -210,7 +210,7 @@ let updateOnRun (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> button.IsActive <- true
+        | GameRunMode.Paused -> button.IsActive <- true
         | _ -> button.IsActive <- false
     finally
         mainLock.ExitReadLock()
@@ -226,7 +226,7 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> game.ResetState()
+        | GameRunMode.Paused -> game.ResetState()
         | _ -> ()
 
     finally
@@ -237,7 +237,7 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | 0<GameMode> -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | GameRunMode.Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
         | _ -> ()
 
     finally
@@ -338,11 +338,11 @@ let gameUpdateLoop () =
                     mainLock.EnterWriteLock()
 
                     match gameRunningState with
-                    | 2<GameMode> -> true
-                    | 1<GameMode> ->
-                        gameRunningState <- 0<GameMode>
+                    | GameRunMode.Infinite -> true
+                    | GameRunMode.Step ->
+                        gameRunningState <- GameRunMode.Paused
                         true
-                    | 0<GameMode>
+                    | GameRunMode.Paused
                     | _ -> false
                 finally
                     mainLock.ExitWriteLock()
