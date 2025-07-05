@@ -23,10 +23,19 @@ let gridWidth =
     if Array.length args >= 2 then
         try
             let result = int args[1]
+
+            if result < 0 then
+                raise (
+                    new ArgumentException $"The width cannot be negative. The parsed width value is equal to {result}"
+                )
+
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid width to: {result}")
             result
-        with _ ->
+        with (ex: Exception) ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
+
+            let exceptionString = ex.ToString().Replace("\n", "\n\t")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {defaultGridWidth}")
             defaultGridWidth
     else
@@ -42,9 +51,18 @@ let gridHeight =
         try
             let result = int args[2]
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
+
+            if result < 0 then
+                raise (
+                    new ArgumentException $"The height cannot be negative. The parsed height value is equal to {result}"
+                )
+
             result
-        with _ ->
+        with (ex: Exception) ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[2]}")
+
+            let exceptionString = ex.ToString().Replace("\n", "\n\t")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
 
             defaultGridHeight
@@ -71,7 +89,7 @@ let game = new Game(startingState)
 
 let mainLock = new ReaderWriterLockSlim()
 
-let mutable gameRunningState = Paused
+let mutable gameRunningState = 0<GameMode>
 
 let canvasX = 25.0f
 let canvasY = 25.0f
@@ -103,8 +121,8 @@ let toggleGame () =
 
         gameRunningState <-
             match gameRunningState with
-            | Paused -> Infinite
-            | _ -> Paused
+            | 0<GameMode> -> 2<GameMode>
+            | _ -> 0<GameMode>
     finally
         mainLock.ExitWriteLock()
 
@@ -113,7 +131,7 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.RunOneStep()
+        | 0<GameMode> -> game.RunOneStep()
         | _ -> ()
     finally
         mainLock.ExitReadLock()
@@ -123,7 +141,7 @@ let update (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> button.Text <- "Run"
+        | 0<GameMode> -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
     finally
         mainLock.ExitReadLock()
@@ -133,7 +151,7 @@ let updateOnRun (button: Button) =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> button.IsActive <- true
+        | 0<GameMode> -> button.IsActive <- true
         | _ -> button.IsActive <- false
     finally
         mainLock.ExitReadLock()
@@ -149,7 +167,7 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.ResetState()
+        | 0<GameMode> -> game.ResetState()
         | _ -> ()
 
     finally
@@ -160,7 +178,7 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | 0<GameMode> -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
         | _ -> ()
 
     finally
@@ -233,14 +251,11 @@ let gameUpdateLoop () =
                     mainLock.EnterWriteLock()
 
                     match gameRunningState with
-                    | Infinite -> true
-                    | Limited x when x > 1 ->
-                        gameRunningState <- Limited(x - 1)
+                    | 2<GameMode> -> true
+                    | 1<GameMode> ->
+                        gameRunningState <- 0<GameMode>
                         true
-                    | Limited _ ->
-                        gameRunningState <- Paused
-                        true
-                    | Paused -> false
+                    | _ -> false
                 finally
                     mainLock.ExitWriteLock()
 
@@ -250,7 +265,7 @@ let gameUpdateLoop () =
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(int canvas.Width, int canvas.Height)
+let renderTexture = Raylib.LoadRenderTexture(windowWidth, windowHeight)
 let mutable fps = 0.0
 let maxSamples = 60
 let frameTimes = Array.create maxSamples 0.0

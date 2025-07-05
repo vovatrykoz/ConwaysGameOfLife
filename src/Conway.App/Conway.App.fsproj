@@ -32,4 +32,9 @@
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>5</AnalysisLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <PublishAot>true</PublishAot>
+    <PublishTrimmed>true</PublishTrimmed>
+    <OptimizationPreference>Speed</OptimizationPreference>
+  </PropertyGroup>
 </Project>
