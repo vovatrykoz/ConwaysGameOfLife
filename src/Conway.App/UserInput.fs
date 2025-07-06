@@ -5,26 +5,15 @@ open Raylib_cs
 module UserInput =
     let tryReadInt (stringValue: string) (parseName: string) (fallbackValue: int) =
         try
-            let result =
-                match int stringValue with
-                | x when x <= 0 ->
-                    Raylib.TraceLog(
-                        TraceLogLevel.Error,
-                        $"The {parseName} cannot be less than or equal to zero. It has to be at least 1. Given {x}"
-                    )
-
-                    Raylib.TraceLog(
-                        TraceLogLevel.Warning,
-                        $"Discarding the provided {parseName} value ({x}) and using the default value instead"
-                    )
-
-                    Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
-                    fallbackValue
-                | x ->
-                    Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {x}")
-                    x
-
-            result
+            match int stringValue with
+            | x when x <= 0 ->
+                Raylib.TraceLog(TraceLogLevel.Error, $"The {parseName} cannot be <= 0. Got {x}")
+                Raylib.TraceLog(TraceLogLevel.Warning, $"Using default: {fallbackValue}")
+                Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
+                fallbackValue
+            | x ->
+                Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {x}")
+                x
         with ex ->
             let exceptionString = ex.ToString().Replace("\n", "\n\t")
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the {parseName}. Given: {stringValue}")
