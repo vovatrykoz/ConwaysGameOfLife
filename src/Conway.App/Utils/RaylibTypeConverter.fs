@@ -17,5 +17,5 @@ module private UnsafeUtils =
 module Convert =
     let inline CBoolToFsBool (cbool: CBool) = Convert.ToBoolean(sbyte cbool)
 
-module Aliases =
+module Alias =
     let inline raylibTrue expr = expr |> Convert.CBoolToFsBool

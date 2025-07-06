@@ -1,6 +1,6 @@
 namespace Conway.App.Input
 
-open Conway.App.Aliases
+open Conway.App.Utils.Alias
 open Raylib_cs
 
 module Mouse =
