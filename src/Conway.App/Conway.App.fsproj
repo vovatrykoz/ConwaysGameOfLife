@@ -20,6 +20,11 @@
     <Compile Include="Graphics/Draw.fs" />
     <Compile Include="Graphics/Display.fs" />
     <Compile Include="Config.fs" />
+    <Compile Include="ApplicationContext.fs" />
+    <Compile Include="Callbacks.fs" />
+    <Compile Include="Buttons.fs" />
+    <Compile Include="Hotkeys.fs" />
+    <Compile Include="UserInput.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

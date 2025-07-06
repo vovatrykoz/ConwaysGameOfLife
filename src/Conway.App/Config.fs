@@ -2,8 +2,6 @@ namespace Conway.App
 
 module Config =
     module Default =
-        open Conway.Core
-
         let windowWidth = 1024
 
         let windowHeight = 768
@@ -23,9 +21,6 @@ module Config =
 
         // 1 in 5 odds that a cell is living
         let oddsOfGettingLivingCell = 5
-
-        let startingState =
-            ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
 
         let sleepTimeCalculator (gridWidth: int) (gridHeight: int) =
             if gridHeight <= 2000 || gridWidth <= 2000 then 34

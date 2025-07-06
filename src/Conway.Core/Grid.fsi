@@ -15,6 +15,10 @@ type ConwayGrid =
     /// </summary>
     member Board: int<CellStatus> array2d
 
+    member ActiveWidth: int
+
+    member ActiveHeight: int
+
     /// <summary>
     /// Advances the grid to the next state according to Conway's Game of Life rules.
     /// </summary>

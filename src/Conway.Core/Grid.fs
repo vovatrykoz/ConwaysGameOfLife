@@ -31,6 +31,10 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     member this.Board = this.Buffers[this.ActiveBufferIndex]
 
+    member this.ActiveWidth = Array2D.length2 this.Board - 2
+
+    member this.ActiveHeight = Array2D.length1 this.Board - 2
+
     [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
     static member inline private countLivingNeighbors
         rowAbove
