@@ -129,9 +129,6 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
         new ConwayGrid(initArr)
 
-    [<CompiledName("InitFromPreset")>]
-    static member initFromPreset preset = preset |||> ConwayGrid.init
-
     [<CompiledName("CopyFrom")>]
     static member copyFrom(otherGrid: ConwayGrid) =
         new ConwayGrid(Array2D.copy otherGrid.Board)

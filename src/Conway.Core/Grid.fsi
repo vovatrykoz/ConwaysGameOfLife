@@ -55,13 +55,6 @@ type ConwayGrid =
     static member init: width: int -> height: int -> initializer: (int -> int -> int<CellStatus>) -> ConwayGrid
 
     /// <summary>
-    /// Initializes a grid from a preset containing dimensions and an initializer function.
-    /// </summary>
-    /// <param name="preset">A tuple of width, height, and initializer function.</param>
-    [<CompiledName("InitFromPreset")>]
-    static member initFromPreset: preset: (int * int * (int -> int -> int<CellStatus>)) -> ConwayGrid
-
-    /// <summary>
     /// Deep copies the state of the provided grid
     /// </summary>
     /// <param name="otherGrid">Grid to copy from.</param>
