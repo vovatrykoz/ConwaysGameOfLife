@@ -10,7 +10,12 @@ module UserInput =
                 | x when x <= 0 ->
                     Raylib.TraceLog(
                         TraceLogLevel.Error,
-                        $"The {parseName} cannot be less than or equal to zero. It has to be at least 1"
+                        $"The {parseName} cannot be less than or equal to zero. It has to be at least 1. Given {x}"
+                    )
+
+                    Raylib.TraceLog(
+                        TraceLogLevel.Warning,
+                        $"Discarding the provided {parseName} value ({x}) and using the default value instead"
                     )
 
                     Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
@@ -24,7 +29,7 @@ module UserInput =
             let exceptionString = ex.ToString().Replace("\n", "\n\t")
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the {parseName}. Given: {stringValue}")
             Raylib.TraceLog(TraceLogLevel.Error, $"Detailed error information:\n\t{exceptionString}")
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {fallbackValue}")
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
 
             fallbackValue
 
