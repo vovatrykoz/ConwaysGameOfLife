@@ -2,13 +2,7 @@ namespace Conway.App
 
 open Config
 open Conway.App.Controls
-open Conway.App.File
-open Conway.App.Utils.Alias
-open Conway.Core
-open Conway.Encoding
 open Raylib_cs
-open System
-open System.IO
 
 module Buttons =
     let createSaveButtonInstance (ctx: ApplicationContext) =
@@ -59,3 +53,12 @@ module Buttons =
         |> Button.text "Clear"
         |> Button.onClickCallback (fun _ -> Callbacks.clearCallback ctx)
         |> Button.onUpdateCallback (fun btn -> Callbacks.updateOnRun ctx btn)
+
+    let instantiate (ctx: ApplicationContext) = [|
+        createRunButtonInstance ctx
+        createAdvanceButtonInstance ctx
+        createResetButtonInstance ctx
+        createClearButtonInstance ctx
+        createSaveButtonInstance ctx
+        createLoadButtonInstance ctx
+    |]

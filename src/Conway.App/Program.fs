@@ -59,16 +59,7 @@ let controlManager = new ControlManager(canvas)
 let currentContext =
     new ApplicationContext(GameRunMode.Paused, controlManager.Canvas)
 
-let buttons = [|
-    Buttons.createRunButtonInstance currentContext
-    Buttons.createAdvanceButtonInstance currentContext
-    Buttons.createResetButtonInstance currentContext
-    Buttons.createClearButtonInstance currentContext
-    Buttons.createSaveButtonInstance currentContext
-    Buttons.createLoadButtonInstance currentContext
-|]
-
-controlManager.Buttons.AddRange buttons
+controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
 controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
 controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
 
