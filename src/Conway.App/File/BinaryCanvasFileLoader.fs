@@ -42,7 +42,7 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                 else if String.IsNullOrWhiteSpace path then
                     Error $"{nameof path} consisted of whitespaces only"
                 else
-                    let invalidCharSet = Path.GetInvalidPathChars() |> Set.ofSeq
+                    let invalidCharSet = Path.GetInvalidPathChars() |> Set.ofArray
 
                     let invalidChars =
                         path |> Seq.filter (fun c -> Set.contains c invalidCharSet) |> Seq.toArray
@@ -59,4 +59,4 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                     (2) {path} is a directory
                     (3) operation is not supported on the current platform"
             | :? NotSupportedException -> Error $"The provided {nameof path} has an invalid format: {path}"
-            | _ -> Error "Something went wrong. Please try again"
+            | _ -> Error "Something went wrong. See the log output for details"

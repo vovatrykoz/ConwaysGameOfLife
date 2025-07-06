@@ -87,14 +87,15 @@ let heightOffset = cellSize * 2.0f
 let cameraPosX = 500.0f
 let cameraPosY = 500.0f
 
+let camera = new Camera(cameraPosX, cameraPosY)
+
 let canvas =
     new Canvas(
         canvasX,
         canvasY,
         float32 windowWidth - widthOffset,
         float32 windowHeight - heightOffset,
-        cameraPosX,
-        cameraPosY,
+        camera,
         game,
         cellSize
     )

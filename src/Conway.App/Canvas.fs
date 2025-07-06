@@ -4,17 +4,7 @@ open Conway.Core
 open Raylib_cs
 open System.Numerics
 
-type Canvas
-    (
-        x: float32,
-        y: float32,
-        width: float32,
-        height: float32,
-        camPosX: float32,
-        camPosY: float32,
-        game: Game,
-        cellSize: float32
-    ) =
+type Canvas(x: float32, y: float32, width: float32, height: float32, camera: Camera, game: Game, cellSize: float32) =
 
     member val Position = Vector2(x, y) with get, set
 
@@ -26,7 +16,7 @@ type Canvas
 
     member val Game = game with get, set
 
-    member val Camera = Camera(camPosX, camPosY) with get, set
+    member val Camera = camera with get, set
 
     member this.CalculateVisibleRange() =
         let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
