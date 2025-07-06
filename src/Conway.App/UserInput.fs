@@ -5,8 +5,20 @@ open Raylib_cs
 module UserInput =
     let tryReadInt (stringValue: string) (parseName: string) (fallbackValue: int) =
         try
-            let result = int stringValue
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
+            let result =
+                match int stringValue with
+                | x when x <= 0 ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The {parseName} cannot be less than or equal to zero. It has to be at least 1"
+                    )
+
+                    Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
+                    fallbackValue
+                | x ->
+                    Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {x}")
+                    x
+
             result
         with ex ->
             let exceptionString = ex.ToString().Replace("\n", "\n\t")
