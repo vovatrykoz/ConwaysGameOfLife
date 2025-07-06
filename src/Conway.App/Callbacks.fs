@@ -51,12 +51,18 @@ module Callbacks =
                 Directory.CreateDirectory saveFilesPath |> ignore
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
+            Directory.EnumerateFiles saveFilesPath
+            |> Seq.toArray
+            |> Array.iter (fun file ->
+                let creationTime = File.GetLastWriteTimeUtc file
+                Raylib.TraceLog(TraceLogLevel.Info, $"Found {file}, last accessed at {creationTime}"))
+
             let newFile = "./Saves/Test.cgol"
             let decoder = new ConwayByteDecoder()
-            let fileSaver = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
+            let fileLoader = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
 
             Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {newFile} ...")
-            let result = (fileSaver :> ICanvasFileLoader).Load newFile
+            let result = (fileLoader :> ICanvasFileLoader).Load newFile
 
             match result with
             | Ok canvasWrapper ->
