@@ -1,5 +1,6 @@
 namespace Conway.Tests
 
+open Conway.App.Controls
 open Conway.App.File
 open Conway.Encoding
 open Conway.Core
@@ -10,8 +11,9 @@ module ``Binary Canvas File Saver Tests`` =
 
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =
-        let game = Game(ConwayGrid.createDead 4 4)
-        let canvas = Canvas(0.0f, 0.0f, 100.0f, 100.0f, 0.0f, 0.0f, game, 25.0f)
+        let game = new Game(ConwayGrid.createDead 4 4)
+        let camera = new Camera(0.0f, 0.0f)
+        let canvas = new Canvas(0.0f, 0.0f, 100.0f, 100.0f, camera, game, 25.0f)
 
         let expectedEncoding = [|
             0b0000_0000uy // camera X-coordinate (32-bit float)
