@@ -54,3 +54,6 @@ module Draw =
 
     let inline textBox (x: float32) (y: float32) fontSize (text: string) =
         Raylib.DrawText(text, int x, int y, fontSize, Color.Black)
+
+    let listBox (x: float32, y: float32, items: List<string>) =
+        Raylib.DrawRectangle(int x, int y, 10, 10, Color.Black)
