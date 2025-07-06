@@ -19,6 +19,7 @@
     <Compile Include="File/BinaryCanvasFileLoader.fs" />
     <Compile Include="Graphics/Draw.fs" />
     <Compile Include="Graphics/Display.fs" />
+    
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

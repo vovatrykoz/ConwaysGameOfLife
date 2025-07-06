@@ -16,7 +16,8 @@ module Display =
         Raylib.SetTargetFPS 120
         Raylib.InitWindow(width, height, "Conway's game of life")
 
-    let private renderBoardOnCanvas (canvas: Canvas) (board: int<CellStatus>[,]) =
+    let private renderBoardOnCanvas (canvas: Canvas) =
+        let board = canvas.Game.CurrentState.Board
         let rows = Array2D.length1 board
         let cols = Array2D.length2 board
 
@@ -52,8 +53,12 @@ module Display =
             | true -> Draw.button button
             | false -> ()
 
-    let private renderGenerationCounter (canvas: Canvas) generation =
-        Draw.textBox (canvas.Position.X + canvas.Width + 5.0f) canvas.Position.Y 24 $"Generation {generation}"
+    let private renderGenerationCounter (canvas: Canvas) =
+        Draw.textBox
+            (canvas.Position.X + canvas.Width + 5.0f)
+            canvas.Position.Y
+            24
+            $"Generation {canvas.Game.Generation}"
 
     let private renderFpsCounter (canvas: Canvas) fps =
         Draw.textBox (canvas.Position.X + canvas.Width + 5.0f) (canvas.Position.Y + 50.0f) 24 $"FPS {fps}"
@@ -81,16 +86,18 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let render (game: Game) (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
+    let render (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
+        let canvas = controls.Canvas
+
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
-        renderBoardOnCanvas controls.Canvas game.CurrentState.Board
         renderControls controls
-        renderGenerationCounter controls.Canvas game.Generation
-        renderFpsCounter controls.Canvas fps
-        renderMousePos controls.Canvas mousePos
-        renderCanvasFocusCoordinates controls.Canvas
+        renderBoardOnCanvas canvas
+        renderGenerationCounter canvas
+        renderFpsCounter canvas fps
+        renderMousePos canvas mousePos
+        renderCanvasFocusCoordinates canvas
 
         Raylib.EndTextureMode()
 

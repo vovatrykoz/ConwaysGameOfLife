@@ -72,8 +72,6 @@ let oddsOfGettingLivingCell = 5
 let startingState =
     ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
 
-let mutable game = new Game(startingState)
-
 let mainLock = new ReaderWriterLockSlim()
 
 let mutable gameRunningState = GameRunMode.Paused
@@ -97,7 +95,7 @@ let canvas =
         float32 windowWidth - widthOffset,
         float32 windowHeight - heightOffset,
         camera,
-        game,
+        new Game(startingState),
         cellSize
     )
 
@@ -157,13 +155,12 @@ let openFile () =
 
             Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
 
-            game <-
+            canvas.Game <-
                 Game.createFrom
                     canvasWrapper.Game.CurrentState
                     canvasWrapper.Game.InitialState
                     canvasWrapper.Game.Generation
 
-            canvas.Game <- game
             canvas.Camera <- canvasWrapper.Camera
             Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
         | Error errorMessage ->
@@ -192,7 +189,7 @@ let advanceOnce () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | GameRunMode.Paused -> game.RunOneStep()
+        | GameRunMode.Paused -> canvas.Game.RunOneStep()
         | _ -> ()
     finally
         mainLock.ExitReadLock()
@@ -220,7 +217,7 @@ let updateOnRun (button: Button) =
 let updateOnRunBack (button: Button) =
     updateOnRun button
 
-    if button.IsActive && game.Generation <= 1 then
+    if button.IsActive && canvas.Game.Generation <= 1 then
         button.IsActive <- false
 
 let resetCallback () =
@@ -228,7 +225,7 @@ let resetCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | GameRunMode.Paused -> game.ResetState()
+        | GameRunMode.Paused -> canvas.Game.ResetState()
         | _ -> ()
 
     finally
@@ -239,7 +236,7 @@ let clearCallback () =
         mainLock.EnterReadLock()
 
         match gameRunningState with
-        | GameRunMode.Paused -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
+        | GameRunMode.Paused -> canvas.Game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
         | _ -> ()
 
     finally
@@ -350,7 +347,7 @@ let gameUpdateLoop () =
                     mainLock.ExitWriteLock()
 
             if shouldRun then
-                game.RunOneStep()
+                canvas.Game.RunOneStep()
     }
 
 gameUpdateLoop () |> Async.Start
@@ -368,7 +365,7 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.render game controlManager renderTexture (int fps) (Raylib.GetMousePosition())
+    Display.render controlManager renderTexture (int fps) (Raylib.GetMousePosition())
 
     let frameEnd = stopwatch.Elapsed.TotalSeconds
     let frameTime = frameEnd - frameStart
