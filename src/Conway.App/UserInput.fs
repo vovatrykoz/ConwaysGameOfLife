@@ -15,3 +15,10 @@ module UserInput =
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {fallbackValue}")
 
             fallbackValue
+
+    let tryReadArg args index name defaultVal =
+        if Array.length args > index then
+            tryReadInt args[index] name defaultVal
+        else
+            Raylib.TraceLog(TraceLogLevel.Info, $"No {name} provided. Using default: {defaultVal}")
+            defaultVal

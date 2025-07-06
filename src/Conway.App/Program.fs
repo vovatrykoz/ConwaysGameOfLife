@@ -9,32 +9,15 @@ open System
 open System.Diagnostics
 
 Display.init Default.windowWidth Default.windowHeight
-
 Display.loadingScreen (float32 (Default.windowWidth / 2)) (float32 (Default.windowHeight / 2))
 
 let args = Environment.GetCommandLineArgs()
 
 let gridWidth =
-    if Array.length args >= 2 then
-        UserInput.tryReadInt args[1] "width" Default.gridWidth
-    else
-        Raylib.TraceLog(
-            TraceLogLevel.Info,
-            $"No width value provided. Setting the grid to the default width value: {Default.gridWidth}"
-        )
-
-        Default.gridWidth
+    UserInput.tryReadArg args Default.gridWidthIndex "width" Default.gridWidth
 
 let gridHeight =
-    if Array.length args >= 3 then
-        UserInput.tryReadInt args[2] "height" Default.gridHeight
-    else
-        Raylib.TraceLog(
-            TraceLogLevel.Info,
-            $"No height value provided. Setting the grid to the default height value: {Default.gridHeight}"
-        )
-
-        Default.gridHeight
+    UserInput.tryReadArg args Default.gridHeightIndex "height" Default.gridHeight
 
 let sleepTime = Default.sleepTimeCalculator gridWidth gridHeight
 

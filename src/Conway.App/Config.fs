@@ -6,6 +6,8 @@ module Config =
 
         let windowHeight = 768
 
+        let gridWidthIndex = 1
+        let gridHeightIndex = 2
         let gridWidth = 1000
         let gridHeight = 1000
 
