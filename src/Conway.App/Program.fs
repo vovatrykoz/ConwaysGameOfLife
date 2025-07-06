@@ -1,3 +1,4 @@
+open Conway.App.Config
 open Conway.App.Controls
 open Conway.App.Graphics
 open Conway.App.File
@@ -10,16 +11,9 @@ open System.Diagnostics
 open System.IO
 open System.Threading
 
-let windowWidth = 1024
+Display.init Default.windowWidth Default.windowHeight
 
-let windowHeight = 768
-
-Display.init windowWidth windowHeight
-
-Display.loadingScreen (float32 (windowWidth / 2)) (float32 (windowHeight / 2))
-
-let defaultGridWidth = 1000
-let defaultGridHeight = 1000
+Display.loadingScreen (float32 (Default.windowWidth / 2)) (float32 (Default.windowHeight / 2))
 
 let args = Environment.GetCommandLineArgs()
 
@@ -29,17 +23,19 @@ let gridWidth =
             let result = int args[1]
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid width to: {result}")
             result
-        with _ ->
+        with ex ->
+            let exceptionString = ex.ToString().Replace("\n", "\n\t")
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {defaultGridWidth}")
-            defaultGridWidth
+            Raylib.TraceLog(TraceLogLevel.Error, $"Detailed error information:\n\t{exceptionString}")
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {Default.gridWidth}")
+            Default.gridWidth
     else
         Raylib.TraceLog(
             TraceLogLevel.Info,
-            $"No width value provided. Setting the grid to the default width value: {defaultGridWidth}"
+            $"No width value provided. Setting the grid to the default width value: {Default.gridWidth}"
         )
 
-        defaultGridWidth
+        Default.gridWidth
 
 let gridHeight =
     if Array.length args = 3 then
@@ -47,56 +43,38 @@ let gridHeight =
             let result = int args[2]
             Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
             result
-        with _ ->
+        with ex ->
+            let exceptionString = ex.ToString().Replace("\n", "\n\t")
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[2]}")
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
+            Raylib.TraceLog(TraceLogLevel.Error, $"Detailed error information:\n\t{exceptionString}")
+            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {Default.gridHeight}")
 
-            defaultGridHeight
+            Default.gridHeight
     else
         Raylib.TraceLog(
             TraceLogLevel.Info,
-            $"No height value provided. Setting the grid to the default height value: {defaultGridHeight}"
+            $"No height value provided. Setting the grid to the default height value: {Default.gridHeight}"
         )
 
-        defaultGridHeight
+        Default.gridHeight
 
-let sleepTime =
-    if gridHeight <= 2000 || gridWidth <= 2000 then 34
-    else if gridHeight <= 5000 || gridWidth <= 5000 then 16
-    else if gridHeight <= 8000 || gridWidth <= 8000 then 8
-    else 4
-
-// 1 in 5 odds that a cell is living
-let oddsOfGettingLivingCell = 5
-
-let startingState =
-    ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
+let sleepTime = Default.sleepTimeCalculator gridWidth gridHeight
 
 let mainLock = new ReaderWriterLockSlim()
 
 let mutable gameRunningState = GameRunMode.Paused
 
-let canvasX = 25.0f
-let canvasY = 25.0f
-let cellSize = 25.0f
-
-let widthOffset = cellSize * 12.0f
-let heightOffset = cellSize * 2.0f
-
-let cameraPosX = 500.0f
-let cameraPosY = 500.0f
-
-let camera = new Camera(cameraPosX, cameraPosY)
+let camera = new Camera(Default.cameraPosX, Default.cameraPosY)
 
 let canvas =
     new Canvas(
-        canvasX,
-        canvasY,
-        float32 windowWidth - widthOffset,
-        float32 windowHeight - heightOffset,
+        Default.canvasX,
+        Default.canvasY,
+        float32 Default.windowWidth - Default.widthOffset,
+        float32 Default.windowHeight - Default.heightOffset,
         camera,
-        new Game(startingState),
-        cellSize
+        new Game(Default.startingState),
+        Default.cellSize
     )
 
 let controlManager = new ControlManager(canvas)
@@ -245,7 +223,7 @@ let clearCallback () =
 let fullscreenUpdate () =
     if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Y) then
         if raylibTrue (Raylib.IsWindowFullscreen()) then
-            Raylib.SetWindowSize(windowWidth, windowHeight)
+            Raylib.SetWindowSize(Default.windowWidth, Default.windowHeight)
         else
             let monitor = Raylib.GetCurrentMonitor()
             let monitorWidth = Raylib.GetMonitorWidth monitor
@@ -256,7 +234,7 @@ let fullscreenUpdate () =
 
 let saveButton =
     Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 400)
+    |> Button.position (Default.windowWidth - 200) (Default.windowHeight - 400)
     |> Button.size 50
     |> Button.text "Save"
     |> Button.onClickCallback saveFile
@@ -264,7 +242,7 @@ let saveButton =
 
 let loadButton =
     Button.create
-    |> Button.position (windowWidth - 100) (windowHeight - 400)
+    |> Button.position (Default.windowWidth - 100) (Default.windowHeight - 400)
     |> Button.size 50
     |> Button.text "Load"
     |> Button.onClickCallback openFile
@@ -272,7 +250,7 @@ let loadButton =
 
 let runButton =
     Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 200)
+    |> Button.position (Default.windowWidth - 200) (Default.windowHeight - 200)
     |> Button.size 50
     |> Button.onClickCallback toggleGame
     |> Button.onUpdateCallback update
@@ -280,7 +258,7 @@ let runButton =
 
 let advanceButton =
     Button.create
-    |> Button.position (windowWidth - 100) (windowHeight - 200)
+    |> Button.position (Default.windowWidth - 100) (Default.windowHeight - 200)
     |> Button.size 50
     |> Button.text "Next"
     |> Button.onClickCallback advanceOnce
@@ -289,7 +267,7 @@ let advanceButton =
 
 let resetButton =
     Button.create
-    |> Button.position (windowWidth - 100) (windowHeight - 100)
+    |> Button.position (Default.windowWidth - 100) (Default.windowHeight - 100)
     |> Button.size 50
     |> Button.text "Reset"
     |> Button.onClickCallback resetCallback
@@ -297,7 +275,7 @@ let resetButton =
 
 let clearButton =
     Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 100)
+    |> Button.position (Default.windowWidth - 200) (Default.windowHeight - 100)
     |> Button.size 50
     |> Button.text "Clear"
     |> Button.onClickCallback clearCallback
@@ -352,9 +330,11 @@ let gameUpdateLoop () =
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(windowWidth, windowWidth)
+let renderTexture =
+    Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+
 let mutable fps = 0.0
-let maxSamples = 60
+let maxSamples = Default.maxFpsSamples
 let frameTimes = Array.create maxSamples 0.0
 let mutable insertIndex = 0
 
