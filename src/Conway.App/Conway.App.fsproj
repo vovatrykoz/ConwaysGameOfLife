@@ -5,7 +5,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Preset.fs" />
-    <Compile Include="RaylibTypeConverter.fs" />
     <Compile Include="Input/Keyboard.fs" />
     <Compile Include="Input/Mouse.fs" />
     <Compile Include="Controls/Button.fs" />
@@ -13,12 +12,13 @@
     <Compile Include="Controls/GameArea.fs" />
     <Compile Include="Controls/Canvas.fs" />
     <Compile Include="Controls/ControlManager.fs" />
-    <Compile Include=".\File\ICanvasFileLoader.fs" />
-    <Compile Include=".\File\ICavnasFileSaver.fs" />
-    <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
-    <Compile Include=".\File\BinaryCanvasFileLoader.fs" />
-    <Compile Include="Draw.fs" />
-    <Compile Include="Display.fs" />
+    <Compile Include="File/ICanvasFileLoader.fs" />
+    <Compile Include="File/ICavnasFileSaver.fs" />
+    <Compile Include="File/BinaryCanvasFileSaver.fs" />
+    <Compile Include="File/BinaryCanvasFileLoader.fs" />
+    <Compile Include="Graphics/Draw.fs" />
+    <Compile Include="Graphics/Display.fs" />
+    <Compile Include="Utils/RaylibTypeConverter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
