@@ -1,6 +1,6 @@
 ﻿namespace Conway.App.File
 
-open Conway.App
+open Conway.App.Controls
 
 [<Interface>]
 type ICanvasFileSaver =

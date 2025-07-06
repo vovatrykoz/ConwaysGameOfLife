@@ -1,5 +1,6 @@
 open Conway.App
 open Conway.App.Aliases
+open Conway.App.Controls
 open Conway.App.File
 open Conway.Core
 open Conway.Encoding

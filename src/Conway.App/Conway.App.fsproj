@@ -6,17 +6,17 @@
   <ItemGroup>
     <Compile Include="Preset.fs" />
     <Compile Include="RaylibTypeConverter.fs" />
-    <Compile Include="Keyboard.fs" />
-    <Compile Include="Mouse.fs" />
-    <Compile Include="Button.fs" />
-    <Compile Include="Camera.fs" />
-    <Compile Include="GameArea.fs" />
-    <Compile Include="Canvas.fs" />
+    <Compile Include="Input/Keyboard.fs" />
+    <Compile Include="Input/Mouse.fs" />
+    <Compile Include="Controls/Button.fs" />
+    <Compile Include="Controls/Camera.fs" />
+    <Compile Include="Controls/GameArea.fs" />
+    <Compile Include="Controls/Canvas.fs" />
+    <Compile Include="Controls/ControlManager.fs" />
     <Compile Include=".\File\ICanvasFileLoader.fs" />
     <Compile Include=".\File\ICavnasFileSaver.fs" />
     <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
     <Compile Include=".\File\BinaryCanvasFileLoader.fs" />
-    <Compile Include="ControlManager.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="Display.fs" />
     <Compile Include="Program.fs" />

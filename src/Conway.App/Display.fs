@@ -1,5 +1,6 @@
 namespace Conway.App
 
+open Conway.App.Controls
 open Conway.Core
 open Raylib_cs
 open System.Numerics

@@ -1,5 +1,6 @@
-namespace Conway.App
+namespace Conway.App.Controls
 
+open Conway.App.Input
 open System.Collections.Generic
 open Raylib_cs
 

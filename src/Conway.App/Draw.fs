@@ -1,5 +1,6 @@
 namespace Conway.App
 
+open Conway.App.Controls
 open Raylib_cs
 
 module Draw =
