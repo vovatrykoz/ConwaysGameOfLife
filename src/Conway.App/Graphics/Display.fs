@@ -27,10 +27,10 @@ module Display =
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
-        let trueWidth = canvas.CellSize * canvas.Camera.ZoomFactor
-        let trueHeight = canvas.CellSize * canvas.Camera.ZoomFactor
+        let scaledCellWidth = canvas.CellSize * canvas.Camera.ZoomFactor
+        let scaledCellHeight = canvas.CellSize * canvas.Camera.ZoomFactor
 
-        let visibleCellSizeReciprocal = 1.0f / trueHeight
+        let visibleCellSizeReciprocal = 1.0f / scaledCellHeight
 
         let halfWidth = canvas.Width * 0.5f * visibleCellSizeReciprocal
         let halfHeight = canvas.Height * 0.5f * visibleCellSizeReciprocal
@@ -40,8 +40,17 @@ module Display =
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
-                let trueY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
+                let baseX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
+                let baseY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
+
+                let trueX = baseX * scaledCellWidth
+                let trueY = baseY * scaledCellHeight
+
+                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellWidth
+                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellHeight
+
+                let trueWidth = min scaledCellWidth (actualEndX - trueX)
+                let trueHeight = min scaledCellHeight (actualEndY - trueY)
 
                 match board[row, col] with
                 | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
