@@ -1,14 +1,18 @@
 namespace Conway.Core
 
-[<Measure>]
-type GameMode
+type GameRunMode =
+    | Paused = 0
+    | Step = 1
+    | Infinite = 2
 
-type Game(initialState: ConwayGrid) =
+type Game(initialState: ConwayGrid, generation: int) =
     let mutable _initialState = ConwayGrid.copyFrom initialState
 
     let mutable _internalState = initialState
 
-    let mutable _generation = 1
+    let mutable _generation = generation
+
+    new(initialState: ConwayGrid) = new Game(initialState, 1)
 
     member _.CurrentState
         with get () = _internalState
@@ -25,19 +29,19 @@ type Game(initialState: ConwayGrid) =
         with get () = _generation
         and private set newValue = _generation <- newValue
 
-    member this.Run(mode: int<GameMode>) =
+    member this.Run(mode: GameRunMode) =
         match mode with
-        | 2<GameMode> ->
+        | GameRunMode.Infinite ->
             while true do
                 this.CurrentState.AdvanceToNextState()
                 this.Generation <- this.Generation + 1
-        | 1<GameMode> ->
+        | GameRunMode.Step ->
             this.CurrentState.AdvanceToNextState()
             this.Generation <- this.Generation + 1
-        | 0<GameMode>
+        | GameRunMode.Paused
         | _ -> ()
 
-    member this.RunOneStep() = this.Run 1<GameMode>
+    member this.RunOneStep() = this.Run GameRunMode.Step
 
     member _.ResetState() =
         _internalState <- ConwayGrid.copyFrom _initialState
@@ -48,8 +52,8 @@ type Game(initialState: ConwayGrid) =
         _generation <- 1
 
     [<CompiledName("CreateFrom")>]
-    static member createFrom (currentState: ConwayGrid) (initialState: ConwayGrid) generationCounter =
-        let newGame = Game(ConwayGrid.copyFrom currentState)
+    static member createFrom (currentState: ConwayGrid) (initialState: ConwayGrid) (generationCounter: int) =
+        let newGame = new Game(ConwayGrid.copyFrom currentState)
         newGame.InitialState <- ConwayGrid.copyFrom initialState
         newGame.Generation <- generationCounter
         newGame

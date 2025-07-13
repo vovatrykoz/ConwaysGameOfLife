@@ -1,6 +1,6 @@
 namespace Conway.App.File
 
-open Conway.App
+open Conway.App.Controls
 open Conway.Encoding
 open System
 open System.IO
@@ -42,7 +42,7 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                 else if String.IsNullOrWhiteSpace path then
                     Error $"{nameof path} consisted of whitespaces only"
                 else
-                    let invalidCharSet = Path.GetInvalidPathChars() |> Set.ofSeq
+                    let invalidCharSet = Path.GetInvalidPathChars() |> Set.ofArray
 
                     let invalidChars =
                         path |> Seq.filter (fun c -> Set.contains c invalidCharSet) |> Seq.toArray
@@ -50,7 +50,7 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                     Error $"{nameof path} contained the following invalid characters: {invalidChars}"
             | :? PathTooLongException -> Error $"The provided {nameof path} was too long: {path}"
             | :? DirectoryNotFoundException -> Error $"The provided {nameof path} was not found: {path}"
-            | :? IOException -> Error $"An I/O error occurred while opening the file at {path}"
+            | :? IOException -> Error $"An I/O error occurred while opening the file at {path}. Does the file exist?"
             | :? Security.SecurityException -> Error $"The caller does not have enough permissions to open the file"
             | :? UnauthorizedAccessException ->
                 Error
@@ -59,4 +59,4 @@ type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
                     (2) {path} is a directory
                     (3) operation is not supported on the current platform"
             | :? NotSupportedException -> Error $"The provided {nameof path} has an invalid format: {path}"
-            | _ -> Error "Something went wrong. Please try again"
+            | _ -> Error "Something went wrong. See the log output for details"

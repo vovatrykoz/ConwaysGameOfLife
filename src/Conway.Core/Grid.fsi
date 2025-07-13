@@ -15,6 +15,10 @@ type ConwayGrid =
     /// </summary>
     member Board: int<CellStatus> array2d
 
+    member ActiveWidth: int
+
+    member ActiveHeight: int
+
     /// <summary>
     /// Advances the grid to the next state according to Conway's Game of Life rules.
     /// </summary>
@@ -53,13 +57,6 @@ type ConwayGrid =
     /// <param name="initializer">Function to determine the initial value of each cell.</param>
     [<CompiledName("Init")>]
     static member init: width: int -> height: int -> initializer: (int -> int -> int<CellStatus>) -> ConwayGrid
-
-    /// <summary>
-    /// Initializes a grid from a preset containing dimensions and an initializer function.
-    /// </summary>
-    /// <param name="preset">A tuple of width, height, and initializer function.</param>
-    [<CompiledName("InitFromPreset")>]
-    static member initFromPreset: preset: (int * int * (int -> int -> int<CellStatus>)) -> ConwayGrid
 
     /// <summary>
     /// Deep copies the state of the provided grid

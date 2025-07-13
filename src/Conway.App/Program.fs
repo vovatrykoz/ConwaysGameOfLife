@@ -1,243 +1,50 @@
-﻿open Conway.Core
 open Conway.App
-open Conway.App.Aliases
+open Conway.App.Config
+open Conway.App.Controls
+open Conway.App.Graphics
+open Conway.App.Utils.Alias
+open Conway.Core
 open Raylib_cs
 open System
 open System.Diagnostics
-open System.Threading
 
-let windowWidth = 1920
-
-let windowHeight = 1080
-
-Display.init windowWidth windowHeight
-
-Display.loadingScreen (float32 (windowWidth / 2)) (float32 (windowHeight / 2))
-
-let defaultGridWidth = 1000
-let defaultGridHeight = 1000
+Display.init Default.windowWidth Default.windowHeight
+Display.loadingScreen (float32 (Default.windowWidth / 2)) (float32 (Default.windowHeight / 2))
 
 let args = Environment.GetCommandLineArgs()
 
 let gridWidth =
-    if Array.length args >= 2 then
-        try
-            let result = int args[1]
-
-            if result < 0 then
-                raise (
-                    new ArgumentException $"The width cannot be negative. The parsed width value is equal to {result}"
-                )
-
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid width to: {result}")
-            result
-        with (ex: Exception) ->
-            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[1]}")
-
-            let exceptionString = ex.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default width value: {defaultGridWidth}")
-            defaultGridWidth
-    else
-        Raylib.TraceLog(
-            TraceLogLevel.Info,
-            $"No width value provided. Setting the grid to the default width value: {defaultGridWidth}"
-        )
-
-        defaultGridWidth
+    UserInput.tryReadArg args Default.gridWidthIndex "width" Default.gridWidth
 
 let gridHeight =
-    if Array.length args = 3 then
-        try
-            let result = int args[2]
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting grid height to: {result}")
+    UserInput.tryReadArg args Default.gridHeightIndex "height" Default.gridHeight
 
-            if result < 0 then
-                raise (
-                    new ArgumentException $"The height cannot be negative. The parsed height value is equal to {result}"
-                )
+let sleepTime = Default.sleepTimeCalculator gridWidth gridHeight
 
-            result
-        with (ex: Exception) ->
-            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the width value. Given: {args[2]}")
-
-            let exceptionString = ex.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Additional information:\n\t{exceptionString}")
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting the grid to the default height value: {defaultGridHeight}")
-
-            defaultGridHeight
-    else
-        Raylib.TraceLog(
-            TraceLogLevel.Info,
-            $"No height value provided. Setting the grid to the default height value: {defaultGridHeight}"
-        )
-
-        defaultGridHeight
-
-let sleepTime =
-    if gridHeight <= 2000 || gridWidth <= 2000 then 34
-    else if gridHeight <= 5000 || gridWidth <= 5000 then 16
-    else 0
-
-// 1 in 5 odds that a cell is living
-let oddsOfGettingLivingCell = 5
+let camera = new Camera(Default.cameraPosX, Default.cameraPosY)
 
 let startingState =
-    ConwayGrid.createRandomWithOdds gridWidth gridHeight oddsOfGettingLivingCell
-
-let game = new Game(startingState)
-
-let mainLock = new ReaderWriterLockSlim()
-
-let mutable gameRunningState = 0<GameMode>
-
-let canvasX = 25.0f
-let canvasY = 25.0f
-let cellSize = 25.0f
-
-let widthOffset = cellSize * 12.0f
-let heightOffset = cellSize * 2.0f
-
-let cameraPosX = 500.0f
-let cameraPosY = 500.0f
+    ConwayGrid.createRandomWithOdds gridWidth gridHeight Default.oddsOfGettingLivingCell
 
 let canvas =
     new Canvas(
-        canvasX,
-        canvasY,
-        float32 windowWidth - widthOffset,
-        float32 windowHeight - heightOffset,
-        cameraPosX,
-        cameraPosY,
-        game,
-        cellSize
+        Default.canvasX,
+        Default.canvasY,
+        float32 Default.windowWidth - Default.widthOffset,
+        float32 Default.windowHeight - Default.heightOffset,
+        camera,
+        new Game(startingState),
+        Default.cellSize
     )
 
 let controlManager = new ControlManager(canvas)
 
-let toggleGame () =
-    try
-        mainLock.EnterWriteLock()
+let currentContext =
+    new ApplicationContext(GameRunMode.Paused, controlManager.Canvas)
 
-        gameRunningState <-
-            match gameRunningState with
-            | 0<GameMode> -> 2<GameMode>
-            | _ -> 0<GameMode>
-    finally
-        mainLock.ExitWriteLock()
-
-let advanceOnce () =
-    try
-        mainLock.EnterReadLock()
-
-        match gameRunningState with
-        | 0<GameMode> -> game.RunOneStep()
-        | _ -> ()
-    finally
-        mainLock.ExitReadLock()
-
-let update (button: Button) =
-    try
-        mainLock.EnterReadLock()
-
-        match gameRunningState with
-        | 0<GameMode> -> button.Text <- "Run"
-        | _ -> button.Text <- "Pause"
-    finally
-        mainLock.ExitReadLock()
-
-let updateOnRun (button: Button) =
-    try
-        mainLock.EnterReadLock()
-
-        match gameRunningState with
-        | 0<GameMode> -> button.IsActive <- true
-        | _ -> button.IsActive <- false
-    finally
-        mainLock.ExitReadLock()
-
-let updateOnRunBack (button: Button) =
-    updateOnRun button
-
-    if button.IsActive && game.Generation <= 1 then
-        button.IsActive <- false
-
-let resetCallback () =
-    try
-        mainLock.EnterReadLock()
-
-        match gameRunningState with
-        | 0<GameMode> -> game.ResetState()
-        | _ -> ()
-
-    finally
-        mainLock.ExitReadLock()
-
-let clearCallback () =
-    try
-        mainLock.EnterReadLock()
-
-        match gameRunningState with
-        | 0<GameMode> -> game.CurrentState <- ConwayGrid.createDead gridWidth gridHeight
-        | _ -> ()
-
-    finally
-        mainLock.ExitReadLock()
-
-let toggleButton =
-    Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 300)
-    |> Button.size 50
-    |> Button.onClickCallback toggleGame
-    |> Button.onUpdateCallback update
-    |> Button.shortcut KeyboardKey.Space
-
-let advanceButton =
-    Button.create
-    |> Button.position (windowWidth - 100) (windowHeight - 200)
-    |> Button.size 50
-    |> Button.text "Next"
-    |> Button.onClickCallback advanceOnce
-    |> Button.onUpdateCallback updateOnRun
-    |> Button.shortcut KeyboardKey.Right
-
-let resetButton =
-    Button.create
-    |> Button.position (windowWidth - 100) (windowHeight - 100)
-    |> Button.size 50
-    |> Button.text "Reset"
-    |> Button.onClickCallback resetCallback
-    |> Button.onUpdateCallback updateOnRun
-
-let clearButton =
-    Button.create
-    |> Button.position (windowWidth - 200) (windowHeight - 100)
-    |> Button.size 50
-    |> Button.text "Clear"
-    |> Button.onClickCallback clearCallback
-    |> Button.onUpdateCallback updateOnRun
-
-let buttons = [| toggleButton; advanceButton; resetButton; clearButton |]
-controlManager.Buttons.AddRange buttons
-
-let keyboardActions = [|
-    KeyboardKey.W, (fun _ -> controlManager.Canvas.Camera.MoveCameraUp 1.0f)
-    KeyboardKey.A, (fun _ -> controlManager.Canvas.Camera.MoveCameraLeft 1.0f)
-    KeyboardKey.S, (fun _ -> controlManager.Canvas.Camera.MoveCameraDown 1.0f)
-    KeyboardKey.D, (fun _ -> controlManager.Canvas.Camera.MoveCameraRight 1.0f)
-    KeyboardKey.Z, (fun _ -> controlManager.Canvas.Camera.ZoomIn 0.2f)
-    KeyboardKey.X, (fun _ -> controlManager.Canvas.Camera.ZoomOut 0.2f)
-|]
-
-let keyboardShiftActions = [|
-    KeyboardKey.W, (fun _ -> controlManager.Canvas.Camera.MoveCameraUp 5.0f)
-    KeyboardKey.A, (fun _ -> controlManager.Canvas.Camera.MoveCameraLeft 5.0f)
-    KeyboardKey.S, (fun _ -> controlManager.Canvas.Camera.MoveCameraDown 5.0f)
-    KeyboardKey.D, (fun _ -> controlManager.Canvas.Camera.MoveCameraRight 5.0f)
-|]
-
-controlManager.KeyActions.AddRange keyboardActions
-controlManager.ShiftKeyActions.AddRange keyboardShiftActions
+controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
+controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
+controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
 
 let gameUpdateLoop () =
     let mutable shouldRun = false
@@ -247,27 +54,25 @@ let gameUpdateLoop () =
             do! Async.Sleep sleepTime
 
             shouldRun <-
-                try
-                    mainLock.EnterWriteLock()
-
-                    match gameRunningState with
-                    | 2<GameMode> -> true
-                    | 1<GameMode> ->
-                        gameRunningState <- 0<GameMode>
-                        true
-                    | _ -> false
-                finally
-                    mainLock.ExitWriteLock()
+                match currentContext.GameMode with
+                | GameRunMode.Infinite -> true
+                | GameRunMode.Step ->
+                    currentContext.GameMode <- GameRunMode.Paused
+                    true
+                | GameRunMode.Paused
+                | _ -> false
 
             if shouldRun then
-                game.RunOneStep()
+                canvas.Game.RunOneStep()
     }
 
 gameUpdateLoop () |> Async.Start
 
-let renderTexture = Raylib.LoadRenderTexture(windowWidth, windowHeight)
+let renderTexture =
+    Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+
 let mutable fps = 0.0
-let maxSamples = 60
+let maxSamples = Default.maxFpsSamples
 let frameTimes = Array.create maxSamples 0.0
 let mutable insertIndex = 0
 
@@ -278,14 +83,13 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.render game controlManager renderTexture (int fps) (Raylib.GetMousePosition())
+    Display.mainWindow controlManager renderTexture (int fps) (Raylib.GetMousePosition())
 
     let frameEnd = stopwatch.Elapsed.TotalSeconds
     let frameTime = frameEnd - frameStart
 
     frameTimes[insertIndex] <- frameTime
     insertIndex <- (insertIndex + 1) % maxSamples
-
     fps <- 1.0 / (frameTimes |> Array.average)
 
 Raylib.UnloadRenderTexture renderTexture

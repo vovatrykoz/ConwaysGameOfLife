@@ -4,21 +4,27 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Preset.fs" />
-    <Compile Include="RaylibTypeConverter.fs" />
-    <Compile Include="Keyboard.fs" />
-    <Compile Include="Mouse.fs" />
-    <Compile Include="Button.fs" />
-    <Compile Include="Camera.fs" />
-    <Compile Include="GameArea.fs" />
-    <Compile Include="Canvas.fs" />
-    <Compile Include=".\File\ICanvasFileLoader.fs" />
-    <Compile Include=".\File\ICavnasFileSaver.fs" />
-    <Compile Include=".\File\BinaryCanvasFileSaver.fs" />
-    <Compile Include=".\File\BinaryCanvasFileLoader.fs" />
-    <Compile Include="Controls.fs" />
-    <Compile Include="Draw.fs" />
-    <Compile Include="Display.fs" />
+    <Compile Include="Utils/RaylibTypeConverter.fs" />
+    <Compile Include="Input/Keyboard.fs" />
+    <Compile Include="Input/Mouse.fs" />
+    <Compile Include="Controls/Button.fs" />
+    <Compile Include="Controls/Camera.fs" />
+    <Compile Include="Controls/GameArea.fs" />
+    <Compile Include="Controls/Canvas.fs" />
+    <Compile Include="Controls\FilePicker.fs" />
+    <Compile Include="Controls/ControlManager.fs" />
+    <Compile Include="File/ICanvasFileLoader.fs" />
+    <Compile Include="File/ICavnasFileSaver.fs" />
+    <Compile Include="File/BinaryCanvasFileSaver.fs" />
+    <Compile Include="File/BinaryCanvasFileLoader.fs" />
+    <Compile Include="Graphics/Draw.fs" />
+    <Compile Include="Graphics/Display.fs" />
+    <Compile Include="Config.fs" />
+    <Compile Include="ApplicationContext.fs" />
+    <Compile Include="Callbacks.fs" />
+    <Compile Include="Buttons.fs" />
+    <Compile Include="Hotkeys.fs" />
+    <Compile Include="UserInput.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -26,6 +32,7 @@
     <ProjectReference Include="..\Conway.Encoding\Conway.Encoding.fsproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="GtkSharp" Version="3.24.24.95" />
     <PackageReference Include="Raylib-cs" Version="7.0.1" />
   </ItemGroup>
   <PropertyGroup>

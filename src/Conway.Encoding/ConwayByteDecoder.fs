@@ -2,7 +2,6 @@ namespace Conway.Encoding
 
 open Conway.Core
 open System
-open System.Collections.Generic
 
 type ConwayByteDecoder() =
 
@@ -11,6 +10,8 @@ type ConwayByteDecoder() =
     static member val RowValueFirstByteIndex = 0 with get
 
     static member val ColumnValueFirstByteIndex = 4 with get
+
+    static member val GenerationCounterFirstByteIndex = 8 with get
 
     static member val GridFirstByteIndex = 12 with get
 
@@ -24,6 +25,12 @@ type ConwayByteDecoder() =
         let cols = BitConverter.ToInt32 colSlice
 
         rows, cols
+
+    member _.DecodeGeneration(bytes: ReadOnlySpan<byte>) =
+        let generationCounterSlice =
+            bytes.Slice(ConwayByteDecoder.GenerationCounterFirstByteIndex, sizeof<int32>)
+
+        BitConverter.ToInt32 generationCounterSlice
 
     member this.DecodeGrid(bytes: ReadOnlySpan<byte>) =
         let rows, cols = this.DecodeDimensions bytes
@@ -49,5 +56,5 @@ type ConwayByteDecoder() =
     interface IConwayByteDecoder with
         member this.Decode(bytes: byte array) =
             let grid = this.DecodeGrid(ReadOnlySpan bytes)
-
-            Game grid
+            let generation = this.DecodeGeneration(ReadOnlySpan bytes)
+            new Game(grid, generation)

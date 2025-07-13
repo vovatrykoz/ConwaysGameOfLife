@@ -31,6 +31,10 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     member this.Board = this.Buffers[this.ActiveBufferIndex]
 
+    member this.ActiveWidth = Array2D.length2 this.Board - 2
+
+    member this.ActiveHeight = Array2D.length1 this.Board - 2
+
     [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
     static member inline private countLivingNeighbors
         rowAbove
@@ -128,9 +132,6 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
                     initializer (i - 1) (j - 1))
 
         new ConwayGrid(initArr)
-
-    [<CompiledName("InitFromPreset")>]
-    static member initFromPreset preset = preset |||> ConwayGrid.init
 
     [<CompiledName("CopyFrom")>]
     static member copyFrom(otherGrid: ConwayGrid) =
