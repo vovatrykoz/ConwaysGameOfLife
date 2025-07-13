@@ -22,7 +22,7 @@ module Callbacks =
                 Directory.CreateDirectory saveFilesPath |> ignore
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
-            let newFile = "./Saves/Test.cgol"
+            let newFile = "./Saves/Test.gol"
             let encoder = new ConwayByteEncoder()
             let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
 
@@ -63,7 +63,7 @@ module Callbacks =
             |> Seq.map (fun str -> str.Split "\\" |> List.ofArray |> List.rev |> List.head)
             |> Display.openFileDialogue ctx.Texture
 
-            let newFile = "./Saves/Test.cgol"
+            let newFile = "./Saves/Test.gol"
             let decoder = new ConwayByteDecoder()
             let fileLoader = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
 
