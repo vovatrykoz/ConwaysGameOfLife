@@ -8,7 +8,7 @@ open System.Numerics
 module Display =
     let posVec = Vector2(0.0f, 0.0f)
 
-    let textureFlipRec width height =
+    let inline textureFlipRec width height =
         Rectangle(posVec, Vector2(width, -height))
 
     let init width height =
@@ -98,7 +98,7 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let render (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
+    let mainWindow (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
         let canvas = controls.Canvas
 
         Raylib.BeginTextureMode texture

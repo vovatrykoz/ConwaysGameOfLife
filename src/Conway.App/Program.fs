@@ -83,7 +83,7 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.render controlManager renderTexture (int fps) (Raylib.GetMousePosition())
+    Display.mainWindow controlManager renderTexture (int fps) (Raylib.GetMousePosition())
 
     let frameEnd = stopwatch.Elapsed.TotalSeconds
     let frameTime = frameEnd - frameStart
