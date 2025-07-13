@@ -12,7 +12,7 @@ module Display =
         Rectangle(posVec, Vector2(width, -height))
 
     let init width height =
-        Raylib.SetConfigFlags ConfigFlags.ResizableWindow
+        // Raylib.SetConfigFlags ConfigFlags.ResizableWindow
         Raylib.SetTargetFPS 120
         Raylib.InitWindow(width, height, "Conway's game of life")
 
