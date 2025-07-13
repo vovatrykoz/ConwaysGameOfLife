@@ -53,13 +53,15 @@ module Callbacks =
                 Directory.CreateDirectory saveFilesPath |> ignore
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
-            Directory.EnumerateFiles saveFilesPath
-            |> Seq.toArray
-            |> Array.iter (fun file ->
-                let creationTime = File.GetLastWriteTimeUtc file
-                Raylib.TraceLog(TraceLogLevel.Info, $"Found {file}, last accessed at {creationTime}"))
+            let allFiles = Directory.EnumerateFiles saveFilesPath
 
-            Display.openFileDialogue ctx.Texture
+            allFiles
+            |> Seq.iteri (fun i fileName -> Raylib.TraceLog(TraceLogLevel.Info, $"Found file: {i} {fileName}"))
+
+            allFiles
+            |> Seq.map (fun filePath -> filePath.Split "/" |> List.ofArray |> List.rev |> List.head)
+            |> Seq.map (fun str -> str.Split "\\" |> List.ofArray |> List.rev |> List.head)
+            |> Display.openFileDialogue ctx.Texture
 
             let newFile = "./Saves/Test.cgol"
             let decoder = new ConwayByteDecoder()

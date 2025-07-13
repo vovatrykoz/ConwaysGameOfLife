@@ -99,7 +99,7 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let openFileDialogue (texture: RenderTexture2D) =
+    let openFileDialogue (texture: RenderTexture2D) fileNames =
         let mutable isCancelled = false
 
         while not isCancelled do
@@ -109,7 +109,8 @@ module Display =
                 Raylib.BeginTextureMode texture
                 Raylib.ClearBackground Color.White
 
-                Draw.textBox 10.0f 10.0f 50 "Bruh"
+                fileNames
+                |> Seq.iteri (fun i item -> Draw.textBox 10.0f (10.0f + 10.0f * float32 i) 50 item)
 
                 Raylib.EndTextureMode()
 
