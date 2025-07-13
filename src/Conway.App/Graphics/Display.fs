@@ -43,18 +43,21 @@ module Display =
                 let baseX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
                 let baseY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
 
-                let trueX = baseX * scaledCellWidth
-                let trueY = baseY * scaledCellHeight
+                let trueX = canvas.CellSize + (baseX - 1.0f) * scaledCellWidth
+                let trueY = canvas.CellSize + (baseY - 1.0f) * scaledCellHeight
 
                 let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellWidth
                 let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellHeight
 
-                let trueWidth = min scaledCellWidth (actualEndX - trueX)
-                let trueHeight = min scaledCellHeight (actualEndY - trueY)
+                let trueWidth = max (min scaledCellWidth (actualEndX - trueX)) 0.0f
+                let trueHeight = max (min scaledCellHeight (actualEndY - trueY)) 0.0f
 
-                match board[row, col] with
-                | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
-                | _ -> Draw.livingCell trueX trueY trueWidth trueHeight
+                if trueWidth = 0.0f || trueHeight = 0.0f then
+                    ()
+                else
+                    match board[row, col] with
+                    | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
+                    | _ -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =
         for button in controls.Buttons do

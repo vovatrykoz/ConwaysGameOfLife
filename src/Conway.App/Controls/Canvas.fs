@@ -102,8 +102,11 @@ type Canvas(x: float32, y: float32, width: float32, height: float32, camera: Cam
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let trueStartX = (float32 col - upperLeftCorner.X) * visibleCellSize
-                let trueStartY = (float32 row - upperLeftCorner.Y) * visibleCellSize
+                let baseX = float32 col - upperLeftCorner.X
+                let baseY = float32 row - upperLeftCorner.Y
+
+                let trueStartX = this.CellSize + (baseX - 1.0f) * visibleCellSize
+                let trueStartY = this.CellSize + (baseY - 1.0f) * visibleCellSize
                 let trueEndX = trueStartX + visibleCellSize
                 let trueEndY = trueStartY + visibleCellSize
 
