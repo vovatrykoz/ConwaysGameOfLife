@@ -110,7 +110,7 @@ module Display =
                 Raylib.ClearBackground Color.White
 
                 fileNames
-                |> Seq.iteri (fun i item -> Draw.textBox 10.0f (10.0f + 10.0f * float32 i) 50 item)
+                |> Seq.iteri (fun i item -> Draw.textBox 10.0f (10.0f + 60.0f * float32 i) 50 item)
 
                 Raylib.EndTextureMode()
 
