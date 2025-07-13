@@ -53,14 +53,8 @@ module Callbacks =
                 Directory.CreateDirectory saveFilesPath |> ignore
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
-            let allFiles = Directory.EnumerateFiles saveFilesPath
-
-            allFiles
-            |> Seq.iteri (fun i fileName -> Raylib.TraceLog(TraceLogLevel.Info, $"Found file: {i} {fileName}"))
-
-            allFiles
-            |> Seq.map (fun filePath -> filePath.Split "/" |> List.ofArray |> List.rev |> List.head)
-            |> Seq.map (fun str -> str.Split "\\" |> List.ofArray |> List.rev |> List.head)
+            Directory.GetFiles saveFilesPath
+            |> Array.map (fun fullPath -> Path.GetFileName fullPath)
             |> Display.openFileDialogue ctx.Texture
 
             let newFile = "./Saves/Test.gol"
