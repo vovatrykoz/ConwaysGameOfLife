@@ -1,6 +1,7 @@
 namespace Conway.App.Graphics
 
 open Conway.App.Controls
+open Conway.App.Input
 open Conway.Core
 open Raylib_cs
 open System.Numerics
@@ -97,6 +98,31 @@ module Display =
             Draw.textBox x y 48 "Loading..."
 
             Raylib.EndDrawing()
+
+    let openFileDialogue (texture: RenderTexture2D) =
+        let mutable isCancelled = false
+
+        while not isCancelled do
+            if Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape then
+                isCancelled <- true
+            else
+                Raylib.BeginTextureMode texture
+                Raylib.ClearBackground Color.White
+
+                Draw.textBox 10.0f 10.0f 50 "Bruh"
+
+                Raylib.EndTextureMode()
+
+                Raylib.BeginDrawing()
+
+                Raylib.DrawTextureRec(
+                    texture.Texture,
+                    textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+                    posVec,
+                    Color.White
+                )
+
+                Raylib.EndDrawing()
 
     let mainWindow (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
         let canvas = controls.Canvas

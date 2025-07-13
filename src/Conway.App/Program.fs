@@ -39,8 +39,11 @@ let canvas =
 
 let controlManager = new ControlManager(canvas)
 
+let renderTexture =
+    Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+
 let currentContext =
-    new ApplicationContext(GameRunMode.Paused, controlManager.Canvas)
+    new ApplicationContext(GameRunMode.Paused, controlManager.Canvas, renderTexture)
 
 controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
 controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
@@ -67,9 +70,6 @@ let gameUpdateLoop () =
     }
 
 gameUpdateLoop () |> Async.Start
-
-let renderTexture =
-    Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
 
 let mutable fps = 0.0
 let maxSamples = Default.maxFpsSamples

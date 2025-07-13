@@ -11,6 +11,8 @@ open System
 open System.IO
 
 module Callbacks =
+    open Conway.App.Graphics
+
     let saveFile (ctx: ApplicationContext) =
         try
             let saveFilesPath = Environment.CurrentDirectory + "/Saves"
@@ -56,6 +58,8 @@ module Callbacks =
             |> Array.iter (fun file ->
                 let creationTime = File.GetLastWriteTimeUtc file
                 Raylib.TraceLog(TraceLogLevel.Info, $"Found {file}, last accessed at {creationTime}"))
+
+            Display.openFileDialogue ctx.Texture
 
             let newFile = "./Saves/Test.cgol"
             let decoder = new ConwayByteDecoder()
