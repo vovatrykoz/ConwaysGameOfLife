@@ -37,13 +37,13 @@ let canvas =
         Default.cellSize
     )
 
-let controlManager = new ControlManager(canvas)
+let controlManager = new ControlManager()
 
 let renderTexture =
     Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
 
 let currentContext =
-    new ApplicationContext(GameRunMode.Paused, controlManager.Canvas, renderTexture)
+    new ApplicationContext(GameRunMode.Paused, canvas, renderTexture)
 
 controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
 controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
@@ -83,7 +83,8 @@ while not (raylibTrue (Raylib.WindowShouldClose())) do
 
     controlManager.ReadInput()
     controlManager.UpdateControls()
-    Display.mainWindow controlManager renderTexture (int fps) (Raylib.GetMousePosition())
+    canvas.ProcessDrawableArea()
+    Display.mainWindow controlManager canvas renderTexture (int fps) (Raylib.GetMousePosition())
 
     let frameEnd = stopwatch.Elapsed.TotalSeconds
     let frameTime = frameEnd - frameStart

@@ -10,10 +10,10 @@
     <Compile Include="Controls/Button.fs" />
     <Compile Include="Controls/Camera.fs" />
     <Compile Include="Controls/GameArea.fs" />
-    <Compile Include="Controls/Canvas.fs" />
     <Compile Include="Controls/FilePicker.fs" />
     <Compile Include="Controls/ItemSelector.fs" />
     <Compile Include="Controls/ControlManager.fs" />
+    <Compile Include="Canvas.fs" />
     <Compile Include="File/ICanvasFileLoader.fs" />
     <Compile Include="File/ICavnasFileSaver.fs" />
     <Compile Include="File/BinaryCanvasFileSaver.fs" />

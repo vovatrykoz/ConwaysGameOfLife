@@ -1,5 +1,6 @@
 namespace Conway.App.Graphics
 
+open Conway.App
 open Conway.App.Controls
 open Conway.App.Input
 open Conway.Core
@@ -23,18 +24,17 @@ module Display =
         let cols = Array2D.length2 board
 
         let struct (visibleStartPoint, visibleEndPoint) = canvas.CalculateVisibleRange()
+
         let startRow = int visibleStartPoint.Y
         let startCol = int visibleStartPoint.X
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
-        let scaledCellWidth = canvas.CellSize * canvas.Camera.ZoomFactor
-        let scaledCellHeight = canvas.CellSize * canvas.Camera.ZoomFactor
+        let scaledCellSize = canvas.CellSize * canvas.Camera.ZoomFactor
+        let scaledCellSizeReciprocal = 1.0f / scaledCellSize
 
-        let visibleCellSizeReciprocal = 1.0f / scaledCellHeight
-
-        let halfWidth = canvas.Width * 0.5f * visibleCellSizeReciprocal
-        let halfHeight = canvas.Height * 0.5f * visibleCellSizeReciprocal
+        let halfWidth = canvas.Width * 0.5f * scaledCellSizeReciprocal
+        let halfHeight = canvas.Height * 0.5f * scaledCellSizeReciprocal
 
         let upperLeftCornerX = canvas.Camera.Position.X - halfWidth
         let upperLeftCornerY = canvas.Camera.Position.Y - halfHeight
@@ -44,14 +44,14 @@ module Display =
                 let baseX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
                 let baseY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
 
-                let trueX = canvas.CellSize + (baseX - 1.0f) * scaledCellWidth
-                let trueY = canvas.CellSize + (baseY - 1.0f) * scaledCellHeight
+                let trueX = canvas.CellSize + (baseX - 1.0f) * scaledCellSize
+                let trueY = canvas.CellSize + (baseY - 1.0f) * scaledCellSize
 
-                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellWidth
-                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellHeight
+                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellSize
+                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellSize
 
-                let trueWidth = max (min scaledCellWidth (actualEndX - trueX)) 0.0f
-                let trueHeight = max (min scaledCellHeight (actualEndY - trueY)) 0.0f
+                let trueWidth = max (min scaledCellSize (actualEndX - trueX)) 0.0f
+                let trueHeight = max (min scaledCellSize (actualEndY - trueY)) 0.0f
 
                 if trueWidth = 0.0f || trueHeight = 0.0f then
                     ()
@@ -125,9 +125,7 @@ module Display =
 
                 Raylib.EndDrawing()
 
-    let mainWindow (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
-        let canvas = controls.Canvas
-
+    let mainWindow (controls: ControlManager) (canvas: Canvas) (texture: RenderTexture2D) fps mousePos =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 

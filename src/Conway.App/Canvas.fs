@@ -1,6 +1,7 @@
-namespace Conway.App.Controls
+namespace Conway.App
 
 open Conway.App.Input
+open Conway.App.Controls
 open Conway.Core
 open Raylib_cs
 open System.Numerics
@@ -89,32 +90,32 @@ type Canvas(x: float32, y: float32, width: float32, height: float32, camera: Cam
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
 
-        let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
-        let visibleCellSizeReciprocal = 1.0f / visibleCellSize
+        let scaledCellSize = this.CellSize * this.Camera.ZoomFactor
+        let scaledCellSizeReciprocal = 1.0f / scaledCellSize
 
-        let halfWidth = this.Width * 0.5f * visibleCellSizeReciprocal
-        let halfHeight = this.Height * 0.5f * visibleCellSizeReciprocal
+        let halfWidth = this.Width * 0.5f * scaledCellSizeReciprocal
+        let halfHeight = this.Height * 0.5f * scaledCellSizeReciprocal
 
         let upperLeftCorner =
             Vector2(this.Camera.Position.X - halfWidth, this.Camera.Position.Y - halfHeight)
 
-        let distanceToBorder = (visibleEndPoint - upperLeftCorner) * visibleCellSize
+        let distanceToBorder = (visibleEndPoint - upperLeftCorner) * scaledCellSize
 
         for row = startRow to endRow do
             for col = startCol to endCol do
                 let baseX = float32 col - upperLeftCorner.X
                 let baseY = float32 row - upperLeftCorner.Y
 
-                let trueStartX = this.CellSize + (baseX - 1.0f) * visibleCellSize
-                let trueStartY = this.CellSize + (baseY - 1.0f) * visibleCellSize
-                let trueEndX = trueStartX + visibleCellSize
-                let trueEndY = trueStartY + visibleCellSize
+                let trueStartX = this.CellSize + (baseX - 1.0f) * scaledCellSize
+                let trueStartY = this.CellSize + (baseY - 1.0f) * scaledCellSize
+                let trueEndX = trueStartX + scaledCellSize
+                let trueEndY = trueStartY + scaledCellSize
 
-                let startX = max trueStartX visibleCellSize
-                let startY = max trueStartY visibleCellSize
+                let startX = max trueStartX scaledCellSize
+                let startY = max trueStartY scaledCellSize
 
-                let endX = min (min (startX + visibleCellSize) distanceToBorder.X) trueEndX
-                let endY = min (min (startY + visibleCellSize) distanceToBorder.Y) trueEndY
+                let endX = min (min (startX + scaledCellSize) distanceToBorder.X) trueEndX
+                let endY = min (min (startY + scaledCellSize) distanceToBorder.Y) trueEndY
 
                 if GameArea.IsLeftPressedWithShift startX startY endX endY then
                     GameArea.makeAlive row col this.Game
