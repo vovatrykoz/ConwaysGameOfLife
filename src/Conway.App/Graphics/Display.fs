@@ -67,40 +67,62 @@ module Display =
             | false -> ()
 
     let private renderGenerationCounter (canvas: Canvas) =
-        Draw.textBox
+        Draw.label
             (canvas.Position.X + canvas.Width + 5.0f)
             canvas.Position.Y
             24
             $"Generation {canvas.Game.Generation}"
+            30
+            30
+            Color.Black
+            Color.White
 
     let private renderFpsCounter (canvas: Canvas) fps =
-        Draw.textBox (canvas.Position.X + canvas.Width + 5.0f) (canvas.Position.Y + 50.0f) 24 $"FPS {fps}"
+        Draw.label
+            (canvas.Position.X + canvas.Width + 5.0f)
+            (canvas.Position.Y + 50.0f)
+            24
+            $"FPS {fps}"
+            30
+            30
+            Color.Black
+            Color.RayWhite
 
     let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
-        Draw.textBox
+        Draw.label
             (canvas.Position.X + canvas.Width + 5.0f)
             (canvas.Position.Y + 170.0f)
             24
             $"Mouse:\nX {mousePos.X} Y {mousePos.Y}"
+            30
+            30
+            Color.Black
+            Color.RayWhite
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
-        Draw.textBox
+        Draw.label
             (canvas.Position.X + canvas.Width + 5.0f)
             (canvas.Position.Y + 100.0f)
             24
             $"Camera:\nX: {canvas.Camera.Position.X:F2} Y: {canvas.Camera.Position.Y:F2}"
+            30
+            30
+            Color.Black
+            Color.RayWhite
 
     let loadingScreen x y =
         for _ in 0..10 do
             Raylib.BeginDrawing()
             Raylib.ClearBackground Color.White
 
-            Draw.textBox x y 48 "Loading..."
+            Draw.label x y 48 "Loading..." 50 50 Color.Black Color.RayWhite
 
             Raylib.EndDrawing()
 
-    let openFileDialogue (texture: RenderTexture2D) fileNames =
+    let openFileDialogue (texture: RenderTexture2D) (files: seq<FileData>) =
         let mutable isCancelled = false
+
+        let filePicker = new FilePicker(files)
 
         while not isCancelled do
             if Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape then
@@ -109,8 +131,35 @@ module Display =
                 Raylib.BeginTextureMode texture
                 Raylib.ClearBackground Color.White
 
-                fileNames
-                |> Seq.iteri (fun i item -> Draw.textBox 10.0f (10.0f + 60.0f * float32 i) 50 item)
+                filePicker.SelectAt 0
+
+                filePicker.Files
+                |> Seq.iteri (fun i currentFile ->
+                    let currentItemIsSelected =
+                        match filePicker.CurrentSelection with
+                        | None -> false
+                        | Some file -> file = currentFile
+
+                    if currentItemIsSelected then
+                        Draw.label
+                            10.0f
+                            (10.0f + 60.0f * float32 i)
+                            50
+                            currentFile.Name
+                            1000
+                            60
+                            Color.RayWhite
+                            Color.Black
+                    else
+                        Draw.label
+                            10.0f
+                            (10.0f + 60.0f * float32 i)
+                            50
+                            currentFile.Name
+                            1000
+                            60
+                            Color.Black
+                            Color.RayWhite)
 
                 Raylib.EndTextureMode()
 

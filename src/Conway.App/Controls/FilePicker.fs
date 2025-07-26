@@ -2,7 +2,6 @@ namespace Conway.App.Controls
 
 open System
 open System.Collections.Generic
-open System.Numerics
 
 [<ReferenceEquality; NoComparison>]
 type FileData = {
@@ -17,9 +16,21 @@ type FileData = {
         Date = date
     }
 
-type FilePicker(x: float32, y: float32) =
-    member val Position = Vector2(x, y) with get, set
+type FilePicker(files: seq<FileData>) =
+    let mutable _currentSelection: FileData option = None
 
-    member val Files = new List<FileData>() with get, set
+    new() = new FilePicker(Seq.empty)
 
-    member val CurrentSelection: FileData option = None with get, set
+    member val Files = new List<FileData>(files) with get, set
+
+    member _.CurrentSelection
+        with get () = _currentSelection
+        and private set value = _currentSelection <- value
+
+    member this.SelectAt index =
+        if index < 0 || index >= this.Files.Count then
+            this.CurrentSelection <- None
+        else
+            this.CurrentSelection <- Some(this.Files.[index])
+
+    member this.ClearSelection() = this.CurrentSelection <- None

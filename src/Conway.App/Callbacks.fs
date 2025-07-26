@@ -54,7 +54,10 @@ module Callbacks =
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
             Directory.GetFiles saveFilesPath
-            |> Array.map (fun fullPath -> Path.GetFileName fullPath)
+            |> Array.map (fun fullPath ->
+                let fileName = Path.GetFileName fullPath
+                let lastModified = File.GetLastWriteTime fullPath
+                FileData.createRecord fileName fullPath lastModified)
             |> Display.openFileDialogue ctx.Texture
 
             let newFile = "./Saves/Test.gol"
@@ -89,11 +92,7 @@ module Callbacks =
                 )
         with ex ->
             let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
-
-            Raylib.TraceLog(
-                TraceLogLevel.Error,
-                $"Failed to create a directory with the following error: {excepionMessage}"
-            )
+            Raylib.TraceLog(TraceLogLevel.Error, $"Failed to load the save with the following error: {excepionMessage}")
 
     let toggleGame (ctx: ApplicationContext) =
         let currentGameMode = ctx.GameMode
