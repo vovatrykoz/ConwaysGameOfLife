@@ -119,60 +119,36 @@ module Display =
 
             Raylib.EndDrawing()
 
-    let openFileDialogue (texture: RenderTexture2D) (files: seq<FileData>) =
-        let mutable isCancelled = false
+    let openFileDialogue (texture: RenderTexture2D) (filePicker: FilePicker) =
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.White
 
-        let filePicker = new FilePicker(files)
+        filePicker.SelectAt 0
 
-        while not isCancelled do
-            if Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape then
-                isCancelled <- true
+        filePicker.Files
+        |> Seq.iteri (fun i currentFile ->
+            let currentItemIsSelected =
+                match filePicker.CurrentSelection with
+                | None -> false
+                | Some file -> file = currentFile
+
+            if currentItemIsSelected then
+                Draw.label 10.0f (10.0f + 60.0f * float32 i) 50 currentFile.Name 1000 60 Color.RayWhite Color.Black
             else
-                Raylib.BeginTextureMode texture
-                Raylib.ClearBackground Color.White
+                Draw.label 10.0f (10.0f + 60.0f * float32 i) 50 currentFile.Name 1000 60 Color.Black Color.RayWhite)
 
-                filePicker.SelectAt 0
+        Raylib.EndTextureMode()
 
-                filePicker.Files
-                |> Seq.iteri (fun i currentFile ->
-                    let currentItemIsSelected =
-                        match filePicker.CurrentSelection with
-                        | None -> false
-                        | Some file -> file = currentFile
+        Raylib.BeginDrawing()
 
-                    if currentItemIsSelected then
-                        Draw.label
-                            10.0f
-                            (10.0f + 60.0f * float32 i)
-                            50
-                            currentFile.Name
-                            1000
-                            60
-                            Color.RayWhite
-                            Color.Black
-                    else
-                        Draw.label
-                            10.0f
-                            (10.0f + 60.0f * float32 i)
-                            50
-                            currentFile.Name
-                            1000
-                            60
-                            Color.Black
-                            Color.RayWhite)
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
 
-                Raylib.EndTextureMode()
-
-                Raylib.BeginDrawing()
-
-                Raylib.DrawTextureRec(
-                    texture.Texture,
-                    textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
-                    posVec,
-                    Color.White
-                )
-
-                Raylib.EndDrawing()
+        Raylib.EndDrawing()
 
     let mainWindow (controls: ControlManager) (canvas: Canvas) (texture: RenderTexture2D) fps mousePos =
         Raylib.BeginTextureMode texture

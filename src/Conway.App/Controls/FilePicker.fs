@@ -3,7 +3,7 @@ namespace Conway.App.Controls
 open System
 open System.Collections.Generic
 
-[<ReferenceEquality; NoComparison>]
+[<NoComparison>]
 type FileData = {
     Name: string
     Path: string
@@ -21,7 +21,7 @@ type FilePicker(files: seq<FileData>) =
 
     new() = new FilePicker(Seq.empty)
 
-    member val Files = new List<FileData>(files) with get, set
+    member val Files = new List<FileData>(files) with get
 
     member _.CurrentSelection
         with get () = _currentSelection

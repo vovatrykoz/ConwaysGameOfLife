@@ -12,6 +12,7 @@ open System.IO
 
 module Callbacks =
     open Conway.App.Graphics
+    open Conway.App.Input
 
     let saveFile (ctx: ApplicationContext) =
         try
@@ -53,12 +54,21 @@ module Callbacks =
                 Directory.CreateDirectory saveFilesPath |> ignore
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
-            Directory.GetFiles saveFilesPath
-            |> Array.map (fun fullPath ->
-                let fileName = Path.GetFileName fullPath
-                let lastModified = File.GetLastWriteTime fullPath
-                FileData.createRecord fileName fullPath lastModified)
-            |> Display.openFileDialogue ctx.Texture
+            let mutable isCancelled = false
+
+            while not isCancelled do
+                if Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape then
+                    isCancelled <- true
+                else
+                    let files =
+                        Directory.GetFiles saveFilesPath
+                        |> Array.map (fun fullPath ->
+                            let fileName = Path.GetFileName fullPath
+                            let lastModified = File.GetLastWriteTime fullPath
+                            FileData.createRecord fileName fullPath lastModified)
+
+                    let filePicker = new FilePicker(files)
+                    Display.openFileDialogue ctx.Texture filePicker
 
             let newFile = "./Saves/Test.gol"
             let decoder = new ConwayByteDecoder()
