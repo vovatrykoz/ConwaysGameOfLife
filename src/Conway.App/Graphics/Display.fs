@@ -123,8 +123,6 @@ module Display =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
-        filePicker.SelectAt 0
-
         filePicker.Files
         |> Seq.iteri (fun i currentFile ->
             let currentItemIsSelected =
@@ -133,9 +131,25 @@ module Display =
                 | Some file -> file = currentFile
 
             if currentItemIsSelected then
-                Draw.label 10.0f (10.0f + 60.0f * float32 i) 50 currentFile.Name 1000 60 Color.RayWhite Color.Black
+                Draw.label
+                    (float32 filePicker.X)
+                    (float32 filePicker.Y + float32 filePicker.FileEntryHeight * float32 i)
+                    (filePicker.FileEntryHeight - 10)
+                    currentFile.Name
+                    filePicker.FileEntryWidth
+                    filePicker.FileEntryHeight
+                    Color.White
+                    Color.Black
             else
-                Draw.label 10.0f (10.0f + 60.0f * float32 i) 50 currentFile.Name 1000 60 Color.Black Color.RayWhite)
+                Draw.label
+                    (float32 filePicker.X)
+                    (float32 filePicker.Y + float32 filePicker.FileEntryHeight * float32 i)
+                    (filePicker.FileEntryHeight - 10)
+                    currentFile.Name
+                    filePicker.FileEntryWidth
+                    filePicker.FileEntryHeight
+                    Color.Black
+                    Color.White)
 
         Raylib.EndTextureMode()
 

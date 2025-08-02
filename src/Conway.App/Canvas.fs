@@ -85,10 +85,10 @@ type Canvas(x: float32, y: float32, width: float32, height: float32, camera: Cam
 
         let struct (visibleStartPoint, visibleEndPoint) = this.CalculateVisibleRange()
 
-        let startCol = int visibleStartPoint.X
         let startRow = int visibleStartPoint.Y
-        let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
+        let startCol = int visibleStartPoint.X
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
+        let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
         let scaledCellSize = this.CellSize * this.Camera.ZoomFactor
         let scaledCellSizeReciprocal = 1.0f / scaledCellSize
