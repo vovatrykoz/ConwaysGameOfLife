@@ -5,6 +5,7 @@ open System.Collections.Generic
 open Conway.App.Input
 open Raylib_cs
 open System.Collections.ObjectModel
+open System.Numerics
 
 [<Struct; NoComparison>]
 type FileData = {
@@ -19,21 +20,82 @@ type FileData = {
         Date = date
     }
 
-type FilePicker(x: int, y: int, fileEntryHeight: int, fileEntryWidth: int, files: seq<FileData>) =
+type FilePicker
+    (
+        x: float32,
+        y: float32,
+        width: float32,
+        height: float32,
+        fileEntryWidth: float32,
+        fileEntryHeight: float32,
+        files: seq<FileData>
+    ) =
     let mutable _currentSelection: int option = None
 
-    new(x: int, y: int, fileEntryHeight: int, fileEntryWidth: int) =
-        new FilePicker(x, y, fileEntryHeight, fileEntryWidth, Seq.empty)
+    let mutable _cancelled = false
+
+    let mutable _confirmed = false
+
+    let _confirmButton =
+        new Button(
+            int x,
+            int (y + fileEntryHeight * 11.0f),
+            65,
+            "Confirm",
+            false,
+            true,
+            Some(fun _ -> _confirmed <- true),
+            None,
+            None,
+            Some KeyboardKey.Enter
+        )
+
+    let _cancelButton =
+        new Button(
+            int x + 100,
+            int (y + fileEntryHeight * 11.0f),
+            65,
+            "Cancel",
+            true,
+            true,
+            Some(fun _ -> _cancelled <- true),
+            None,
+            None,
+            Some KeyboardKey.Escape
+        )
+
+    new(x: float32, y: float32, width: float32, height: float32, fileEntryWidth: float32, fileEntryHeight: float32) =
+        new FilePicker(x, y, width, height, fileEntryWidth, fileEntryHeight, Seq.empty)
 
     member val X = x with get, set
 
     member val Y = y with get, set
+
+    member val Width = width with get, set
+
+    member val Height = height with get, set
 
     member val FileEntryWidth = fileEntryWidth with get, set
 
     member val FileEntryHeight = fileEntryHeight with get, set
 
     member val Files = new ObservableCollection<FileData>(files) with get
+
+    member val Camera = new Camera(x, y) with get
+
+    member val private ActivatedButton: option<Button> = None with get, set
+
+    member _.Cancelled
+        with get () = _cancelled
+        and private set value = _cancelled <- value
+
+    member _.Confirmed
+        with get () = _confirmed
+        and private set value = _confirmed <- value
+
+    member _.ConfirmButton = _confirmButton
+
+    member _.CancelButton = _cancelButton
 
     member this.CurrentSelection
         with get () =
@@ -42,33 +104,51 @@ type FilePicker(x: int, y: int, fileEntryHeight: int, fileEntryWidth: int, files
             | Some index -> Some this.Files.[index]
         and private set value =
             match value with
-            | None -> _currentSelection <- None
+            | None ->
+                _currentSelection <- None
+                _confirmButton.IsActive <- false
             | Some fileData ->
                 let index = this.Files.IndexOf fileData
 
                 match index with
                 | -1 -> _currentSelection <- None
-                | _ -> _currentSelection <- Some index
+                | _ ->
+                    _currentSelection <- Some index
+                    _confirmButton.IsActive <- true
 
     member this.SelectAt index =
         if index < 0 || index >= this.Files.Count then
             _currentSelection <- None
+            _confirmButton.IsActive <- false
         else
             _currentSelection <- Some index
+            _confirmButton.IsActive <- true
 
-    member this.ClearSelection() = this.CurrentSelection <- None
+    member this.ClearSelection() =
+        this.CurrentSelection <- None
+        _confirmButton.IsActive <- false
 
     member this.ProcessMouseInput() =
-        if Mouse.buttonClicked MouseButton.Left then
-            let mousePos = Mouse.getPosition ()
+        let mouseScroll = Mouse.getScrollAmount ()
+        this.Camera.MoveCameraDown(-mouseScroll.Y * this.FileEntryHeight)
 
+        if
+            Mouse.buttonClicked MouseButton.Left
+            && not (
+                Button.isClicked this.ConfirmButton
+                || Button.isClicked this.CancelButton
+                || Button.isPressed this.ConfirmButton
+                || Button.isPressed this.CancelButton
+            )
+        then
+            let mousePos = Mouse.getPosition () + this.Camera.Position - Vector2(this.X, this.Y)
             _currentSelection <- None
+            let struct (startX, endX) = this.CalculateVisibleIndexRange()
 
-            this.Files
-            |> Seq.iteri (fun index _ ->
+            for index = startX to endX do
                 let minX = this.X
                 let maxX = this.X + this.FileEntryWidth
-                let minY = this.Y + this.FileEntryHeight * index
+                let minY = this.Y + this.FileEntryHeight * float32 index
                 let maxY = minY + this.FileEntryHeight
 
                 if
@@ -77,7 +157,9 @@ type FilePicker(x: int, y: int, fileEntryHeight: int, fileEntryWidth: int, files
                     && mousePos.Y >= float32 minY
                     && mousePos.Y <= float32 maxY
                 then
-                    this.SelectAt index)
+                    this.SelectAt index
+        else if Mouse.buttonClicked MouseButton.Right then
+            this.ClearSelection()
 
     member this.ProcessKeyboardInput() =
         match _currentSelection with
@@ -88,6 +170,46 @@ type FilePicker(x: int, y: int, fileEntryHeight: int, fileEntryWidth: int, files
             else if Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
                 _currentSelection <- Some(max (selectedIndex - 1) 0)
 
+    member private this.ProcessButton(button: Button) =
+        match button.IsActive with
+        | false -> ()
+        | true ->
+            if Button.isClicked button || Button.isShortcutPressed button then
+                this.ActivatedButton <- Some button
+
+            match this.ActivatedButton with
+            | None ->
+                if Button.isPressed button then
+                    this.ActivatedButton <- Some button
+
+                    match button.OnPressAndHold with
+                    | Some callback -> callback ()
+                    | None -> ()
+            | Some pressedButton when pressedButton = button ->
+                if Button.isPressed button then
+                    match button.OnPressAndHold with
+                    | Some callback -> callback ()
+                    | None -> ()
+            | Some _ -> ()
+
+            match this.ActivatedButton with
+            | None -> ()
+            | Some activatedButton ->
+                if Button.isReleased activatedButton then
+                    this.ActivatedButton <- None
+
+    member this.CalculateVisibleIndexRange() =
+        let trueY = this.Camera.Position.Y - this.Y
+
+        let startIndex = max (int trueY / int this.FileEntryHeight) 0
+
+        let endIndex =
+            min ((int trueY + int this.Height) / int this.FileEntryHeight) (this.Files.Count - 1)
+
+        struct (startIndex, endIndex)
+
     member this.ProcessInput() =
+        this.ProcessButton _confirmButton
+        this.ProcessButton _cancelButton
         this.ProcessMouseInput()
         this.ProcessKeyboardInput()

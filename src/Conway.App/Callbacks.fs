@@ -59,10 +59,13 @@ module Callbacks =
 
             Raylib.SetExitKey KeyboardKey.Null
 
-            let filePicker = new FilePicker(10, 10, 60, 1000)
+            let filePicker = new FilePicker(10.0f, 10.0f, 1000.0f, 600.0f, 1000.0f, 60.0f)
             filePicker.Files.CollectionChanged.Add(fun _ -> filePicker.ClearSelection())
 
-            while not isCancelled && not (raylibTrue (Raylib.WindowShouldClose())) do
+            while not isCancelled
+                  && not (raylibTrue (Raylib.WindowShouldClose()))
+                  && not filePicker.Cancelled
+                  && not filePicker.Confirmed do
                 if Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape then
                     isCancelled <- true
                 else
@@ -92,38 +95,41 @@ module Callbacks =
 
             Raylib.SetExitKey KeyboardKey.Escape
 
-            match filePicker.CurrentSelection with
-            | None -> ()
-            | Some fileData ->
-                let decoder = new ConwayByteDecoder()
-                let fileLoader = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
+            if isCancelled || filePicker.Cancelled then
+                ()
+            else
+                match filePicker.CurrentSelection with
+                | None -> ()
+                | Some fileData ->
+                    let decoder = new ConwayByteDecoder()
+                    let fileLoader = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
 
-                Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {fileData.Path} ...")
-                let result = (fileLoader :> ICanvasFileLoader).Load fileData.Path
+                    Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {fileData.Path} ...")
+                    let result = (fileLoader :> ICanvasFileLoader).Load fileData.Path
 
-                match result with
-                | Ok canvasWrapper ->
-                    Raylib.TraceLog(TraceLogLevel.Info, "Test file loaded successfully")
+                    match result with
+                    | Ok canvasWrapper ->
+                        Raylib.TraceLog(TraceLogLevel.Info, "Test file loaded successfully")
 
-                    match canvasWrapper.OptionalMessage with
-                    | None -> ()
-                    | Some message -> Raylib.TraceLog(TraceLogLevel.Info, message)
+                        match canvasWrapper.OptionalMessage with
+                        | None -> ()
+                        | Some message -> Raylib.TraceLog(TraceLogLevel.Info, message)
 
-                    Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
+                        Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
 
-                    ctx.Canvas.Game <-
-                        Game.createFrom
-                            canvasWrapper.Game.CurrentState
-                            canvasWrapper.Game.InitialState
-                            canvasWrapper.Game.Generation
+                        ctx.Canvas.Game <-
+                            Game.createFrom
+                                canvasWrapper.Game.CurrentState
+                                canvasWrapper.Game.InitialState
+                                canvasWrapper.Game.Generation
 
-                    ctx.Canvas.Camera <- canvasWrapper.Camera
-                    Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
-                | Error errorMessage ->
-                    Raylib.TraceLog(
-                        TraceLogLevel.Error,
-                        $"Could not load the file due to the following error: {errorMessage}"
-                    )
+                        ctx.Canvas.Camera <- canvasWrapper.Camera
+                        Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
+                    | Error errorMessage ->
+                        Raylib.TraceLog(
+                            TraceLogLevel.Error,
+                            $"Could not load the file due to the following error: {errorMessage}"
+                        )
         with ex ->
             let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
             Raylib.TraceLog(TraceLogLevel.Error, $"Failed to load the save with the following error: {excepionMessage}")

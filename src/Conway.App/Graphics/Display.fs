@@ -120,11 +120,14 @@ module Display =
             Raylib.EndDrawing()
 
     let openFileDialogue (texture: RenderTexture2D) (filePicker: FilePicker) =
+        let struct (startIndex, endIndex) = filePicker.CalculateVisibleIndexRange()
+
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
-        filePicker.Files
-        |> Seq.iteri (fun i currentFile ->
+        for index = startIndex to endIndex do
+            let currentFile = filePicker.Files.[index]
+
             let currentItemIsSelected =
                 match filePicker.CurrentSelection with
                 | None -> false
@@ -133,23 +136,28 @@ module Display =
             if currentItemIsSelected then
                 Draw.label
                     (float32 filePicker.X)
-                    (float32 filePicker.Y + float32 filePicker.FileEntryHeight * float32 i)
-                    (filePicker.FileEntryHeight - 10)
+                    (float32 filePicker.Y
+                     + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f))
                     currentFile.Name
-                    filePicker.FileEntryWidth
-                    filePicker.FileEntryHeight
+                    (int filePicker.FileEntryWidth)
+                    (int filePicker.FileEntryHeight)
                     Color.White
                     Color.Black
             else
                 Draw.label
                     (float32 filePicker.X)
-                    (float32 filePicker.Y + float32 filePicker.FileEntryHeight * float32 i)
-                    (filePicker.FileEntryHeight - 10)
+                    (float32 filePicker.Y
+                     + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f))
                     currentFile.Name
-                    filePicker.FileEntryWidth
-                    filePicker.FileEntryHeight
+                    (int filePicker.FileEntryWidth)
+                    (int filePicker.FileEntryHeight)
                     Color.Black
-                    Color.White)
+                    Color.White
+
+        Draw.button filePicker.ConfirmButton
+        Draw.button filePicker.CancelButton
 
         Raylib.EndTextureMode()
 

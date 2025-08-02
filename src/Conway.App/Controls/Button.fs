@@ -3,6 +3,7 @@ namespace Conway.App.Controls
 open Raylib_cs
 open Conway.App.Input
 
+[<Class>]
 type Button
     (
         x: int,
