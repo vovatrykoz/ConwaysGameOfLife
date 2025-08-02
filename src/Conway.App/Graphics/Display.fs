@@ -133,11 +133,12 @@ module Display =
                 | None -> false
                 | Some file -> file = currentFile
 
+            let y = max filePicker.Y -filePicker.Camera.Position.Y
+
             if currentItemIsSelected then
                 Draw.label
                     (float32 filePicker.X)
-                    (float32 filePicker.Y
-                     + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
                     (int (filePicker.FileEntryHeight - 10.0f))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
@@ -147,8 +148,7 @@ module Display =
             else
                 Draw.label
                     (float32 filePicker.X)
-                    (float32 filePicker.Y
-                     + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
                     (int (filePicker.FileEntryHeight - 10.0f))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
