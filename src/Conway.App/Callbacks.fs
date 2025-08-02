@@ -66,7 +66,10 @@ module Callbacks =
                   && not (raylibTrue (Raylib.WindowShouldClose()))
                   && not filePicker.Cancelled
                   && not filePicker.Confirmed do
-                if Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape then
+                if
+                    Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape
+                    || Keyboard.keyHasBeenPressedOnce KeyboardKey.Backspace
+                then
                     isCancelled <- true
                 else
                     let files =

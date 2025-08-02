@@ -40,7 +40,8 @@ type FilePicker
         new Button(
             int x,
             int (y + fileEntryHeight * 11.0f),
-            65,
+            100,
+            40,
             "Confirm",
             false,
             true,
@@ -52,9 +53,10 @@ type FilePicker
 
     let _cancelButton =
         new Button(
-            int x + 100,
+            int x + 150,
             int (y + fileEntryHeight * 11.0f),
-            65,
+            100,
+            40,
             "Cancel",
             true,
             true,
@@ -132,6 +134,17 @@ type FilePicker
         let mouseScroll = Mouse.getScrollAmount ()
         this.Camera.MoveCameraDown(-mouseScroll.Y * this.FileEntryHeight)
 
+        if this.Camera.Position.Y < 0.0f then
+            this.Camera.MoveCameraUp(-mouseScroll.Y * this.FileEntryHeight)
+
+        let struct (startY, endY) = this.CalculateVisibleIndexRange()
+
+        let maxCameraPosition =
+            float32 this.Files.Count * this.FileEntryHeight - this.Height
+
+        if this.Camera.Position.Y > maxCameraPosition then
+            this.Camera.MoveCameraDown(mouseScroll.Y * this.FileEntryHeight)
+
         if
             Mouse.buttonClicked MouseButton.Left
             && not (
@@ -142,10 +155,9 @@ type FilePicker
             )
         then
             let mousePos = Mouse.getPosition () + this.Camera.Position - Vector2(this.X, this.Y)
-            _currentSelection <- None
-            let struct (startX, endX) = this.CalculateVisibleIndexRange()
+            this.ClearSelection()
 
-            for index = startX to endX do
+            for index = startY to endY do
                 let minX = this.X
                 let maxX = this.X + this.FileEntryWidth
                 let minY = this.Y + this.FileEntryHeight * float32 index
@@ -165,10 +177,21 @@ type FilePicker
         match _currentSelection with
         | None -> ()
         | Some selectedIndex ->
+            let struct (startY, endY) = this.CalculateVisibleIndexRange()
+
             if Keyboard.keyHasBeenPressedOnce KeyboardKey.Down then
-                _currentSelection <- Some(min (selectedIndex + 1) (this.Files.Count - 1))
+                let newIndex = min (selectedIndex + 1) (this.Files.Count - 1)
+                _currentSelection <- Some newIndex
+
+                if newIndex > endY then
+                    this.Camera.MoveCameraDown this.FileEntryHeight
+
             else if Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
-                _currentSelection <- Some(max (selectedIndex - 1) 0)
+                let newIndex = max (selectedIndex - 1) 0
+                _currentSelection <- Some newIndex
+
+                if newIndex < startY then
+                    this.Camera.MoveCameraUp this.FileEntryHeight
 
     member private this.ProcessButton(button: Button) =
         match button.IsActive with
