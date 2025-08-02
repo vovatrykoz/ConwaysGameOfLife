@@ -59,7 +59,7 @@ module Callbacks =
 
             Raylib.SetExitKey KeyboardKey.Null
 
-            let filePicker = new FilePicker(10.0f, 10.0f, 1000.0f, 600.0f, 1000.0f, 60.0f)
+            let filePicker = new FilePicker(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
             filePicker.Files.CollectionChanged.Add(fun _ -> filePicker.ClearSelection())
 
             while not isCancelled

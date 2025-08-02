@@ -39,8 +39,8 @@ type FilePicker
     let _confirmButton =
         new Button(
             int x,
-            int (y + fileEntryHeight * 11.0f),
-            100,
+            int (y + fileEntryHeight * 15.0f),
+            200,
             40,
             "Confirm",
             false,
@@ -53,9 +53,9 @@ type FilePicker
 
     let _cancelButton =
         new Button(
-            int x + 150,
-            int (y + fileEntryHeight * 11.0f),
-            100,
+            int x + 300,
+            int (y + fileEntryHeight * 15.0f),
+            200,
             40,
             "Cancel",
             true,
