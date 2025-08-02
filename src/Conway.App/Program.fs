@@ -81,10 +81,11 @@ let stopwatch = Stopwatch.StartNew()
 while not (raylibTrue (Raylib.WindowShouldClose())) do
     let frameStart = stopwatch.Elapsed.TotalSeconds
 
+    Display.mainWindow controlManager canvas renderTexture (int fps) (Raylib.GetMousePosition())
+
     controlManager.ReadInput()
     controlManager.UpdateControls()
     canvas.ProcessDrawableArea()
-    Display.mainWindow controlManager canvas renderTexture (int fps) (Raylib.GetMousePosition())
 
     let frameEnd = stopwatch.Elapsed.TotalSeconds
     let frameTime = frameEnd - frameStart
