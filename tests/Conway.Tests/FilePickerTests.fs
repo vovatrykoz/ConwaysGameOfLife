@@ -9,11 +9,11 @@ module ``File Picker Tests`` =
     [<Test>]
     let ``Can correctly calculate visible start index`` () =
         let randomFiles = [
-            FileData.createRecord "File1" "./File1" DateTime.Now
-            FileData.createRecord "File2" "./File2" DateTime.Now
-            FileData.createRecord "File3" "./File3" DateTime.Now
-            FileData.createRecord "File4" "./File4" DateTime.Now
-            FileData.createRecord "File5" "./File5" DateTime.Now
+            FileData.createRecord "File1" "./File1" Other DateTime.Now
+            FileData.createRecord "File2" "./File2" Other DateTime.Now
+            FileData.createRecord "File3" "./File3" Other DateTime.Now
+            FileData.createRecord "File4" "./File4" Other DateTime.Now
+            FileData.createRecord "File5" "./File5" Other DateTime.Now
         ]
 
         let filePicker = new FilePicker(0.0f, 0.0f, 8.0f, 4.0f, 8.0f, 2.0f, randomFiles)
@@ -27,11 +27,11 @@ module ``File Picker Tests`` =
     [<Test>]
     let ``Can correctly calculate visible end index`` () =
         let randomFiles = [
-            FileData.createRecord "File1" "./File1" DateTime.Now
-            FileData.createRecord "File2" "./File2" DateTime.Now
-            FileData.createRecord "File3" "./File3" DateTime.Now
-            FileData.createRecord "File4" "./File4" DateTime.Now
-            FileData.createRecord "File5" "./File5" DateTime.Now
+            FileData.createRecord "File1" "./File1" Other DateTime.Now
+            FileData.createRecord "File2" "./File2" Other DateTime.Now
+            FileData.createRecord "File3" "./File3" Other DateTime.Now
+            FileData.createRecord "File4" "./File4" Other DateTime.Now
+            FileData.createRecord "File5" "./File5" Other DateTime.Now
         ]
 
         let filePicker = new FilePicker(0.0f, 0.0f, 8.0f, 4.0f, 8.0f, 2.0f, randomFiles)

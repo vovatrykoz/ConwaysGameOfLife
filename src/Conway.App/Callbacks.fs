@@ -77,7 +77,16 @@ module Callbacks =
                         |> Array.map (fun fullPath ->
                             let fileName = Path.GetFileName fullPath
                             let lastModified = File.GetLastWriteTime fullPath
-                            FileData.createRecord fileName fullPath lastModified)
+                            let fileExtention = Path.GetExtension fullPath
+
+                            let fileType =
+                                match fileExtention with
+                                | ".gol" -> UncompressedSave
+                                | ".golz" -> CompressedSave
+                                | _ -> Other
+
+                            FileData.createRecord fileName fullPath fileType lastModified)
+                        |> Array.filter (fun fileRecord -> fileRecord.FileType = UncompressedSave)
 
                     files
                     |> Array.iter (fun fileData ->
@@ -88,7 +97,7 @@ module Callbacks =
 
                     filePicker.Files
                     |> Seq.iteri (fun index fileData ->
-                        if not (Array.contains fileData files) then
+                        if not (files |> Array.contains fileData) then
                             removalIndeces.Add index)
 
                     removalIndeces.ForEach(fun index -> filePicker.Files.RemoveAt index)
@@ -112,7 +121,7 @@ module Callbacks =
 
                     match result with
                     | Ok canvasWrapper ->
-                        Raylib.TraceLog(TraceLogLevel.Info, "Test file loaded successfully")
+                        Raylib.TraceLog(TraceLogLevel.Info, $"{fileData.Path} loaded successfully")
 
                         match canvasWrapper.OptionalMessage with
                         | None -> ()
@@ -134,8 +143,13 @@ module Callbacks =
                             $"Could not load the file due to the following error: {errorMessage}"
                         )
         with ex ->
-            let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Failed to load the save with the following error: {excepionMessage}")
+            let excepionMessage = ex.Message.Replace("\n", "\n\t")
+            let stackTrace = ex.StackTrace.Replace("\n", "\n\t")
+
+            Raylib.TraceLog(
+                TraceLogLevel.Error,
+                $"Failed to load the save with the following error:\n\t{excepionMessage}\nStack trace:\n\t{stackTrace}"
+            )
 
     let toggleGame (ctx: ApplicationContext) =
         let currentGameMode = ctx.GameMode

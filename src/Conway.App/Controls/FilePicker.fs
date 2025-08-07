@@ -1,22 +1,29 @@
 namespace Conway.App.Controls
 
 open System
-open System.Collections.Generic
 open Conway.App.Input
 open Raylib_cs
 open System.Collections.ObjectModel
 open System.Numerics
 
+[<Struct>]
+type FileType =
+    | UncompressedSave
+    | CompressedSave
+    | Other
+
 [<Struct; NoComparison>]
 type FileData = {
     Name: string
     Path: string
+    FileType: FileType
     Date: DateTime
 } with
 
-    static member createRecord name path date = {
+    static member createRecord name path fileType date = {
         Name = name
         Path = path
+        FileType = fileType
         Date = date
     }
 
