@@ -15,6 +15,18 @@ module Callbacks =
     open Conway.App.Input
     open System.Collections.Generic
 
+    let private saveGameState (ctx: ApplicationContext) (newFile: string) =
+        let encoder = new ConwayByteEncoder()
+        let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
+
+        Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to '{newFile}' ...")
+        let result = (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
+
+        match result with
+        | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+        | Error errorMessage ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{errorMessage}")
+
     let saveFile (ctx: ApplicationContext) =
         try
             let saveFilesPath = Environment.CurrentDirectory + "/Saves"
@@ -28,49 +40,72 @@ module Callbacks =
 
             Raylib.SetExitKey KeyboardKey.Null
 
-            let fileSaver = new FileSaver(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
+            let mutable saveActionConfirmed = false
 
-            while not isCancelled
-                  && not (raylibTrue (Raylib.WindowShouldClose()))
-                  && not fileSaver.Cancelled
-                  && not fileSaver.Confirmed do
-                Display.saveFileDialogue ctx.Texture fileSaver
-                fileSaver.ProcessInput()
+            while not saveActionConfirmed do
+                let fileSaver = new FileSaver(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
 
-                match fileSaver.Buffer.Length with
-                | x when x >= 50 -> ()
-                | _ ->
-                    let userInput = Keyboard.getCharPressed ()
+                while not isCancelled
+                      && not (raylibTrue (Raylib.WindowShouldClose()))
+                      && not fileSaver.Cancelled
+                      && not fileSaver.Confirmed
+                      && not (Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape) do
+                    Display.saveFileDialogue ctx.Texture fileSaver
+                    fileSaver.ProcessInput()
 
-                    match userInput with
-                    | 0 -> ()
-                    | someOtherKeyCode -> someOtherKeyCode |> char |> fileSaver.Buffer.Append |> ignore
+                    match fileSaver.Buffer.Length with
+                    | x when x >= 50 -> ()
+                    | _ ->
+                        let userInput = Keyboard.getCharPressed ()
 
-                if Keyboard.keyHasBeenPressedOnce KeyboardKey.Backspace then
-                    if fileSaver.Buffer.Length <= 0 then
-                        ()
+                        match userInput with
+                        | 0 -> ()
+                        | someOtherKeyCode -> someOtherKeyCode |> char |> fileSaver.Buffer.Append |> ignore
+
+                    if Keyboard.keyHasBeenPressedOnce KeyboardKey.Backspace then
+                        if fileSaver.Buffer.Length <= 0 then
+                            ()
+                        else
+                            fileSaver.Buffer.Remove(fileSaver.Buffer.Length - 1, 1) |> ignore
+
+                Raylib.SetExitKey KeyboardKey.Escape
+
+                if fileSaver.Confirmed && not isCancelled then
+                    let fileName = fileSaver.Buffer.ToString() + ".gol"
+                    let newFile = "./Saves/" + fileName
+
+                    if File.Exists newFile then
+                        isCancelled <- false
+
+                        let message =
+                            $"{fileName} already exists.\nDo you want to overwrite the existing file?"
+
+                        let fileOverwriteControl =
+                            new MessageBox(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f, message, "Yes", "No")
+
+                        Raylib.SetExitKey KeyboardKey.Null
+
+                        while not isCancelled
+                              && not (raylibTrue (Raylib.WindowShouldClose()))
+                              && not fileOverwriteControl.Cancelled
+                              && not fileOverwriteControl.Confirmed
+                              && not (Keyboard.keyHasBeenPressedOnce KeyboardKey.Escape) do
+                            Display.messageBox ctx.Texture fileOverwriteControl
+                            fileOverwriteControl.ProcessInput()
+
+                        Raylib.SetExitKey KeyboardKey.Escape
+
+                        if fileOverwriteControl.Confirmed then
+                            saveGameState ctx newFile
+                            saveActionConfirmed <- true
+                        else
+                            ()
                     else
-                        fileSaver.Buffer.Remove(fileSaver.Buffer.Length - 1, 1) |> ignore
-
-            Raylib.SetExitKey KeyboardKey.Escape
-
-            if fileSaver.Cancelled then
-                ()
-            else
-                let newFile = "./Saves/" + fileSaver.Buffer.ToString() + ".gol"
-                let encoder = new ConwayByteEncoder()
-                let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
-
-                Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to {newFile} ...")
-                let result = (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
-
-                match result with
-                | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
-                | Error errorMessage ->
-                    Raylib.TraceLog(
-                        TraceLogLevel.Error,
-                        $"Could not save the file due to the following error: {errorMessage}"
-                    )
+                        saveGameState ctx newFile
+                        saveActionConfirmed <- true
+                else
+                    saveActionConfirmed <- true
+                    Raylib.TraceLog(TraceLogLevel.Info, "Saving aborted")
         with ex ->
             let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
             Raylib.SetExitKey KeyboardKey.Escape

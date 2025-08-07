@@ -171,6 +171,38 @@ module Display =
 
         Raylib.EndDrawing()
 
+    let messageBox (texture: RenderTexture2D) (messageBox: MessageBox) =
+        let baseOffsetY = 10.0f
+
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.White
+
+        Draw.label
+            (float32 messageBox.X)
+            (baseOffsetY + float32 messageBox.MessageLineHeight)
+            (int (messageBox.MessageLineHeight - 10.0f))
+            messageBox.Message
+            (int messageBox.MessageLineWidth)
+            (int messageBox.MessageLineHeight)
+            Color.Black
+            Color.White
+
+        Draw.button messageBox.ConfirmButton
+        Draw.button messageBox.CancelButton
+
+        Raylib.EndTextureMode()
+
+        Raylib.BeginDrawing()
+
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
+
+        Raylib.EndDrawing()
+
     let openFileDialogue (texture: RenderTexture2D) (filePicker: FilePicker) =
         let struct (startIndex, endIndex) = filePicker.CalculateVisibleIndexRange()
 
@@ -208,24 +240,24 @@ module Display =
                     Color.Black
                     Color.White
 
-            let currentFileTypeText =
                 match filePicker.CurrentSelection with
-                | None -> ""
+                | None -> ()
                 | Some file ->
-                    match file.FileType with
-                    | CompressedSave -> "Selected file type:\nCompressed Savefile"
-                    | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
-                    | Other -> "Selected file type:\nOther"
+                    let currentFileTypeText =
+                        match file.FileType with
+                        | CompressedSave -> "Selected file type:\nCompressed Savefile"
+                        | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
+                        | Other -> "Selected file type:\nOther"
 
-            Draw.label
-                (float32 filePicker.X + 600.0f)
-                (float32 y + float32 filePicker.FileEntryHeight * float32 15.0f)
-                (int (filePicker.FileEntryHeight - 10.0f))
-                currentFileTypeText
-                (int filePicker.FileEntryWidth)
-                (int filePicker.FileEntryHeight)
-                Color.Black
-                Color.White
+                    Draw.label
+                        (float32 filePicker.X + 600.0f)
+                        (float32 y + float32 filePicker.FileEntryHeight * float32 15.0f)
+                        (int (filePicker.FileEntryHeight - 10.0f))
+                        currentFileTypeText
+                        (int filePicker.FileEntryWidth)
+                        (int filePicker.FileEntryHeight)
+                        Color.Black
+                        Color.White
 
         Draw.button filePicker.ConfirmButton
         Draw.button filePicker.CancelButton
