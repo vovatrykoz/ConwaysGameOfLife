@@ -43,14 +43,16 @@ module Callbacks =
                     let userInput = Keyboard.getCharPressed ()
 
                     match userInput with
-                    | 0
-                    | 27 -> ()
-                    | 127 ->
-                        if fileSaver.Buffer.Length <= 0 then
-                            ()
-                        else
-                            fileSaver.Buffer.Remove(fileSaver.Buffer.Length - 1, 1) |> ignore
-                    | key -> key |> char |> fileSaver.Buffer.Append |> ignore
+                    | 0 -> ()
+                    | someOtherKeyCode -> someOtherKeyCode |> char |> fileSaver.Buffer.Append |> ignore
+
+                if Keyboard.keyHasBeenPressedOnce KeyboardKey.Backspace then
+                    if fileSaver.Buffer.Length <= 0 then
+                        ()
+                    else
+                        fileSaver.Buffer.Remove(fileSaver.Buffer.Length - 1, 1) |> ignore
+
+            Raylib.SetExitKey KeyboardKey.Escape
 
             if fileSaver.Cancelled then
                 ()
@@ -71,6 +73,7 @@ module Callbacks =
                     )
         with ex ->
             let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
+            Raylib.SetExitKey KeyboardKey.Escape
 
             Raylib.TraceLog(
                 TraceLogLevel.Error,

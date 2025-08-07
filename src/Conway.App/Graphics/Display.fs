@@ -120,19 +120,40 @@ module Display =
             Raylib.EndDrawing()
 
     let saveFileDialogue (texture: RenderTexture2D) (fileSaver: FileSaver) =
+        let baseOffsetY = 10.0f
 
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
         Draw.label
             (float32 fileSaver.X)
-            (float32 10.0f + float32 fileSaver.FileEntryHeight)
+            baseOffsetY
+            (int (fileSaver.FileEntryHeight - 10.0f))
+            "Enter file name:"
+            (int fileSaver.FileEntryWidth)
+            (int fileSaver.FileEntryHeight)
+            Color.Black
+            Color.White
+
+        Draw.label
+            (float32 fileSaver.X)
+            (baseOffsetY + float32 fileSaver.FileEntryHeight)
             (int (fileSaver.FileEntryHeight - 10.0f))
             (fileSaver.Buffer.ToString())
             (int fileSaver.FileEntryWidth)
             (int fileSaver.FileEntryHeight)
             Color.White
             Color.Black
+
+        Draw.label
+            (float32 fileSaver.X)
+            (baseOffsetY + float32 fileSaver.FileEntryHeight * 2.0f)
+            (int (fileSaver.FileEntryHeight - 10.0f))
+            $"{fileSaver.Buffer.Length}/50"
+            (int fileSaver.FileEntryWidth)
+            (int fileSaver.FileEntryHeight)
+            Color.Black
+            Color.White
 
         Draw.button fileSaver.ConfirmButton
         Draw.button fileSaver.CancelButton
