@@ -3,8 +3,9 @@ namespace Conway.App
 open Conway.Core
 open System.Threading
 open Conway.App.Controls
+open Raylib_cs
 
-type ApplicationContext(gameMode: GameRunMode, canvas: Canvas) =
+type ApplicationContext(gameMode: GameRunMode, canvas: Canvas, texture: RenderTexture2D) =
     let _lock = new ReaderWriterLockSlim()
 
     let mutable _gameMode = gameMode
@@ -24,3 +25,5 @@ type ApplicationContext(gameMode: GameRunMode, canvas: Canvas) =
                 _lock.ExitWriteLock()
 
     member val Canvas = canvas with get
+
+    member val Texture = texture with get

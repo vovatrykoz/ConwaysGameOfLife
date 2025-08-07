@@ -3,11 +3,13 @@ namespace Conway.App.Controls
 open Raylib_cs
 open Conway.App.Input
 
+[<Class>]
 type Button
     (
         x: int,
         y: int,
-        size: int,
+        width: int,
+        height: int,
         text: string,
         isActive: bool,
         isVisible: bool,
@@ -35,7 +37,9 @@ type Button
 
     member val Y = y with get, set
 
-    member val Size = size with get, set
+    member val Width = width with get, set
+
+    member val Height = height with get, set
 
     member val Text = text with get, set
 
@@ -79,9 +83,9 @@ type Button
         if Mouse.buttonIsPressed MouseButton.Left then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
-            let maxX = button.X + button.Size
+            let maxX = button.X + button.Width
             let minY = button.Y
-            let maxY = button.Y + button.Size
+            let maxY = button.Y + button.Height
 
             if
                 mousePos.X >= float32 minX
@@ -103,9 +107,9 @@ type Button
         if Mouse.buttonClicked MouseButton.Left then
             let mousePos = Mouse.getPosition ()
             let minX = button.X
-            let maxX = button.X + button.Size
+            let maxX = button.X + button.Width
             let minY = button.Y
-            let maxY = button.Y + button.Size
+            let maxY = button.Y + button.Height
 
             if
                 mousePos.X >= float32 minX
@@ -128,9 +132,9 @@ type Button
         else
             let mousePos = Mouse.getPosition ()
             let minX = button.X
-            let maxX = button.X + button.Size
+            let maxX = button.X + button.Width
             let minY = button.Y
-            let maxY = button.Y + button.Size
+            let maxY = button.Y + button.Height
 
             if
                 mousePos.X >= float32 minX
@@ -146,15 +150,19 @@ type Button
             else
                 false
 
-    static member create = new Button(0, 0, 0, "", true, true, None, None, None, None)
+    static member create = new Button(0, 0, 0, 0, "", true, true, None, None, None, None)
 
     static member position x y (button: Button) =
         button.X <- x
         button.Y <- y
         button
 
-    static member size size (button: Button) =
-        button.Size <- size
+    static member width width (button: Button) =
+        button.Width <- width
+        button
+
+    static member height height (button: Button) =
+        button.Height <- height
         button
 
     static member text text (button: Button) =

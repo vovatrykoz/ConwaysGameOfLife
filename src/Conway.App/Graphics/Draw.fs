@@ -6,8 +6,8 @@ open Raylib_cs
 module Draw =
     open System.Numerics
 
-    let inline private buttonBorderRectangle x y size =
-        Rectangle(float32 (x - 2), float32 (y - 2), float32 (size + 4), float32 (size + 4))
+    let inline private buttonBorderRectangle x y width height =
+        Rectangle(float32 (x - 2), float32 (y - 2), float32 (width + 4), float32 (height + 4))
 
     let inline private calculateBorderSize buttonSize = float32 buttonSize / 12.5f
 
@@ -33,8 +33,8 @@ module Draw =
 
     let button (button: Button) =
         match button.IsActive with
-        | true -> Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Black)
-        | false -> Raylib.DrawRectangle(button.X, button.Y, button.Size, button.Size, Color.Gray)
+        | true -> Raylib.DrawRectangle(button.X, button.Y, button.Width, button.Height, Color.Black)
+        | false -> Raylib.DrawRectangle(button.X, button.Y, button.Width, button.Height, Color.Gray)
 
         Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)
 
@@ -42,13 +42,23 @@ module Draw =
         | false -> ()
         | true ->
             Raylib.DrawRectangleLinesEx(
-                buttonBorderRectangle button.X button.Y button.Size,
-                calculateBorderSize button.Size,
+                buttonBorderRectangle button.X button.Y button.Width button.Height,
+                calculateBorderSize (max button.Width button.Height),
                 Color.Black
             )
 
-    let inline textBox (x: float32) (y: float32) fontSize (text: string) =
-        Raylib.DrawText(text, int x, int y, fontSize, Color.Black)
+    let inline label
+        (x: float32)
+        (y: float32)
+        (fontSize: int)
+        (text: string)
+        (width: int)
+        (height: int)
+        (textColor: Color)
+        (backgroundColor: Color)
+        =
+        Raylib.DrawRectangle(int x, int y, int width, int height, backgroundColor)
+        Raylib.DrawText(text, int x, int y, fontSize, textColor)
 
     let listBox (x: float32, y: float32, items: List<string>) =
         Raylib.DrawRectangle(int x, int y, 10, 10, Color.Black)

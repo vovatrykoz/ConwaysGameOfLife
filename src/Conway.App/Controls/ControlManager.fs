@@ -4,13 +4,11 @@ open Conway.App.Input
 open System.Collections.Generic
 open Raylib_cs
 
-type ControlManager(canvas: Canvas) =
+type ControlManager() =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
     member val Buttons: List<Button> = new List<Button>() with get, set
-
-    member val Canvas = canvas with get, set
 
     member val KeyActions: List<KeyboardKey * (unit -> unit)> = new List<KeyboardKey * (unit -> unit)>() with get, set
 
@@ -72,7 +70,6 @@ type ControlManager(canvas: Canvas) =
     member this.ReadInput() =
         this.ProcessButtons()
         this.ProcessKeyActions()
-        this.Canvas.ProcessDrawableArea()
 
     member this.UpdateControls() =
         for button in this.Buttons do

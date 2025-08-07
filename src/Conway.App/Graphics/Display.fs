@@ -1,6 +1,8 @@
 namespace Conway.App.Graphics
 
+open Conway.App
 open Conway.App.Controls
+open Conway.App.Input
 open Conway.Core
 open Raylib_cs
 open System.Numerics
@@ -22,18 +24,17 @@ module Display =
         let cols = Array2D.length2 board
 
         let struct (visibleStartPoint, visibleEndPoint) = canvas.CalculateVisibleRange()
+
         let startRow = int visibleStartPoint.Y
         let startCol = int visibleStartPoint.X
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
-        let scaledCellWidth = canvas.CellSize * canvas.Camera.ZoomFactor
-        let scaledCellHeight = canvas.CellSize * canvas.Camera.ZoomFactor
+        let scaledCellSize = canvas.CellSize * canvas.Camera.ZoomFactor
+        let scaledCellSizeReciprocal = 1.0f / scaledCellSize
 
-        let visibleCellSizeReciprocal = 1.0f / scaledCellHeight
-
-        let halfWidth = canvas.Width * 0.5f * visibleCellSizeReciprocal
-        let halfHeight = canvas.Height * 0.5f * visibleCellSizeReciprocal
+        let halfWidth = canvas.Width * 0.5f * scaledCellSizeReciprocal
+        let halfHeight = canvas.Height * 0.5f * scaledCellSizeReciprocal
 
         let upperLeftCornerX = canvas.Camera.Position.X - halfWidth
         let upperLeftCornerY = canvas.Camera.Position.Y - halfHeight
@@ -43,14 +44,14 @@ module Display =
                 let baseX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
                 let baseY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
 
-                let trueX = canvas.CellSize + (baseX - 1.0f) * scaledCellWidth
-                let trueY = canvas.CellSize + (baseY - 1.0f) * scaledCellHeight
+                let trueX = canvas.CellSize + (baseX - 1.0f) * scaledCellSize
+                let trueY = canvas.CellSize + (baseY - 1.0f) * scaledCellSize
 
-                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellWidth
-                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellHeight
+                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellSize
+                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellSize
 
-                let trueWidth = max (min scaledCellWidth (actualEndX - trueX)) 0.0f
-                let trueHeight = max (min scaledCellHeight (actualEndY - trueY)) 0.0f
+                let trueWidth = max (min scaledCellSize (actualEndX - trueX)) 0.0f
+                let trueHeight = max (min scaledCellSize (actualEndY - trueY)) 0.0f
 
                 if trueWidth = 0.0f || trueHeight = 0.0f then
                     ()
@@ -66,41 +67,215 @@ module Display =
             | false -> ()
 
     let private renderGenerationCounter (canvas: Canvas) =
-        Draw.textBox
+        Draw.label
             (canvas.Position.X + canvas.Width + 5.0f)
             canvas.Position.Y
             24
             $"Generation {canvas.Game.Generation}"
+            30
+            30
+            Color.Black
+            Color.White
 
     let private renderFpsCounter (canvas: Canvas) fps =
-        Draw.textBox (canvas.Position.X + canvas.Width + 5.0f) (canvas.Position.Y + 50.0f) 24 $"FPS {fps}"
+        Draw.label
+            (canvas.Position.X + canvas.Width + 5.0f)
+            (canvas.Position.Y + 50.0f)
+            24
+            $"FPS {fps}"
+            30
+            30
+            Color.Black
+            Color.RayWhite
 
     let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
-        Draw.textBox
+        Draw.label
             (canvas.Position.X + canvas.Width + 5.0f)
             (canvas.Position.Y + 170.0f)
             24
             $"Mouse:\nX {mousePos.X} Y {mousePos.Y}"
+            30
+            30
+            Color.Black
+            Color.RayWhite
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
-        Draw.textBox
+        Draw.label
             (canvas.Position.X + canvas.Width + 5.0f)
             (canvas.Position.Y + 100.0f)
             24
             $"Camera:\nX: {canvas.Camera.Position.X:F2} Y: {canvas.Camera.Position.Y:F2}"
+            30
+            30
+            Color.Black
+            Color.RayWhite
 
     let loadingScreen x y =
         for _ in 0..10 do
             Raylib.BeginDrawing()
             Raylib.ClearBackground Color.White
 
-            Draw.textBox x y 48 "Loading..."
+            Draw.label x y 48 "Loading..." 50 50 Color.Black Color.RayWhite
 
             Raylib.EndDrawing()
 
-    let mainWindow (controls: ControlManager) (texture: RenderTexture2D) fps mousePos =
-        let canvas = controls.Canvas
+    let saveFileDialogue (texture: RenderTexture2D) (fileSaver: FileSaver) =
+        let baseOffsetY = 10.0f
 
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.White
+
+        Draw.label
+            (float32 fileSaver.X)
+            baseOffsetY
+            (int (fileSaver.FileEntryHeight - 10.0f))
+            "Enter file name:"
+            (int fileSaver.FileEntryWidth)
+            (int fileSaver.FileEntryHeight)
+            Color.Black
+            Color.White
+
+        Draw.label
+            (float32 fileSaver.X)
+            (baseOffsetY + float32 fileSaver.FileEntryHeight)
+            (int (fileSaver.FileEntryHeight - 10.0f))
+            (fileSaver.Buffer.ToString())
+            (int fileSaver.FileEntryWidth)
+            (int fileSaver.FileEntryHeight)
+            Color.White
+            Color.Black
+
+        Draw.label
+            (float32 fileSaver.X)
+            (baseOffsetY + float32 fileSaver.FileEntryHeight * 2.0f)
+            (int (fileSaver.FileEntryHeight - 10.0f))
+            $"{fileSaver.Buffer.Length}/50"
+            (int fileSaver.FileEntryWidth)
+            (int fileSaver.FileEntryHeight)
+            Color.Black
+            Color.White
+
+        Draw.button fileSaver.ConfirmButton
+        Draw.button fileSaver.CancelButton
+
+        Raylib.EndTextureMode()
+
+        Raylib.BeginDrawing()
+
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
+
+        Raylib.EndDrawing()
+
+    let messageBox (texture: RenderTexture2D) (messageBox: MessageBox) =
+        let baseOffsetY = 10.0f
+
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.White
+
+        Draw.label
+            (float32 messageBox.X)
+            (baseOffsetY + float32 messageBox.MessageLineHeight)
+            (int (messageBox.MessageLineHeight - 10.0f))
+            messageBox.Message
+            (int messageBox.MessageLineWidth)
+            (int messageBox.MessageLineHeight)
+            Color.Black
+            Color.White
+
+        Draw.button messageBox.ConfirmButton
+        Draw.button messageBox.CancelButton
+
+        Raylib.EndTextureMode()
+
+        Raylib.BeginDrawing()
+
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
+
+        Raylib.EndDrawing()
+
+    let openFileDialogue (texture: RenderTexture2D) (filePicker: FilePicker) =
+        let struct (startIndex, endIndex) = filePicker.CalculateVisibleIndexRange()
+
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.White
+
+        for index = startIndex to endIndex do
+            let currentFile = filePicker.Files.[index]
+
+            let currentItemIsSelected =
+                match filePicker.CurrentSelection with
+                | None -> false
+                | Some file -> file = currentFile
+
+            let y = max filePicker.Y -filePicker.Camera.Position.Y
+
+            if currentItemIsSelected then
+                Draw.label
+                    (float32 filePicker.X)
+                    (float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f))
+                    currentFile.Name
+                    (int filePicker.FileEntryWidth)
+                    (int filePicker.FileEntryHeight)
+                    Color.White
+                    Color.Black
+            else
+                Draw.label
+                    (float32 filePicker.X)
+                    (float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f))
+                    currentFile.Name
+                    (int filePicker.FileEntryWidth)
+                    (int filePicker.FileEntryHeight)
+                    Color.Black
+                    Color.White
+
+                match filePicker.CurrentSelection with
+                | None -> ()
+                | Some file ->
+                    let currentFileTypeText =
+                        match file.FileType with
+                        | CompressedSave -> "Selected file type:\nCompressed Savefile"
+                        | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
+                        | Other -> "Selected file type:\nOther"
+
+                    Draw.label
+                        (float32 filePicker.X + 600.0f)
+                        (float32 y + float32 filePicker.FileEntryHeight * float32 15.0f)
+                        (int (filePicker.FileEntryHeight - 10.0f))
+                        currentFileTypeText
+                        (int filePicker.FileEntryWidth)
+                        (int filePicker.FileEntryHeight)
+                        Color.Black
+                        Color.White
+
+        Draw.button filePicker.ConfirmButton
+        Draw.button filePicker.CancelButton
+
+        Raylib.EndTextureMode()
+
+        Raylib.BeginDrawing()
+
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
+
+        Raylib.EndDrawing()
+
+    let mainWindow (controls: ControlManager) (canvas: Canvas) (texture: RenderTexture2D) fps mousePos =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
