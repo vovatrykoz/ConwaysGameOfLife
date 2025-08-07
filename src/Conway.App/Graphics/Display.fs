@@ -119,6 +119,37 @@ module Display =
 
             Raylib.EndDrawing()
 
+    let saveFileDialogue (texture: RenderTexture2D) (fileSaver: FileSaver) =
+
+        Raylib.BeginTextureMode texture
+        Raylib.ClearBackground Color.White
+
+        Draw.label
+            (float32 fileSaver.X)
+            (float32 10.0f + float32 fileSaver.FileEntryHeight)
+            (int (fileSaver.FileEntryHeight - 10.0f))
+            (fileSaver.Buffer.ToString())
+            (int fileSaver.FileEntryWidth)
+            (int fileSaver.FileEntryHeight)
+            Color.White
+            Color.Black
+
+        Draw.button fileSaver.ConfirmButton
+        Draw.button fileSaver.CancelButton
+
+        Raylib.EndTextureMode()
+
+        Raylib.BeginDrawing()
+
+        Raylib.DrawTextureRec(
+            texture.Texture,
+            textureFlipRec (float32 texture.Texture.Width) (float32 texture.Texture.Height),
+            posVec,
+            Color.White
+        )
+
+        Raylib.EndDrawing()
+
     let openFileDialogue (texture: RenderTexture2D) (filePicker: FilePicker) =
         let struct (startIndex, endIndex) = filePicker.CalculateVisibleIndexRange()
 

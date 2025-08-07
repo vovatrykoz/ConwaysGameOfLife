@@ -24,20 +24,51 @@ module Callbacks =
                 Directory.CreateDirectory saveFilesPath |> ignore
                 Raylib.TraceLog(TraceLogLevel.Info, "Save files directory created")
 
-            let newFile = "./Saves/Test.gol"
-            let encoder = new ConwayByteEncoder()
-            let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
+            let mutable isCancelled = false
 
-            Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to {newFile} ...")
-            let result = (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
+            Raylib.SetExitKey KeyboardKey.Null
 
-            match result with
-            | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
-            | Error errorMessage ->
-                Raylib.TraceLog(
-                    TraceLogLevel.Error,
-                    $"Could not save the file due to the following error: {errorMessage}"
-                )
+            let fileSaver = new FileSaver(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
+
+            while not isCancelled
+                  && not (raylibTrue (Raylib.WindowShouldClose()))
+                  && not fileSaver.Cancelled
+                  && not fileSaver.Confirmed do
+                Display.saveFileDialogue ctx.Texture fileSaver
+                fileSaver.ProcessInput()
+
+                match fileSaver.Buffer.Length with
+                | x when x >= 50 -> ()
+                | _ ->
+                    let userInput = Keyboard.getCharPressed ()
+
+                    match userInput with
+                    | 0
+                    | 27 -> ()
+                    | 127 ->
+                        if fileSaver.Buffer.Length <= 0 then
+                            ()
+                        else
+                            fileSaver.Buffer.Remove(fileSaver.Buffer.Length - 1, 1) |> ignore
+                    | key -> key |> char |> fileSaver.Buffer.Append |> ignore
+
+            if fileSaver.Cancelled then
+                ()
+            else
+                let newFile = "./Saves/" + fileSaver.Buffer.ToString() + ".gol"
+                let encoder = new ConwayByteEncoder()
+                let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
+
+                Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to {newFile} ...")
+                let result = (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
+
+                match result with
+                | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+                | Error errorMessage ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"Could not save the file due to the following error: {errorMessage}"
+                    )
         with ex ->
             let excepionMessage = ex.Message.ToString().Replace("\n", "\n\t")
 
