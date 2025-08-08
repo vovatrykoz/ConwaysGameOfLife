@@ -64,7 +64,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     needs: [build-linux, build-windows]
     steps:
       - name: Download Linux artifact
