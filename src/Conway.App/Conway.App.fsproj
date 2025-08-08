@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ApplicationIcon>./Resources/icon.ico</ApplicationIcon>
+    <AssemblyName>Game</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Utils/RaylibTypeConverter.fs" />

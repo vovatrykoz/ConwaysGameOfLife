@@ -30,12 +30,13 @@ jobs:
             -c Release
             -r linux-x64
             -p:PublishAot=true
-            -p:AssemblyName=ConwaysGameOfLife
             --self-contained true
-            -o ./ConwaysGameOfLife-Linux
+            -o ./linux-build/ConwaysGameOfLife
 
       - name: Archive Linux build
-        run: zip -r linux-x64.zip ./ConwaysGameOfLife-Linux
+        run: cd ./linux-build/ |
+            zip -r ../linux-x64.zip ./ConwaysGameOfLife |
+            cd ../
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -64,12 +65,13 @@ jobs:
             -c Release
             -r win-x64
             -p:PublishAot=true
-            -p:AssemblyName=ConwaysGameOfLife
             --self-contained true
-            -o ./ConwaysGameOfLife-Windows
+            -o ./windows-build/ConwaysGameOfLife
 
       - name: Archive Windows build
-        run: powershell Compress-Archive -Path ./ConwaysGameOfLife-Windows -DestinationPath ./win-x64.zip
+        run: Set-Location ./windows-build |
+            powershell Compress-Archive -Path ./ConwaysGameOfLife -DestinationPath ../win-x64.zip |
+            Set-Location ../
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
