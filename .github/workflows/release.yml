@@ -20,8 +20,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      - name: Restore dependencies
+        run: dotnet restore
+
       - name: Publish Linux (AOT)
-        run: dotnet publish -c Release -r linux-x64 -p:PublishAot=true --self-contained true -o ./publish-linux
+        run: dotnet publish ./src/Conway.App/ -c Release -r linux-x64 -p:PublishAot=true --self-contained true -o ./publish-linux
 
       - name: Archive Linux build
         run: zip -r linux-x64.zip ./publish-linux
@@ -47,7 +50,7 @@ jobs:
         run: dotnet restore
 
       - name: Publish Windows (AOT)
-        run: dotnet publish -c Release -r win-x64 -p:PublishAot=true --self-contained true -o ./publish-windows
+        run: dotnet publish ./src/Conway.App/ -c Release -r win-x64 -p:PublishAot=true --self-contained true -o ./publish-windows
 
       - name: Archive Windows build
         run: powershell Compress-Archive -Path ./publish-windows -DestinationPath ./win-x64.zip
@@ -60,6 +63,8 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [build-linux, build-windows]
     steps:
       - name: Download Linux artifact
