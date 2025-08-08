@@ -1,7 +1,6 @@
 namespace Conway.App.Controls
 
 open Raylib_cs
-open System.Text
 
 type MessageBox
     (

@@ -2,19 +2,11 @@ namespace Conway.App
 
 open Config
 open Conway.App.Controls
-open Conway.App.File
 open Conway.App.Utils.Alias
 open Conway.Core
-open Conway.Encoding
 open Raylib_cs
-open System
-open System.IO
 
 module Callbacks =
-    open Conway.App.Graphics
-    open Conway.App.Input
-    open System.Collections.Generic
-
     let saveFile (ctx: ApplicationContext) =
         try
             Run.saveFileProgram ctx
