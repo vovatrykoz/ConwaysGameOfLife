@@ -24,14 +24,15 @@ jobs:
         run: dotnet restore
 
       - name: Publish Linux (AOT)
-        run: dotnet publish \
-              ./src/Conway.App/ \
-              -c Release \
-              -r linux-x64 \
-              -p:PublishAot=true \
-              -p:AssemblyName=ConwaysGameOfLife \
-              --self-contained true \
-              -o ./linux-build/ConwaysGameOfLife
+        run: >
+            dotnet publish
+            ./src/Conway.App/
+            -c Release
+            -r linux-x64
+            -p:PublishAot=true
+            -p:AssemblyName=ConwaysGameOfLife
+            --self-contained true
+            -o ./linux-build/ConwaysGameOfLife
 
       - name: Archive Linux build
         run: zip -r linux-x64.zip ./linux-build/ConwaysGameOfLife
@@ -57,14 +58,15 @@ jobs:
         run: dotnet restore
 
       - name: Publish Windows (AOT)
-        run: dotnet publish \
-              ./src/Conway.App/\
-              -c Release \
-              -r win-x64 \
-              -p:PublishAot=true \
-              -p:AssemblyName=ConwaysGameOfLife \
-              --self-contained true \
-              -o ./windows-build/ConwaysGameOfLife
+        run: > 
+            dotnet publish
+            ./src/Conway.App/
+            -c Release
+            -r win-x64
+            -p:PublishAot=true
+            -p:AssemblyName=ConwaysGameOfLife
+            --self-contained true
+            -o ./windows-build/ConwaysGameOfLife
 
       - name: Archive Windows build
         run: powershell Compress-Archive -Path ./windows-build/ConwaysGameOfLife -DestinationPath ./win-x64.zip
