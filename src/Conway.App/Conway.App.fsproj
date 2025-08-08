@@ -25,6 +25,7 @@
     <Compile Include="Graphics/Display.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="ApplicationContext.fs" />
+    <Compile Include="Run.fs" />
     <Compile Include="Callbacks.fs" />
     <Compile Include="Buttons.fs" />
     <Compile Include="Hotkeys.fs" />
@@ -36,7 +37,6 @@
     <ProjectReference Include="..\Conway.Encoding\Conway.Encoding.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GtkSharp" Version="3.24.24.95" />
     <PackageReference Include="Raylib-cs" Version="7.0.1" />
   </ItemGroup>
   <PropertyGroup>
