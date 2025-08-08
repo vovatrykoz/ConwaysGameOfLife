@@ -229,6 +229,22 @@ module Display =
                     (int filePicker.FileEntryHeight)
                     Color.White
                     Color.Black
+
+                let currentFileTypeText =
+                    match currentFile.FileType with
+                    | CompressedSave -> "Selected file type:\nCompressed Savefile"
+                    | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
+                    | Other -> "Selected file type:\nOther"
+
+                Draw.label
+                    (float32 filePicker.X + 600.0f)
+                    (float32 y + float32 filePicker.FileEntryHeight * float32 15.0f)
+                    (int (filePicker.FileEntryHeight - 10.0f))
+                    currentFileTypeText
+                    (int filePicker.FileEntryWidth)
+                    (int filePicker.FileEntryHeight)
+                    Color.Black
+                    Color.White
             else
                 Draw.label
                     (float32 filePicker.X)
@@ -239,25 +255,6 @@ module Display =
                     (int filePicker.FileEntryHeight)
                     Color.Black
                     Color.White
-
-                match filePicker.CurrentSelection with
-                | None -> ()
-                | Some file ->
-                    let currentFileTypeText =
-                        match file.FileType with
-                        | CompressedSave -> "Selected file type:\nCompressed Savefile"
-                        | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
-                        | Other -> "Selected file type:\nOther"
-
-                    Draw.label
-                        (float32 filePicker.X + 600.0f)
-                        (float32 y + float32 filePicker.FileEntryHeight * float32 15.0f)
-                        (int (filePicker.FileEntryHeight - 10.0f))
-                        currentFileTypeText
-                        (int filePicker.FileEntryWidth)
-                        (int filePicker.FileEntryHeight)
-                        Color.Black
-                        Color.White
 
         Draw.button filePicker.ConfirmButton
         Draw.button filePicker.CancelButton
