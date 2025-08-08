@@ -24,10 +24,17 @@ jobs:
         run: dotnet restore
 
       - name: Publish Linux (AOT)
-        run: dotnet publish ./src/Conway.App/ -c Release -r linux-x64 -p:PublishAot=true --self-contained true -o ./publish-linux
+        run: dotnet publish \
+              ./src/Conway.App/ \
+              -c Release \
+              -r linux-x64 \
+              -p:PublishAot=true \
+              -p:AssemblyName=ConwaysGameOfLife \
+              --self-contained true \
+              -o ./linux-build/ConwaysGameOfLife
 
       - name: Archive Linux build
-        run: zip -r linux-x64.zip ./publish-linux
+        run: zip -r linux-x64.zip ./linux-build/ConwaysGameOfLife
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
@@ -50,10 +57,17 @@ jobs:
         run: dotnet restore
 
       - name: Publish Windows (AOT)
-        run: dotnet publish ./src/Conway.App/ -c Release -r win-x64 -p:PublishAot=true --self-contained true -o ./publish-windows
+        run: dotnet publish \
+              ./src/Conway.App/\
+              -c Release \
+              -r win-x64 \
+              -p:PublishAot=true \
+              -p:AssemblyName=ConwaysGameOfLife \
+              --self-contained true \
+              -o ./windows-build/ConwaysGameOfLife
 
       - name: Archive Windows build
-        run: powershell Compress-Archive -Path ./publish-windows -DestinationPath ./win-x64.zip
+        run: powershell Compress-Archive -Path ./ConwaysGameOfLife -DestinationPath ./win-x64.zip
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
