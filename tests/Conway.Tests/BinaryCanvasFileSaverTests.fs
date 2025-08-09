@@ -8,6 +8,7 @@ open NUnit.Framework
 
 module ``Binary Canvas File Saver Tests`` =
     open Conway.App
+    open NUnit.Framework.Legacy
 
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =

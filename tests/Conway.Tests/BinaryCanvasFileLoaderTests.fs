@@ -7,6 +7,7 @@ open Conway.Core
 open NUnit.Framework
 
 module ``Binary Canvas File Loader Tests`` =
+    open NUnit.Framework.Legacy
 
     [<Test>]
     let ``Can correctly load a simple canvas with default camera parameters`` () =
