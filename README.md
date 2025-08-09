@@ -17,6 +17,8 @@ Created to explore the performance capabilities of F# with a large grid and basi
 
 ## Getting Started
 
+This guide is for those who want to build the project from source. If you just want to run the published executables, feel free to skip ahead to the **Usage** section.
+
 ### Prerequisites
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later installed  
@@ -40,7 +42,7 @@ To create an AoT build use:
 dotnet publish -r <your_platform> -c Release --property:PublishDir=<output_directory>
 ```
 
-### Usage
+## Usage
 Run Game.exe to start the game. On launch, the program generates a random grid. Use save/load buttons to save or load game state. Run the simulation continuously or step-by-step based on your preference.
 
 To change the size of the starting grid, run Game.exe from the command line with width and height arguments:
@@ -48,7 +50,7 @@ To change the size of the starting grid, run Game.exe from the command line with
 ./Game.exe <width> <height>
 ```
 
-# Controls
+### Controls
 
 - `Click and drag` to move around the grid  
 - `Shift + Left Mouse Button` — make a cell alive  
@@ -57,7 +59,7 @@ To change the size of the starting grid, run Game.exe from the command line with
 - `Right arrow` — move to the next generation
 - `Mouse wheel` - zoom in/zoom out
 
-# Buttons
+### Buttons
 
 - `Save` — save the current state of the game to a file  
 - `Load` — load a previously saved state from a file  
