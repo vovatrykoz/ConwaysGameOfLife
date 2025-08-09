@@ -64,6 +64,7 @@ To change the size of the starting grid, run Game.exe from the command line with
 - `Save` — save the current state of the game to a file  
 - `Load` — load a previously saved state from a file  
 - `Run` — run the grid; press again to pause  
+- `Rand` — randomize the current grid  
 - `Next` — advance to the next generation  
 - `Clear` — set all cells to dead  
 - `Reset` — restore the grid to its initial state.  
