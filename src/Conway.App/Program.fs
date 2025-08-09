@@ -13,85 +13,171 @@ Display.loadingScreen (float32 (Default.windowWidth / 2)) (float32 (Default.wind
 
 let args = Environment.GetCommandLineArgs()
 
-let gridWidth =
-    UserInput.tryReadArg args Default.gridWidthIndex "width" Default.gridWidth
+let userInput = UserInput.tryReadArgs args
 
-let gridHeight =
-    UserInput.tryReadArg args Default.gridHeightIndex "height" Default.gridHeight
+match userInput with
+| Error err ->
+    match err with
+    | UnknownSwitch sw -> Raylib.TraceLog(TraceLogLevel.Error, $"Unknown switch {sw}. Terminating the program")
+    | NoWidthProvided ->
+        Raylib.TraceLog(
+            TraceLogLevel.Error,
+            $"No width value provided after the width switch (-w|--width) was used. Terminating the program"
+        )
+    | NoHeightProvided ->
+        Raylib.TraceLog(
+            TraceLogLevel.Error,
+            $"No height value provided after the height switch (-h|--height) was used. Terminating the program"
+        )
 
-let sleepTime = Default.sleepTimeCalculator gridWidth gridHeight
+    Environment.Exit 1
+| Ok result ->
+    let gridWidth =
+        match result.WidthResult with
+        | None ->
+            Raylib.TraceLog(TraceLogLevel.Warning, $"No width value provided, using default: {Default.gridWidth}")
+            Ok Default.gridWidth
+        | Some result ->
+            match result with
+            | Error err ->
+                match err with
+                | NumberTooLarge value ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The width value was outside of the allowed range: {value}\n"
+                        + $"Largest allowed value {Int32.MaxValue}"
+                        + $"Smallest allowed value {Int32.MinValue}"
+                    )
 
-let camera = new Camera(float32 (gridWidth / 2), float32 (gridHeight / 2))
+                    Error()
 
-let startingState = ConwayGrid.createDead gridWidth gridHeight
+                | InvalidNumber value ->
+                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was not a valid number: {value}")
+                    Error()
 
-let canvas =
-    new Canvas(
-        Default.canvasX,
-        Default.canvasY,
-        float32 Default.windowWidth - Default.widthOffset,
-        float32 Default.windowHeight - Default.heightOffset,
-        camera,
-        new Game(startingState),
-        Default.cellSize
-    )
+                | NegativeNumber value ->
+                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was negative: {value}")
+                    Error()
+                | NullInput ->
+                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided width string was null")
+                    Error()
 
-let controlManager = new ControlManager()
+            | Ok value ->
+                Raylib.TraceLog(TraceLogLevel.Info, $"Setting width = {value}")
+                Ok value
 
-let renderTexture =
-    Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+    let gridHeight =
+        match result.HeightResult with
+        | None ->
+            Raylib.TraceLog(TraceLogLevel.Warning, $"No height value provided, using default: {Default.gridHeight}")
+            Ok Default.gridHeight
+        | Some result ->
+            match result with
+            | Error err ->
+                match err with
+                | NumberTooLarge value ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The height value was outside of the allowed range: {value}\n"
+                        + $"Largest allowed value {Int32.MaxValue}"
+                        + $"Smallest allowed value {Int32.MinValue}"
+                    )
 
-let currentContext =
-    new ApplicationContext(GameRunMode.Paused, canvas, renderTexture)
+                    Error()
 
-controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
-controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
-controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
+                | InvalidNumber value ->
+                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was not a valid number: {value}")
+                    Error()
 
-let gameUpdateLoop () =
-    let mutable shouldRun = false
+                | NegativeNumber value ->
+                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was negative: {value}")
+                    Error()
+                | NullInput ->
+                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided height string was null")
+                    Error()
+            | Ok value ->
+                Raylib.TraceLog(TraceLogLevel.Info, $"Setting height = {value}")
+                Ok value
 
-    async {
-        while true do
-            do! Async.Sleep sleepTime
+    match gridWidth, gridHeight with
+    | Error(), _
+    | _, Error() ->
+        Raylib.TraceLog(TraceLogLevel.Error, $"Terminating the program")
+        Environment.Exit 1
+    | Ok width, Ok height ->
+        let sleepTime = Default.sleepTimeCalculator width height
 
-            shouldRun <-
-                match currentContext.GameMode with
-                | GameRunMode.Infinite -> true
-                | GameRunMode.Step ->
-                    currentContext.GameMode <- GameRunMode.Paused
-                    true
-                | GameRunMode.Paused
-                | _ -> false
+        let camera = new Camera(float32 (width / 2), float32 (height / 2))
 
-            if shouldRun then
-                canvas.Game.RunOneStep()
-    }
+        let startingState = ConwayGrid.createDead width height
 
-gameUpdateLoop () |> Async.Start
+        let canvas =
+            new Canvas(
+                Default.canvasX,
+                Default.canvasY,
+                float32 Default.windowWidth - Default.widthOffset,
+                float32 Default.windowHeight - Default.heightOffset,
+                camera,
+                new Game(startingState),
+                Default.cellSize
+            )
 
-let mutable fps = 0.0
-let maxSamples = Default.maxFpsSamples
-let frameTimes = Array.create maxSamples 0.0
-let mutable insertIndex = 0
+        let controlManager = new ControlManager()
 
-let stopwatch = Stopwatch.StartNew()
+        let renderTexture =
+            Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
 
-while not (raylibTrue (Raylib.WindowShouldClose())) do
-    let frameStart = stopwatch.Elapsed.TotalSeconds
+        let currentContext =
+            new ApplicationContext(GameRunMode.Paused, canvas, renderTexture)
 
-    Display.mainWindow controlManager canvas renderTexture (int fps) (Raylib.GetMousePosition())
+        controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
+        controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
+        controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
 
-    controlManager.ReadInput()
-    controlManager.UpdateControls()
-    canvas.ProcessDrawableArea()
+        let gameUpdateLoop () =
+            let mutable shouldRun = false
 
-    let frameEnd = stopwatch.Elapsed.TotalSeconds
-    let frameTime = frameEnd - frameStart
+            async {
+                while true do
+                    do! Async.Sleep sleepTime
 
-    frameTimes[insertIndex] <- frameTime
-    insertIndex <- (insertIndex + 1) % maxSamples
-    fps <- 1.0 / (frameTimes |> Array.average)
+                    shouldRun <-
+                        match currentContext.GameMode with
+                        | GameRunMode.Infinite -> true
+                        | GameRunMode.Step ->
+                            currentContext.GameMode <- GameRunMode.Paused
+                            true
+                        | GameRunMode.Paused
+                        | _ -> false
 
-Raylib.UnloadRenderTexture renderTexture
-Display.close ()
+                    if shouldRun then
+                        canvas.Game.RunOneStep()
+            }
+
+        gameUpdateLoop () |> Async.Start
+
+        let mutable fps = 0.0
+        let maxSamples = Default.maxFpsSamples
+        let frameTimes = Array.create maxSamples 0.0
+        let mutable insertIndex = 0
+
+        let stopwatch = Stopwatch.StartNew()
+
+        while not (raylibTrue (Raylib.WindowShouldClose())) do
+            let frameStart = stopwatch.Elapsed.TotalSeconds
+
+            Display.mainWindow controlManager canvas renderTexture (int fps) (Raylib.GetMousePosition())
+
+            controlManager.ReadInput()
+            controlManager.UpdateControls()
+            canvas.ProcessDrawableArea()
+
+            let frameEnd = stopwatch.Elapsed.TotalSeconds
+            let frameTime = frameEnd - frameStart
+
+            frameTimes[insertIndex] <- frameTime
+            insertIndex <- (insertIndex + 1) % maxSamples
+            fps <- 1.0 / (frameTimes |> Array.average)
+
+        Raylib.UnloadRenderTexture renderTexture
+        Display.close ()
