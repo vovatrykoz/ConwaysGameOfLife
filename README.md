@@ -34,7 +34,7 @@ cd ConwaysGameOfLife
 
 To create a JiT build use:
 ```
-dotnet build
+dotnet build -c Release
 ```
 
 To create an AoT build use:
