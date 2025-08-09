@@ -31,6 +31,18 @@ module Callbacks =
                 $"Failed to load the save with the following error:\n\t{excepionMessage}\nStack trace:\n\t{stackTrace}"
             )
 
+    let randomize (ctx: ApplicationContext) =
+        let currentGameMode = ctx.GameMode
+
+        match currentGameMode with
+        | GameRunMode.Paused ->
+            ctx.Canvas.Game.CurrentState <-
+                ConwayGrid.createRandomWithOdds
+                    ctx.Canvas.Game.CurrentState.ActiveWidth
+                    ctx.Canvas.Game.CurrentState.ActiveHeight
+                    Default.oddsOfGettingLivingCell
+        | _ -> ()
+
     let toggleGame (ctx: ApplicationContext) =
         let currentGameMode = ctx.GameMode
 

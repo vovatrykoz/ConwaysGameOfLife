@@ -23,8 +23,7 @@ let sleepTime = Default.sleepTimeCalculator gridWidth gridHeight
 
 let camera = new Camera(float32 (gridWidth / 2), float32 (gridHeight / 2))
 
-let startingState =
-    ConwayGrid.createRandomWithOdds gridWidth gridHeight Default.oddsOfGettingLivingCell
+let startingState = ConwayGrid.createDead gridWidth gridHeight
 
 let canvas =
     new Canvas(
