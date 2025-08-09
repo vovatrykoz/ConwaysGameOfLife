@@ -34,9 +34,10 @@ jobs:
             -o ./linux-build/ConwaysGameOfLife
 
       - name: Archive Linux build
-        run: cd ./linux-build/ |
-            zip -r ../linux-x64.zip ./ConwaysGameOfLife |
-            cd ../
+        run: |
+          cd ./linux-build
+          zip -r ../linux-x64.zip ./ConwaysGameOfLife
+          cd ../
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
