@@ -2,29 +2,97 @@ namespace Conway.App
 
 open Raylib_cs
 
+type ParsingStep =
+    | ReadingSwitches
+    | ReadingWidth
+    | ReadingHeight
+
+type ParsingError =
+    | UnknownSwitch of string
+    | NoWidthProvided
+    | NoHeightProvided
+
+type IntCastingError =
+    | NullInput
+    | InvalidNumber of string
+    | NumberTooLarge of string
+    | NegativeNumber of int
+
+type UserDefinedValues = {
+    WidthResult: Result<int, IntCastingError> option
+    HeightResult: Result<int, IntCastingError> option
+} with
+
+    static member create widthOption heigthOption = {
+        WidthResult = widthOption
+        HeightResult = heigthOption
+    }
+
+    static member empty = {
+        WidthResult = None
+        HeightResult = None
+    }
+
 module UserInput =
-    let tryReadInt (stringValue: string) (parseName: string) (fallbackValue: int) =
+
+    let widthShortSwitch, widthLongSwitch = "-w", "--width"
+
+    let heightShortSwitch, heightLongSwitch = "-h", "--height"
+
+    let tryReadInt (stringValue: string) =
         try
             match int stringValue with
-            | x when x <= 0 ->
-                Raylib.TraceLog(TraceLogLevel.Error, $"The {parseName} cannot be <= 0. Got {x}")
-                Raylib.TraceLog(TraceLogLevel.Warning, $"Using default: {fallbackValue}")
-                Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
-                fallbackValue
-            | x ->
-                Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {x}")
-                x
-        with ex ->
-            let exceptionString = ex.ToString().Replace("\n", "\n\t")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Could not parse the {parseName}. Given: {stringValue}")
-            Raylib.TraceLog(TraceLogLevel.Error, $"Detailed error information:\n\t{exceptionString}")
-            Raylib.TraceLog(TraceLogLevel.Info, $"Setting {parseName} = {fallbackValue}")
+            | x when x <= 0 -> Error(NegativeNumber x)
+            | x -> Ok x
+        with
+        | :? System.OverflowException -> Error(NumberTooLarge stringValue)
+        | :? System.FormatException -> Error(InvalidNumber stringValue)
+        | :? System.ArgumentNullException -> Error NullInput
 
-            fallbackValue
-
-    let tryReadArg args index name defaultVal =
-        if Array.length args > index then
-            tryReadInt args[index] name defaultVal
+    [<TailCall>]
+    let rec private tryReadArgsRec (args: string array) index parsingStep state =
+        if index >= args.Length then
+            match parsingStep with
+            | ReadingWidth -> Error NoWidthProvided
+            | ReadingHeight -> Error NoHeightProvided
+            | _ -> Ok state
         else
-            Raylib.TraceLog(TraceLogLevel.Info, $"No {name} provided. Using default: {defaultVal}")
-            defaultVal
+            match parsingStep with
+            | ReadingSwitches ->
+                match args[index] with
+                | "-w"
+                | "--width" -> tryReadArgsRec args (index + 1) ReadingWidth state
+                | "-h"
+                | "--height" -> tryReadArgsRec args (index + 1) ReadingHeight state
+                | _ -> Error(UnknownSwitch args[index])
+            | ReadingWidth ->
+                let conversionResult = tryReadInt args[index]
+
+                match conversionResult with
+                | Ok result ->
+                    tryReadArgsRec args (index + 1) ReadingSwitches {
+                        state with
+                            WidthResult = Some(Ok result)
+                    }
+                | Error err ->
+                    tryReadArgsRec args (index + 1) ReadingSwitches {
+                        state with
+                            WidthResult = Some(Error err)
+                    }
+            | ReadingHeight ->
+                let conversionResult = tryReadInt args[index]
+
+                match conversionResult with
+                | Ok result ->
+                    tryReadArgsRec args (index + 1) ReadingSwitches {
+                        state with
+                            HeightResult = Some(Ok result)
+                    }
+                | Error err ->
+                    tryReadArgsRec args (index + 1) ReadingSwitches {
+                        state with
+                            HeightResult = Some(Error err)
+                    }
+
+    let tryReadArgs (args: string array) =
+        tryReadArgsRec args 1 ReadingSwitches UserDefinedValues.empty

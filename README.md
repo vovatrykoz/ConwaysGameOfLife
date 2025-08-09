@@ -43,11 +43,11 @@ dotnet publish -r <your_platform> -c Release --property:PublishDir=<output_direc
 ```
 
 ## Usage
-Run Game.exe to start the game. On launch, the program generates a random grid. Use save/load buttons to save or load game state. Run the simulation continuously or step-by-step based on your preference.
+Run Game.exe to start the game. On launch, the program generates dead grid. Use save/load buttons to save or load game state. You can run the simulation continuously or step-by-step based on your preference.
 
 To change the size of the starting grid, run Game.exe from the command line with width and height arguments:
 ```
-./Game.exe <width> <height>
+./Game.exe -w|--width <width> -h|--height <height>
 ```
 
 ### Controls
