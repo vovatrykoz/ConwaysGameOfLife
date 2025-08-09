@@ -25,11 +25,21 @@ module Buttons =
 
     let createRunButtonInstance (ctx: ApplicationContext) =
         Button.create
-        |> Button.position (Default.windowWidth - 200) (Default.windowHeight - 200)
+        |> Button.position (Default.windowWidth - 200) (Default.windowHeight - 300)
         |> Button.width 50
         |> Button.height 50
         |> Button.onClickCallback (fun _ -> Callbacks.toggleGame ctx)
         |> Button.onUpdateCallback (fun btn -> Callbacks.update ctx btn)
+        |> Button.shortcut KeyboardKey.Space
+
+    let createRandomizeButtonInstance (ctx: ApplicationContext) =
+        Button.create
+        |> Button.position (Default.windowWidth - 200) (Default.windowHeight - 200)
+        |> Button.width 50
+        |> Button.height 50
+        |> Button.text "Rand"
+        |> Button.onClickCallback (fun _ -> Callbacks.randomize ctx)
+        |> Button.onUpdateCallback (fun btn -> Callbacks.updateOnRun ctx btn)
         |> Button.shortcut KeyboardKey.Space
 
     let createAdvanceButtonInstance (ctx: ApplicationContext) =
@@ -62,6 +72,7 @@ module Buttons =
 
     let instantiate (ctx: ApplicationContext) = [|
         createRunButtonInstance ctx
+        createRandomizeButtonInstance ctx
         createAdvanceButtonInstance ctx
         createResetButtonInstance ctx
         createClearButtonInstance ctx
