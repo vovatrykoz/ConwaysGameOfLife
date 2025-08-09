@@ -47,7 +47,7 @@ Run Game.exe to start the game. On launch, the program generates dead grid. Use 
 
 To change the size of the starting grid, run Game.exe from the command line with width and height arguments:
 ```
-./Game.exe <width> <height>
+./Game.exe -w|--width <width> -h|--height <height>
 ```
 
 ### Controls
