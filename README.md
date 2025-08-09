@@ -52,7 +52,7 @@ To change the size of the starting grid, run Game.exe from the command line with
 
 ### Controls
 
-- `Click and drag` to move around the grid  
+- `Click and drag` - move around the grid  
 - `Shift + Left Mouse Button` — make a cell alive  
 - `Shift + Right Mouse Button` — make a cell dead  
 - `Space` — run the grid; press again to pause  
