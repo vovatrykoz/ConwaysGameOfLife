@@ -54,7 +54,6 @@ match userInput with
                 | InvalidNumber value ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was not a valid number: {value}")
                     Error()
-
                 | NegativeNumber value ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was negative: {value}")
                     Error()
@@ -88,7 +87,6 @@ match userInput with
                 | InvalidNumber value ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was not a valid number: {value}")
                     Error()
-
                 | NegativeNumber value ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was negative: {value}")
                     Error()
@@ -106,9 +104,7 @@ match userInput with
         Environment.Exit 1
     | Ok width, Ok height ->
         let sleepTime = Default.sleepTimeCalculator width height
-
         let camera = new Camera(float32 (width / 2), float32 (height / 2))
-
         let startingState = ConwayGrid.createDead width height
 
         let canvas =
