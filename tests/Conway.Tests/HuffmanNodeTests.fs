@@ -104,7 +104,7 @@ module ``Huffman Node`` =
                 let emptyPriorityQueue = new PriorityQueue<HuffmanNode<char>, int>()
 
                 let expected = None
-                let actual = HuffmanNode<char>.buildTreeFromPriorityQueue emptyPriorityQueue
+                let actual = HuffmanNode<char>.tryBuildTreeFromPriorityQueue emptyPriorityQueue
 
                 Assert.That(actual, Is.EqualTo expected)
 
@@ -116,7 +116,7 @@ module ``Huffman Node`` =
                 let node = HuffmanNode<char>.createLeaf frequency value
                 priorityQueue.Enqueue(node, frequency)
 
-                let root = HuffmanNode<char>.buildTreeFromPriorityQueue priorityQueue
+                let root = HuffmanNode<char>.tryBuildTreeFromPriorityQueue priorityQueue
                 let expected = Some node
 
                 Assert.That(root, Is.EqualTo expected)
@@ -146,6 +146,6 @@ module ``Huffman Node`` =
                 priorityQueue.Enqueue(node3, node3.Weight)
                 priorityQueue.Enqueue(node4, node4.Weight)
 
-                let actual = HuffmanNode<char>.buildTreeFromPriorityQueue priorityQueue
+                let actual = HuffmanNode<char>.tryBuildTreeFromPriorityQueue priorityQueue
 
                 Assert.That(actual, Is.EqualTo expected)

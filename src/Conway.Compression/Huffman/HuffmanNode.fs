@@ -27,6 +27,21 @@ type HuffmanNode<'T> = {
     [<CompiledName("BuildTreeFromPriorityQueue")>]
     static member buildTreeFromPriorityQueue(priorityQueue: PriorityQueue<HuffmanNode<'T>, int>) =
         match priorityQueue.Count with
+        | x when x = 1 -> priorityQueue.Dequeue()
+        | x when x >= 2 ->
+            while priorityQueue.Count >= 2 do
+                let leftNode = priorityQueue.Dequeue()
+                let rightNode = priorityQueue.Dequeue()
+                let newNode = leftNode.MergeWith rightNode
+
+                priorityQueue.Enqueue(newNode, newNode.Weight)
+
+            priorityQueue.Dequeue()
+        | _ -> invalidArg (nameof priorityQueue) "The priority queue was empty. No symbols to encode"
+
+    [<CompiledName("TryBuildTreeFromPriorityQueue")>]
+    static member tryBuildTreeFromPriorityQueue(priorityQueue: PriorityQueue<HuffmanNode<'T>, int>) =
+        match priorityQueue.Count with
         | x when x = 1 -> Some(priorityQueue.Dequeue())
         | x when x >= 2 ->
             while priorityQueue.Count >= 2 do
