@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BitVector8.fs" />
+    <Compile Include="BitVector8.fs" /><Compile Include="BitVector8Tracked.fs" />
     <Compile Include="IConwayByteEncoder.fs" />
     <Compile Include="IConwayByteDecoder.fs" />
     <Compile Include="ConwayByteEncoder.fs" /><Compile Include="ConwayByteDecoder.fs" />

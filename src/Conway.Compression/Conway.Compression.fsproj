@@ -8,8 +8,12 @@
   <ItemGroup>
     <Compile Include="IByteCompressor.fs" />
     <Compile Include="IByteDecompressor.fs" />
-    <Compile Include="Huffman/HuffmanNodeType.fs" />
-    <Compile Include="Huffman/HuffmanNode.fs" />
+    <Compile Include="Huffman\HuffmanNode.fs" />
+    <Compile Include="Huffman\WeightedHuffmanNode.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Conway.Encoding\Conway.Encoding.fsproj" />
   </ItemGroup>
 
   <PropertyGroup>

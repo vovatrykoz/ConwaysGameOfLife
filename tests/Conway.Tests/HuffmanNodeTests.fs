@@ -10,7 +10,7 @@ module ``Huffman Node`` =
         //
         [<Property>]
         let ``The "Left" component of the internal huffman node is correctly assigned on creation``
-            (leftValue: HuffmanNodeType<char>, rightValue: HuffmanNodeType<char>)
+            (leftValue: HuffmanNode<char>, rightValue: HuffmanNode<char>)
             =
             let internalHuffmanNode = InternalHuffmanNode<char>.create leftValue rightValue
 
@@ -18,7 +18,7 @@ module ``Huffman Node`` =
 
         [<Property>]
         let ``The "Right" component of the internal huffman node is correctly assigned on creation``
-            (leftValue: HuffmanNodeType<char>, rightValue: HuffmanNodeType<char>)
+            (leftValue: HuffmanNode<char>, rightValue: HuffmanNode<char>)
             =
             let internalHuffmanNode = InternalHuffmanNode<char>.create leftValue rightValue
 
@@ -26,16 +26,16 @@ module ``Huffman Node`` =
 
         [<Property>]
         let ``Can create an internal node with the corresponding static member of HuffmanNodeType``
-            (leftValue: HuffmanNodeType<char>, rightValue: HuffmanNodeType<char>)
+            (leftValue: HuffmanNode<char>, rightValue: HuffmanNode<char>)
             =
-            let actual = HuffmanNodeType<char>.createInternal leftValue rightValue
+            let actual = HuffmanNode<char>.createInternal leftValue rightValue
             let expected = InternalNode(InternalHuffmanNode<char>.create leftValue rightValue)
 
             Assert.That(actual, Is.EqualTo expected)
 
         [<Property>]
         let ``Can create a leaf node with the corresponding static member of HuffmanNodeType`` (value: char) =
-            let actual = HuffmanNodeType<char>.createLeaf value
+            let actual = HuffmanNode<char>.createLeaf value
             let expected = Leaf value
 
             Assert.That(actual, Is.EqualTo expected)
@@ -46,49 +46,49 @@ module ``Huffman Node`` =
             //
             [<Property>]
             let ``Can create a new node using the corresponding static member ``
-                (weight: int, node: HuffmanNodeType<char>)
+                (weight: int, node: HuffmanNode<char>)
                 =
                 let expected = { Weight = weight; Node = node }
-                let actual = HuffmanNode<char>.create weight node
+                let actual = WeightedHuffmanNode<char>.create weight node
 
                 Assert.That(actual, Is.EqualTo expected)
 
             [<Property>]
             let ``Can create an internal node using the corresponding static member ``
-                (weight: int, leftNode: HuffmanNodeType<char>, rightNode: HuffmanNodeType<char>)
+                (weight: int, leftNode: HuffmanNode<char>, rightNode: HuffmanNode<char>)
                 =
                 let expected = {
                     Weight = weight
                     Node = InternalNode(InternalHuffmanNode<_>.create leftNode rightNode)
                 }
 
-                let actual = HuffmanNode<char>.createInternal weight leftNode rightNode
+                let actual = WeightedHuffmanNode<char>.createInternal weight leftNode rightNode
 
                 Assert.That(actual, Is.EqualTo expected)
 
             [<Property>]
             let ``Can create a leaf node using the corresponding static member `` (weight: int, value: char) =
                 let expected = { Weight = weight; Node = Leaf value }
-                let actual = HuffmanNode<char>.createLeaf weight value
+                let actual = WeightedHuffmanNode<char>.createLeaf weight value
 
                 Assert.That(actual, Is.EqualTo expected)
 
             [<Property>]
             let ``Can merge two nodes using the corresponding static member ``
-                (leftNode: HuffmanNode<char>, rightNode: HuffmanNode<char>)
+                (leftNode: WeightedHuffmanNode<char>, rightNode: WeightedHuffmanNode<char>)
                 =
                 let expected = {
                     Weight = leftNode.Weight + rightNode.Weight
                     Node = InternalNode(InternalHuffmanNode<char>.create leftNode.Node rightNode.Node)
                 }
 
-                let actual = HuffmanNode<char>.merge leftNode rightNode
+                let actual = WeightedHuffmanNode<char>.merge leftNode rightNode
 
                 Assert.That(actual, Is.EqualTo expected)
 
             [<Property>]
             let ``Can merge two nodes using the corresponding instance member ``
-                (leftNode: HuffmanNode<char>, rightNode: HuffmanNode<char>)
+                (leftNode: WeightedHuffmanNode<char>, rightNode: WeightedHuffmanNode<char>)
                 =
                 let expected = {
                     Weight = leftNode.Weight + rightNode.Weight
@@ -101,10 +101,12 @@ module ``Huffman Node`` =
 
             [<Test>]
             let ``Trying to build a huffman tree from an empty priority queue returns "None"`` () =
-                let emptyPriorityQueue = new PriorityQueue<HuffmanNode<char>, int>()
+                let emptyPriorityQueue = new PriorityQueue<WeightedHuffmanNode<char>, int>()
 
                 let expected = None
-                let actual = HuffmanNode<char>.tryBuildTreeFromPriorityQueue emptyPriorityQueue
+
+                let actual =
+                    WeightedHuffmanNode<char>.tryBuildTreeFromPriorityQueue emptyPriorityQueue
 
                 Assert.That(actual, Is.EqualTo expected)
 
@@ -112,20 +114,24 @@ module ``Huffman Node`` =
             let ``Building a huffman tree from a priority queue with a single element results in a huffman tree with just one node``
                 (value: char, frequency: int)
                 =
-                let priorityQueue = new PriorityQueue<HuffmanNode<char>, int>()
-                let node = HuffmanNode<char>.createLeaf frequency value
+                let priorityQueue = new PriorityQueue<WeightedHuffmanNode<char>, int>()
+                let node = WeightedHuffmanNode<char>.createLeaf frequency value
                 priorityQueue.Enqueue(node, frequency)
 
-                let root = HuffmanNode<char>.tryBuildTreeFromPriorityQueue priorityQueue
-                let expected = Some node
+                let root = WeightedHuffmanNode<char>.tryBuildTreeFromPriorityQueue priorityQueue
+                let expected = Some node.Node
 
                 Assert.That(root, Is.EqualTo expected)
 
             [<Property>]
             let ``Building a huffman tree from several leaves results in a correct tree``
-                (node1: HuffmanNode<char>, node2: HuffmanNode<char>, node3: HuffmanNode<char>, node4: HuffmanNode<char>)
-                =
-                let priorityQueue = new PriorityQueue<HuffmanNode<char>, int>()
+                (
+                    node1: WeightedHuffmanNode<char>,
+                    node2: WeightedHuffmanNode<char>,
+                    node3: WeightedHuffmanNode<char>,
+                    node4: WeightedHuffmanNode<char>
+                ) =
+                let priorityQueue = new PriorityQueue<WeightedHuffmanNode<char>, int>()
 
                 priorityQueue.Enqueue(node1, node1.Weight)
                 priorityQueue.Enqueue(node2, node2.Weight)
@@ -139,13 +145,13 @@ module ``Huffman Node`` =
 
                     priorityQueue.Enqueue(newNode, newNode.Weight)
 
-                let expected = Some(priorityQueue.Dequeue())
+                let expected = Some(priorityQueue.Dequeue().Node)
 
                 priorityQueue.Enqueue(node1, node1.Weight)
                 priorityQueue.Enqueue(node2, node2.Weight)
                 priorityQueue.Enqueue(node3, node3.Weight)
                 priorityQueue.Enqueue(node4, node4.Weight)
 
-                let actual = HuffmanNode<char>.tryBuildTreeFromPriorityQueue priorityQueue
+                let actual = WeightedHuffmanNode<char>.tryBuildTreeFromPriorityQueue priorityQueue
 
                 Assert.That(actual, Is.EqualTo expected)

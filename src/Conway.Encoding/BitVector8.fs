@@ -13,10 +13,20 @@ type BitVector8 private (b: byte) =
     [<CompiledName("CreateFromByte")>]
     static member createFromByte b = BitVector8 b
 
-    member inline bv.ReadBitAt(position: int) = bv.Byte >>> position &&& 1uy = 1uy
+    [<CompiledName("ReadBit")>]
+    static member inline readBit (position: int) (bitVector: BitVector8) =
+        bitVector.Byte >>> position &&& 1uy = 1uy
 
-    member bv.SetBitAt(position: int) =
-        BitVector8(bv.Byte ||| (1uy <<< position))
+    member inline bv.ReadBitAt(position: int) = BitVector8.readBit position bv
 
-    member bv.ClearBitAt(position: int) =
-        BitVector8(bv.Byte &&& ~~~(1uy <<< position))
+    [<CompiledName("SetBit")>]
+    static member setBit (position: int) (bitVector: BitVector8) =
+        BitVector8(bitVector.Byte ||| (1uy <<< position))
+
+    member inline bv.SetBitAt(position: int) = BitVector8.setBit position bv
+
+    [<CompiledName("ClearBit")>]
+    static member clearBit (position: int) (bitVector: BitVector8) =
+        BitVector8(bitVector.Byte &&& ~~~(1uy <<< position))
+
+    member inline bv.ClearBitAt(position: int) = BitVector8.clearBit position bv

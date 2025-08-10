@@ -1,55 +1,52 @@
 namespace Conway.Compression.Huffman
 
+open Conway.Encoding
 open System.Collections.Generic
 
-type HuffmanNode<'T> = {
-    Weight: int
-    Node: HuffmanNodeType<'T>
+type HuffmanNode<'T> when 'T: equality =
+    | Leaf of 'T
+    | InternalNode of InternalHuffmanNode<'T>
+
+    [<CompiledName("CreateInternal")>]
+    static member createInternal left right =
+        InternalNode(InternalHuffmanNode<_>.create left right)
+
+    [<CompiledName("CreateLeaf")>]
+    static member createLeaf value = Leaf value
+
+    static member private buildEncodingDictionaryRec
+        (treeStack: Stack<HuffmanNode<'T> * bool>)
+        (result: Dictionary<'T, BitVector8Tracked>)
+        =
+        if treeStack.Count = 0 then
+            result
+        else
+            let currentNode, isleft = treeStack.Pop()
+
+            match currentNode with
+            | Leaf value ->
+                result.Add(value, BitVector8Tracked.zeroed |> BitVector8Tracked.pushBit isleft)
+                HuffmanNode<_>.buildEncodingDictionaryRec treeStack result
+            | InternalNode node ->
+                treeStack.Push((node.Right, false))
+                treeStack.Push((node.Left, true))
+                HuffmanNode<_>.buildEncodingDictionaryRec treeStack result
+
+    static member buildEncodingDictionary(root: HuffmanNode<'T>) =
+        match root with
+        | Leaf value ->
+            let result = new Dictionary<'T, BitVector8Tracked>()
+            result.Add(value, BitVector8Tracked.zeroed |> BitVector8Tracked.pushBit false)
+            result
+        | InternalNode _ ->
+            let treeStack = new Stack<HuffmanNode<'T> * bool>()
+            treeStack.Push((root, false))
+            HuffmanNode<_>.buildEncodingDictionaryRec treeStack (new Dictionary<'T, BitVector8Tracked>())
+
+and InternalHuffmanNode<'T> when 'T: equality = {
+    Left: HuffmanNode<'T>
+    Right: HuffmanNode<'T>
 } with
 
     [<CompiledName("Create")>]
-    static member create weight node = { Weight = weight; Node = node }
-
-    [<CompiledName("CreateInternal")>]
-    static member createInternal weight left right =
-        HuffmanNode<_>.create weight (HuffmanNodeType<_>.createInternal left right)
-
-    [<CompiledName("CreateLeaf")>]
-    static member createLeaf weight value =
-        HuffmanNode<_>.create weight (HuffmanNodeType<_>.createLeaf value)
-
-    [<CompiledName("Merge")>]
-    static member merge leftNode rightNode =
-        HuffmanNode<_>.createInternal (leftNode.Weight + rightNode.Weight) leftNode.Node rightNode.Node
-
-    member this.MergeWith(other: HuffmanNode<_>) = HuffmanNode<_>.merge this other
-
-    [<CompiledName("BuildTreeFromPriorityQueue")>]
-    static member buildTreeFromPriorityQueue(priorityQueue: PriorityQueue<HuffmanNode<'T>, int>) =
-        match priorityQueue.Count with
-        | x when x = 1 -> priorityQueue.Dequeue()
-        | x when x >= 2 ->
-            while priorityQueue.Count >= 2 do
-                let leftNode = priorityQueue.Dequeue()
-                let rightNode = priorityQueue.Dequeue()
-                let newNode = leftNode.MergeWith rightNode
-
-                priorityQueue.Enqueue(newNode, newNode.Weight)
-
-            priorityQueue.Dequeue()
-        | _ -> invalidArg (nameof priorityQueue) "The priority queue was empty. No symbols to encode"
-
-    [<CompiledName("TryBuildTreeFromPriorityQueue")>]
-    static member tryBuildTreeFromPriorityQueue(priorityQueue: PriorityQueue<HuffmanNode<'T>, int>) =
-        match priorityQueue.Count with
-        | x when x = 1 -> Some(priorityQueue.Dequeue())
-        | x when x >= 2 ->
-            while priorityQueue.Count >= 2 do
-                let leftNode = priorityQueue.Dequeue()
-                let rightNode = priorityQueue.Dequeue()
-                let newNode = leftNode.MergeWith rightNode
-
-                priorityQueue.Enqueue(newNode, newNode.Weight)
-
-            Some(priorityQueue.Dequeue())
-        | _ -> None
+    static member create left right = { Left = left; Right = right }
