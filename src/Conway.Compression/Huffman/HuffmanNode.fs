@@ -14,6 +14,7 @@ type HuffmanNode<'T> when 'T: equality =
     [<CompiledName("CreateLeaf")>]
     static member createLeaf value = Leaf value
 
+    [<CompiledName("BuildEncodingDictionaryRec"); TailCall>]
     static member private buildEncodingDictionaryRec
         (treeStack: Stack<HuffmanNode<'T> * bool>)
         (result: Dictionary<'T, BitVector8Tracked>)
@@ -32,6 +33,7 @@ type HuffmanNode<'T> when 'T: equality =
                 treeStack.Push((node.Left, true))
                 HuffmanNode<_>.buildEncodingDictionaryRec treeStack result
 
+    [<CompiledName("BuildEncodingDictionary")>]
     static member buildEncodingDictionary(root: HuffmanNode<'T>) =
         match root with
         | Leaf value ->
