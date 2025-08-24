@@ -11,7 +11,7 @@ Created to explore the performance capabilities of F# with a large grid and basi
 - Save and load game state  
 - Default board size: **1000x1000** (configurable via command-line arguments)  
 - Ability to run the simulation continuously or step-by-step  
-- Builds available for Windows and Ubuntu  
+- Builds available for Windows and Ubuntu (22.04 or later)
 
 ---
 
@@ -43,7 +43,7 @@ dotnet publish -r <your_platform> -c Release --property:PublishDir=<output_direc
 ```
 
 ## Usage
-Run Game.exe to start the game. On launch, the program generates dead grid. Use save/load buttons to save or load game state. You can run the simulation continuously or step-by-step based on your preference.
+Run Game.exe (or simply Game on ubuntu) to start the game. If you are running the game on Ubuntu, you might need to change the file permissions to make it exectuable. Run the following command while in the game directory to do so: `chmod +x Game`. On launch, the program generates dead grid. Use save/load buttons to save or load game state. You can run the simulation continuously or step-by-step based on your preference.
 
 To change the size of the starting grid, run Game.exe from the command line with width and height arguments:
 ```
