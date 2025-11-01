@@ -13,9 +13,9 @@ type Camera(x: float32, y: float32, zoomFactor: float32) =
 
     member val ZoomFactor = zoomFactor with get, set
 
-    member val MaxZoomFactor = 2.0f with get, set
+    member val MaxZoomFactor = 2.0f with get
 
-    member val MinZoomFactor = 0.2f with get, set
+    member val MinZoomFactor = 0.2f with get
 
     member _.MoveCameraRight(speed: float32) = _position.X <- _position.X + speed
 
