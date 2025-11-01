@@ -9,7 +9,7 @@ type ConwayByteDecoder() =
 
     static member val RowValueFirstByteIndex = 0 with get
 
-    static member val ColumnValueFirstByteIndex = 4 with get
+    static member val ColumnValueFirstByteIndex= 4 with get
 
     static member val GenerationCounterFirstByteIndex = 8 with get
 
@@ -36,7 +36,7 @@ type ConwayByteDecoder() =
         let rows, cols = this.DecodeDimensions bytes
         let totalCells = rows * cols
         let totalBytes = totalCells / ConwayByteDecoder.BitsInByte
-        let cellArray = Array2D.create rows cols 0<CellStatus>
+        let cellArray = Array2D.create rows cols ConwayGrid.DeadCell
 
         bytes.Slice(ConwayByteDecoder.GridFirstByteIndex, totalBytes).ToArray()
         |> Array.map (fun b -> BitVector8.createFromByte b)
@@ -47,11 +47,11 @@ type ConwayByteDecoder() =
                 let col = actualIndex % cols
 
                 match b.ReadBitAt j with
-                | true -> cellArray.[row, col] <- 1<CellStatus>
-                | false -> cellArray.[row, col] <- 0<CellStatus>)
+                | true -> cellArray.[row, col] <- ConwayGrid.LivingCell
+                | false -> cellArray.[row, col] <- ConwayGrid.DeadCell)
 
         let initializer i j = cellArray.[i, j]
-        ConwayGrid.init rows cols initializer
+        ConwayGrid.init cols rows initializer
 
     interface IConwayByteDecoder with
         member this.Decode(bytes: byte array) =

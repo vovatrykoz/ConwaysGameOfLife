@@ -30,7 +30,7 @@ type ConwayByteEncoder() =
                 let currentBitVector = gridBytes.[currentIndex]
 
                 match grid.Board.[row, col] with
-                | 0<CellStatus> -> ()
+                | x when x = ConwayGrid.DeadCell -> ()
                 | _ -> gridBytes.[currentIndex] <- currentBitVector.SetBitAt bitCounter
 
                 bitCounter <- bitCounter + 1

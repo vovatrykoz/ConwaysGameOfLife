@@ -27,6 +27,18 @@ module internal Generators =
 
         let valid2dBoardArb () = validConwayGridGen () |> Arb.fromGen
 
+    module Game =
+        let validGameArb () =
+            gen {
+                let! currentGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
+                let! initialGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
+                let! generationCounter = ArbMap.defaults.ArbFor<int>() |> Arb.toGen
+
+                return currentGridGen, initialGridGen, generationCounter
+            }
+            |> Gen.map (fun (cg, ig, gc) -> Game.createFrom cg ig gc)
+            |> Arb.fromGen
+
 type ConwayGen =
     //
     static member ConwayGrid() =
@@ -34,3 +46,5 @@ type ConwayGen =
 
     static member Valid2dBoard() =
         Generators.ConwayGrid.valid2dBoardArb ()
+
+    static member Game() = Generators.Game.validGameArb ()
