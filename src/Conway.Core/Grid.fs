@@ -47,7 +47,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     member this.ActiveHeight = Array2D.length1 this.Board - 2
 
-    [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     static member inline private countLivingNeighbors
         rowAbove
         rowCurrent
@@ -64,7 +64,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         + NativePtr.get ptr (rowBelow + colCurrent)
         + NativePtr.get ptr (rowBelow + (colCurrent + 1))
 
-    [<CompiledName("EvolveCellAt"); MethodImpl(MethodImplOptions.AggressiveInlining)>]
+    [<CompiledName("EvolveCellAt"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     static member inline private evolveCellAt row col cols activePtr passivePtr =
         let rowAbove = (row - 1) * cols
         let rowCurrent = row * cols
@@ -81,6 +81,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         | 3<Neighbors> -> NativePtr.set passivePtr index Constants.livingCell
         | _ -> NativePtr.set passivePtr index Constants.deadCell
 
+    [<MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     member this.AdvanceToNextState() =
         let activeIndex = this.ActiveBufferIndex
         let passiveIndex = (activeIndex + 1) % this.Buffers.Length
