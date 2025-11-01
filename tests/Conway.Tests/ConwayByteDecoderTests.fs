@@ -3,7 +3,6 @@ namespace Conway.Tests
 open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
-open NUnit.Framework.Legacy
 
 module ``Conway Byte Decoder Tests`` =
 
@@ -85,4 +84,4 @@ module ``Conway Byte Decoder Tests`` =
         let encoder = new ConwayByteDecoder()
         let actualGrid = encoder.DecodeGrid encoding
 
-        CollectionAssert.AreEqual(expectedGrid.Board, actualGrid.Board)
+        Assert.That(actualGrid.Board, Is.EqualTo expectedGrid.Board)
