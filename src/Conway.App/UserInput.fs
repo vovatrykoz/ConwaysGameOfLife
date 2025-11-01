@@ -1,7 +1,5 @@
 namespace Conway.App
 
-open Raylib_cs
-
 type ParsingStep =
     | ReadingSwitches
     | ReadingWidth
@@ -36,11 +34,19 @@ type UserDefinedValues = {
 
 module UserInput =
 
-    let widthShortSwitch, widthLongSwitch = "-w", "--width"
+    [<Literal>]
+    let widthShortSwitch = "-w"
 
-    let heightShortSwitch, heightLongSwitch = "-h", "--height"
+    [<Literal>]
+    let widthLongSwitch = "--width"
 
-    let tryReadInt (stringValue: string) =
+    [<Literal>]
+    let heightShortSwitch = "-h"
+
+    [<Literal>]
+    let heightLongSwitch = "--height"
+
+    let private tryReadInt (stringValue: string) =
         try
             match int stringValue with
             | x when x < 0 -> Error(NegativeNumber x)
