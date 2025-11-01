@@ -17,6 +17,7 @@ type IntCastingError =
     | InvalidNumber of string
     | NumberTooLarge of string
     | NegativeNumber of int
+    | ZeroNumber
 
 type UserDefinedValues = {
     WidthResult: Result<int, IntCastingError> option
@@ -42,7 +43,8 @@ module UserInput =
     let tryReadInt (stringValue: string) =
         try
             match int stringValue with
-            | x when x <= 0 -> Error(NegativeNumber x)
+            | x when x < 0 -> Error(NegativeNumber x)
+            | x when x = 0 -> Error ZeroNumber
             | x -> Ok x
         with
         | :? System.OverflowException -> Error(NumberTooLarge stringValue)

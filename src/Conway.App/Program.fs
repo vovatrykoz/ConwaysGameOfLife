@@ -45,8 +45,8 @@ match userInput with
                     Raylib.TraceLog(
                         TraceLogLevel.Error,
                         $"The width value was outside of the allowed range: {value}\n"
-                        + $"Largest allowed value {Int32.MaxValue}"
-                        + $"Smallest allowed value {Int32.MinValue}"
+                        + $"Largest allowed value: {Int32.MaxValue}"
+                        + $"Smallest allowed value: 1"
                     )
 
                     Error()
@@ -55,7 +55,18 @@ match userInput with
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was not a valid number: {value}")
                     Error()
                 | NegativeNumber value ->
-                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was negative: {value}")
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided width value was negative: {value}. Only positive values are allowed"
+                    )
+
+                    Error()
+                | ZeroNumber ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided width value was zero. Only positive values are allowed"
+                    )
+
                     Error()
                 | NullInput ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided width string was null")
@@ -90,6 +101,13 @@ match userInput with
                 | NegativeNumber value ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was negative: {value}")
                     Error()
+                | ZeroNumber ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided width value was zero. Only positive values are allowed"
+                    )
+
+                    Error()
                 | NullInput ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height string was null")
                     Error()
@@ -100,7 +118,7 @@ match userInput with
     match gridWidth, gridHeight with
     | Error(), _
     | _, Error() ->
-        Raylib.TraceLog(TraceLogLevel.Error, $"Terminating the program")
+        Raylib.TraceLog(TraceLogLevel.Error, $"Terminating the program!")
         Environment.Exit 1
     | Ok width, Ok height ->
         let sleepTime = Default.sleepTimeCalculator width height
