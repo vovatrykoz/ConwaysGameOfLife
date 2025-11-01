@@ -87,6 +87,35 @@ module internal Generators =
         let validUserInputArb () =
             validUserInputGen () |> Gen.map (fun x -> ValidUserInput x) |> Arb.fromGen
 
+    module Application =
+        open Conway.App.Controls
+
+        let cameraGen () =
+            ArbMap.defaults.ArbFor<float32>()
+            |> Arb.toGen
+            |> Gen.three
+            |> Gen.map (fun (x, y, zoomFactor) -> Camera(x, y, zoomFactor))
+
+        let cameraArb () = cameraGen () |> Arb.fromGen
+
+        let floatGen () =
+            ArbMap.defaults.ArbFor<float32>() |> Arb.toGen
+
+        let canvasGen () =
+            gen {
+                let! x = floatGen ()
+                let! y = floatGen ()
+                let! width = floatGen ()
+                let! height = floatGen ()
+                let! camera = cameraGen ()
+                let! game = Game.validGameArb () |> Arb.toGen
+                let! cellSize = floatGen ()
+
+                return Canvas(x, y, width, height, camera, game, cellSize)
+            }
+
+        let canvasArb () = canvasGen () |> Arb.fromGen
+
 type ConwayGen =
     //
     static member ConwayGrid() =
@@ -99,3 +128,7 @@ type ConwayGen =
 
     static member ValidUserInput() =
         Generators.UserInput.validUserInputArb ()
+
+    static member Camera() = Generators.Application.cameraArb ()
+
+    static member Canvas() = Generators.Application.canvasArb ()

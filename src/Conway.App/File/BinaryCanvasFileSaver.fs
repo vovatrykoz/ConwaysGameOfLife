@@ -6,9 +6,9 @@ open Conway.Encoding
 open System
 open System.IO
 
-type BinaryCanvasFileSaver(encoder: IConwayByteEncoder) =
+type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
 
-    member val Encoder = encoder with get, set
+    member val Encoder = gameEncoder with get
 
     member _.EncodeCameraData(camera: Camera) =
         let encodedPositionX = BitConverter.GetBytes camera.Position.X
