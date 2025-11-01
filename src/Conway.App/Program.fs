@@ -148,26 +148,20 @@ match userInput with
         controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
 
         let gameUpdateLoop () =
-            let mutable shouldRun = false
-
-            async {
+            task {
                 while true do
                     do! Async.Sleep sleepTime
 
-                    shouldRun <-
-                        match currentContext.GameMode with
-                        | GameState.Infinite -> true
-                        | GameState.Step ->
-                            currentContext.GameMode <- GameState.Paused
-                            true
-                        | GameState.Paused
-                        | _ -> false
-
-                    if shouldRun then
+                    match currentContext.GameMode with
+                    | GameState.Infinite -> canvas.Game.RunOneStep()
+                    | GameState.Step ->
                         canvas.Game.RunOneStep()
+                        currentContext.GameMode <- GameState.Paused
+                    | GameState.Paused
+                    | _ -> ()
             }
 
-        gameUpdateLoop () |> Async.Start
+        gameUpdateLoop () |> ignore
 
         let mutable fps = 0.0
         let maxSamples = Default.maxFpsSamples
@@ -193,4 +187,5 @@ match userInput with
             fps <- 1.0 / (frameTimes |> Array.average)
 
         Raylib.UnloadRenderTexture renderTexture
-        Display.close ()
+
+Display.close ()
