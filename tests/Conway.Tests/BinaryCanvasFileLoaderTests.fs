@@ -5,6 +5,7 @@ open Conway.App.File
 open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
+open NUnit.Framework.Legacy
 
 module ``Binary Canvas File Loader Tests`` =
 

@@ -18,12 +18,24 @@ type CellStatus
 [<Measure>]
 type Neighbors = CellStatus
 
+module private Constants =
+
+    [<Literal>]
+    let deadCell = 0<CellStatus>
+
+    [<Literal>]
+    let livingCell = 1<CellStatus>
+
 type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     private new(width: int, height: int) =
         let initArr = Array2D.create (height + 2) (width + 2) 0<CellStatus>
 
         new ConwayGrid(initArr)
+
+    static member DeadCell = Constants.deadCell
+
+    static member LivingCell = Constants.livingCell
 
     member val private Buffers = [| Array2D.copy startingGrid; Array2D.copy startingGrid |] with get, set
 
@@ -66,8 +78,8 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         | 2<Neighbors> ->
             let currentValue = NativePtr.get activePtr index
             NativePtr.set passivePtr index currentValue
-        | 3<Neighbors> -> NativePtr.set passivePtr index 1<CellStatus>
-        | _ -> NativePtr.set passivePtr index 0<CellStatus>
+        | 3<Neighbors> -> NativePtr.set passivePtr index Constants.livingCell
+        | _ -> NativePtr.set passivePtr index Constants.deadCell
 
     member this.AdvanceToNextState() =
         let activeIndex = this.ActiveBufferIndex
@@ -101,9 +113,9 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    0<CellStatus>
+                    Constants.deadCell
                 else
-                    1<CellStatus>)
+                    Constants.livingCell)
 
         new ConwayGrid(initArr)
 
@@ -114,11 +126,14 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    0<CellStatus>
+                    Constants.deadCell
                 else
                     let randomValue = random.Next(0, oddsOfLiving - 1)
 
-                    if randomValue = 0 then 1<CellStatus> else 0<CellStatus>)
+                    if randomValue = 0 then
+                        Constants.livingCell
+                    else
+                        Constants.deadCell)
 
         new ConwayGrid(initArr)
 
@@ -127,7 +142,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         let initArr =
             Array2D.init (height + 2) (width + 2) (fun i j ->
                 if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    0<CellStatus>
+                    Constants.deadCell
                 else
                     initializer (i - 1) (j - 1))
 

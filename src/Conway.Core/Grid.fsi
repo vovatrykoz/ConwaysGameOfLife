@@ -11,6 +11,16 @@ type CellStatus
 type ConwayGrid =
 
     /// <summary>
+    /// Returns a default dead cell value.
+    /// </summary>
+    static member DeadCell: int<CellStatus>
+
+    /// <summary>
+    /// Returns a default living cell value.
+    /// </summary>
+    static member LivingCell: int<CellStatus>
+
+    /// <summary>
     /// Gets the current state of the board as a 2D array of cells.
     /// </summary>
     member Board: int<CellStatus> array2d

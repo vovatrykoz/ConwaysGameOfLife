@@ -3,6 +3,7 @@ namespace Conway.Tests
 open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
+open NUnit.Framework.Legacy
 
 module ``Conway Byte Encoder Tests`` =
 
