@@ -90,7 +90,7 @@ match userInput with
                         TraceLogLevel.Error,
                         $"The height value was outside of the allowed range: {value}\n"
                         + $"Largest allowed value {Int32.MaxValue}"
-                        + $"Smallest allowed value {Int32.MinValue}"
+                        + $"Smallest allowed value {1}"
                     )
 
                     Error()
@@ -99,7 +99,11 @@ match userInput with
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was not a valid number: {value}")
                     Error()
                 | NegativeNumber value ->
-                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was negative: {value}")
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided height value was negative: {value}. Only positive values are allowed"
+                    )
+
                     Error()
                 | ZeroNumber ->
                     Raylib.TraceLog(
@@ -122,18 +126,18 @@ match userInput with
         Environment.Exit 1
     | Ok width, Ok height ->
         let sleepTime = Default.sleepTimeCalculator width height
-        let camera = new Camera(float32 (width / 2), float32 (height / 2))
+        let camera = new Camera(x = float32 (width / 2), y = float32 (height / 2))
         let startingState = ConwayGrid.createDead width height
 
         let canvas =
             new Canvas(
-                Default.canvasX,
-                Default.canvasY,
-                float32 Default.windowWidth - Default.widthOffset,
-                float32 Default.windowHeight - Default.heightOffset,
-                camera,
-                new Game(startingState),
-                Default.cellSize
+                x = Default.canvasX,
+                y = Default.canvasY,
+                width = float32 Default.windowWidth - Default.widthOffset,
+                height = float32 Default.windowHeight - Default.heightOffset,
+                camera = camera,
+                game = new Game(startingState),
+                cellSize = Default.cellSize
             )
 
         let controlManager = new ControlManager()
@@ -141,7 +145,8 @@ match userInput with
         let renderTexture =
             Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
 
-        let currentContext = new ApplicationContext(GameState.Paused, canvas, renderTexture)
+        let currentContext =
+            new ApplicationContext(gameState = GameState.Paused, canvas = canvas, texture = renderTexture)
 
         controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
         controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
