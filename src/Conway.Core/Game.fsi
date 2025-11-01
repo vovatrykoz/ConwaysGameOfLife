@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents the mode in which the game can run.
 /// </summary>
-type GameRunMode =
+type GameState =
     | Paused = 0
     | Step = 1
     | Infinite = 2
@@ -23,6 +23,7 @@ type Game =
     /// Initializes a new instance of the Game class with the given initial grid state and a generation.
     /// </summary>
     /// <param name="initialState">The starting state of the game grid.</param>
+    /// <param name="generation">The current generation of the game grid.</param>
     new: initialState: ConwayGrid * generation: int -> Game
 
     /// <summary>
@@ -41,10 +42,9 @@ type Game =
     member Generation: int with get
 
     /// <summary>
-    /// Starts running the game using the specified game mode.
+    /// Gets the startin generation number.
     /// </summary>
-    /// <param name="mode">The mode in which to run the game.</param>
-    member Run: GameRunMode -> unit
+    member StartingGeneration: int with get
 
     /// <summary>
     /// Advances the game by one generation step.

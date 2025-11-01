@@ -84,4 +84,4 @@ module ``Conway Byte Decoder Tests`` =
         let encoder = new ConwayByteDecoder()
         let actualGrid = encoder.DecodeGrid encoding
 
-        CollectionAssert.AreEqual(expectedGrid.Board, actualGrid.Board)
+        Assert.That(actualGrid.Board, Is.EqualTo expectedGrid.Board)

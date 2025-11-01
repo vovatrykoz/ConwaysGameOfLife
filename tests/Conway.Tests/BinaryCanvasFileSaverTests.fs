@@ -8,6 +8,7 @@ open NUnit.Framework
 
 module ``Binary Canvas File Saver Tests`` =
     open Conway.App
+    open System.Collections
 
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =
@@ -50,4 +51,4 @@ module ``Binary Canvas File Saver Tests`` =
         let fileSaver = BinaryCanvasFileSaver encoder
         let actualEncoding = fileSaver.EncodeCanvasData canvas
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)

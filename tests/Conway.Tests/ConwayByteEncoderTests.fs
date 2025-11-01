@@ -5,6 +5,7 @@ open Conway.Core
 open NUnit.Framework
 
 module ``Conway Byte Encoder Tests`` =
+    open System.Collections
 
     [<Test>]
     let ``Can correctly encode grid dimensions`` () =
@@ -24,7 +25,7 @@ module ``Conway Byte Encoder Tests`` =
         let encoder = new ConwayByteEncoder()
         let actualEncoding = encoder.EncodeDimensions grid
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
     [<Test>]
     let ``Can correctly encode a living grid`` () =
@@ -38,7 +39,7 @@ module ``Conway Byte Encoder Tests`` =
         let encoder = new ConwayByteEncoder()
         let actualEncoding = encoder.EncodeGrid grid
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
     [<Test>]
     let ``Can correctly encode a dead grid`` () =
@@ -52,7 +53,7 @@ module ``Conway Byte Encoder Tests`` =
         let encoder = new ConwayByteEncoder()
         let actualEncoding = encoder.EncodeGrid grid
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
     [<Test>]
     let ``Can correctly encode a mixed grid`` () =
@@ -69,7 +70,7 @@ module ``Conway Byte Encoder Tests`` =
         let encoder = new ConwayByteEncoder()
         let actualEncoding = encoder.EncodeGrid grid
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
     [<Test>]
     let ``Can correctly encode a game that hasn't started yet`` () =
@@ -97,7 +98,7 @@ module ``Conway Byte Encoder Tests`` =
         let encoder = new ConwayByteEncoder() :> IConwayByteEncoder
         let actualEncoding = encoder.Encode game
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
     [<Test>]
     let ``Can correctly encode a game that has been run`` () =
@@ -134,4 +135,4 @@ module ``Conway Byte Encoder Tests`` =
         let encoder = new ConwayByteEncoder() :> IConwayByteEncoder
         let actualEncoding = encoder.Encode game
 
-        CollectionAssert.AreEqual(expectedEncoding, actualEncoding)
+        Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)

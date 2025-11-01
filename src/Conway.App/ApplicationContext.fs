@@ -5,10 +5,10 @@ open System.Threading
 open Conway.App.Controls
 open Raylib_cs
 
-type ApplicationContext(gameMode: GameRunMode, canvas: Canvas, texture: RenderTexture2D) =
+type ApplicationContext(gameState: GameState, canvas: Canvas, texture: RenderTexture2D) =
     let _lock = new ReaderWriterLockSlim()
 
-    let mutable _gameMode = gameMode
+    let mutable _gameMode = gameState
 
     member _.GameMode
         with get () =

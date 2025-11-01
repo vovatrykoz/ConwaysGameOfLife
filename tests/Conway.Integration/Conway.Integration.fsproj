@@ -1,22 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="Generators.fs" />
-    <Compile Include="CellTests.fs" />
-    <Compile Include="BitVector8Tests.fs" />
-    <Compile Include="ConwayByteEncoderTests.fs" />
-    <Compile Include="ConwayByteDecoderTests.fs" />
-    <Compile Include="BinaryCanvasFileSaverTests.fs" />
-    <Compile Include="BinaryCanvasFileLoaderTests.fs" />
-    <Compile Include="FilePickerTests.fs" />
-    <Compile Include="GridPropertyTests.fs" /><Compile Include="GamePropertyTests.fs" /><Compile Include="UserInputTests,fs.fs" />
+    <Compile Include="EncodingIntegration.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FsCheck" Version="3.3.0" />
     <PackageReference Include="FsCheck.NUnit" Version="3.3.0" />
@@ -26,14 +21,18 @@
     <PackageReference Include="NUnit.Analyzers" Version="4.9.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Conway.Core\Conway.Core.fsproj" />
-    <ProjectReference Include="..\..\src\Conway.App\Conway.App.fsproj" />
     <ProjectReference Include="..\..\src\Conway.Encoding\Conway.Encoding.fsproj" />
+    <ProjectReference Include="..\..\src\Conway.App\Conway.App.fsproj" />
+    <ProjectReference Include="..\Conway.Tests\Conway.Tests.fsproj" />
   </ItemGroup>
+
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>5</AnalysisLevel>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
+
 </Project>

@@ -48,8 +48,9 @@ module ``Binary Canvas File Loader Tests`` =
         let fileLoader = BinaryCanvasFileLoader decoder
         let actualGame, actualCamera = fileLoader.Decode encoding
 
-        CollectionAssert.AreEqual(actualGame.CurrentState.Board, expectedGame.CurrentState.Board)
-        CollectionAssert.AreEqual(actualGame.InitialState.Board, expectedGame.InitialState.Board)
-        Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
-        Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
-        Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor)
+        Assert.Multiple(fun _ ->
+            Assert.That(actualGame.CurrentState.Board, Is.EqualTo expectedGame.CurrentState.Board)
+            Assert.That(actualGame.InitialState.Board, Is.EqualTo expectedGame.InitialState.Board)
+            Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
+            Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
+            Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor))
