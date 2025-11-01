@@ -1,6 +1,6 @@
 namespace Conway.Core
 
-type GameRunMode =
+type GameState =
     | Paused = 0
     | Step = 1
     | Infinite = 2
@@ -9,6 +9,10 @@ type Game(initialState: ConwayGrid, generation: int) =
     let mutable _initialState = ConwayGrid.copyFrom initialState
 
     let mutable _internalState = initialState
+
+    let mutable _initialGeneration = generation
+
+    let mutable _initialGeneration = generation
 
     let mutable _generation = generation
 
@@ -20,6 +24,7 @@ type Game(initialState: ConwayGrid, generation: int) =
             _internalState <- newState
             _initialState <- ConwayGrid.copyFrom newState
             _generation <- 1
+            _initialGeneration <- generation
 
     member _.InitialState
         with get () = _initialState
@@ -29,31 +34,27 @@ type Game(initialState: ConwayGrid, generation: int) =
         with get () = _generation
         and private set newValue = _generation <- newValue
 
-    member this.Run(mode: GameRunMode) =
-        match mode with
-        | GameRunMode.Infinite ->
-            while true do
-                this.CurrentState.AdvanceToNextState()
-                this.Generation <- this.Generation + 1
-        | GameRunMode.Step ->
-            this.CurrentState.AdvanceToNextState()
-            this.Generation <- this.Generation + 1
-        | GameRunMode.Paused
-        | _ -> ()
+    member _.StartingGeneration
+        with get () = _initialGeneration
+        and private set newValue = _initialGeneration <- newValue
 
-    member this.RunOneStep() = this.Run GameRunMode.Step
+    member this.RunOneStep() =
+        this.CurrentState.AdvanceToNextState()
+        this.Generation <- this.Generation + 1
 
     member _.ResetState() =
         _internalState <- ConwayGrid.copyFrom _initialState
-        _generation <- 1
+        _generation <- _initialGeneration
 
     member this.ResetGenerationCounter() =
         _initialState <- ConwayGrid.copyFrom this.CurrentState
         _generation <- 1
+        _initialGeneration <- _generation
 
     [<CompiledName("CreateFrom")>]
     static member createFrom (currentState: ConwayGrid) (initialState: ConwayGrid) (generationCounter: int) =
         let newGame = new Game(ConwayGrid.copyFrom currentState)
         newGame.InitialState <- ConwayGrid.copyFrom initialState
         newGame.Generation <- generationCounter
+        newGame.StartingGeneration <- generationCounter
         newGame

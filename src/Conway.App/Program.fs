@@ -123,8 +123,7 @@ match userInput with
         let renderTexture =
             Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
 
-        let currentContext =
-            new ApplicationContext(GameRunMode.Paused, canvas, renderTexture)
+        let currentContext = new ApplicationContext(GameState.Paused, canvas, renderTexture)
 
         controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
         controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
@@ -139,11 +138,11 @@ match userInput with
 
                     shouldRun <-
                         match currentContext.GameMode with
-                        | GameRunMode.Infinite -> true
-                        | GameRunMode.Step ->
-                            currentContext.GameMode <- GameRunMode.Paused
+                        | GameState.Infinite -> true
+                        | GameState.Step ->
+                            currentContext.GameMode <- GameState.Paused
                             true
-                        | GameRunMode.Paused
+                        | GameState.Paused
                         | _ -> false
 
                     if shouldRun then
