@@ -57,7 +57,7 @@ type Canvas
         struct (Vec2.create startX startY, Vec2.create endX endY)
 
     member this.ProcessMouseDrag() =
-        let mousePos = Mouse.position () |> Vec2.fromNumericVector
+        let mousePos = Mouse.position () |> Vec2.numericVectorAsVec2
 
         if
             mousePos.X >= this.Position.X
@@ -68,7 +68,7 @@ type Canvas
             && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
             && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
         then
-            let mouseDelta = Mouse.getDelta () |> Vec2<px>.fromNumericVector
+            let mouseDelta = Mouse.getDelta () |> Vec2<px>.numericVectorAsVec2
             let cellSizeInverse = 1.0f<cells> / (this.CellSize * this.Camera.ZoomFactor)
 
             this.Camera.Position <-
@@ -76,7 +76,7 @@ type Canvas
                 - Vec2.create (mouseDelta.X * cellSizeInverse) (mouseDelta.Y * cellSizeInverse)
 
     member this.ProcessMouseScroll() =
-        let mousePos = Mouse.position () |> Vec2.fromNumericVector
+        let mousePos = Mouse.position () |> Vec2.numericVectorAsVec2
 
         if
             mousePos.X >= this.Position.X

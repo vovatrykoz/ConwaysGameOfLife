@@ -173,7 +173,8 @@ type FilePicker
             let posVec = Vec2.create this.X this.Y
 
             let mousePos =
-                (Mouse.getPosition () |> Vec2.fromNumericVector) + this.Camera.Position - posVec
+                (Mouse.getPosition () |> Vec2.numericVectorAsVec2) + this.Camera.Position
+                - posVec
 
             this.ClearSelection()
 
