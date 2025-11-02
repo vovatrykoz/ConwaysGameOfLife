@@ -1,6 +1,7 @@
 namespace Conway.Tests
 
 open Conway.App.Controls
+open Conway.App.Math
 open NUnit.Framework
 
 module ``File Picker Tests`` =
@@ -16,8 +17,10 @@ module ``File Picker Tests`` =
             FileData.createRecord "File5" "./File5" Other DateTime.Now
         ]
 
-        let filePicker = new FilePicker(0.0f, 0.0f, 8.0f, 4.0f, 8.0f, 2.0f, randomFiles)
-        filePicker.Camera.MoveCameraDown 3.0f
+        let filePicker =
+            new FilePicker(0.0f<px>, 0.0f<px>, 8.0f<px>, 4.0f<px>, 8.0f<px>, 2.0f<px>, randomFiles)
+
+        filePicker.Camera.ScrollDown 3.0f<px>
 
         let expectedStartIndex = 1
         let struct (actualStartIndex, _) = filePicker.CalculateVisibleIndexRange()
@@ -34,8 +37,10 @@ module ``File Picker Tests`` =
             FileData.createRecord "File5" "./File5" Other DateTime.Now
         ]
 
-        let filePicker = new FilePicker(0.0f, 0.0f, 8.0f, 4.0f, 8.0f, 2.0f, randomFiles)
-        filePicker.Camera.MoveCameraDown 3.0f
+        let filePicker =
+            new FilePicker(0.0f<px>, 0.0f<px>, 8.0f<px>, 4.0f<px>, 8.0f<px>, 2.0f<px>, randomFiles)
+
+        filePicker.Camera.ScrollDown 3.0f<px>
 
         let expectedEndIndex = 3
         let struct (_, actualEndIndex) = filePicker.CalculateVisibleIndexRange()

@@ -11,7 +11,6 @@ open FsCheck.NUnit
 
 [<Properties(Arbitrary = [| typeof<ConwayGen> |])>]
 module ``Encoding Integration Tests`` =
-    open System
     open System.IO
 
     // FsCheck test count increased from 100 to 1000
@@ -149,6 +148,7 @@ module ``Encoding Integration Tests`` =
         match savedCanvas with
         | Ok wrapper ->
             Assert.Multiple(fun _ ->
-                Assert.That(wrapper.Camera.Position, Is.EqualTo originalCanvas.Camera.Position)
+                Assert.That(wrapper.Camera.Position.X, Is.EqualTo originalCanvas.Camera.Position.X)
+                Assert.That(wrapper.Camera.Position.Y, Is.EqualTo originalCanvas.Camera.Position.Y)
                 Assert.That(wrapper.Camera.ZoomFactor, Is.EqualTo originalCanvas.Camera.ZoomFactor))
         | Error err -> Assert.Fail $"Expected Ok, got {err}"

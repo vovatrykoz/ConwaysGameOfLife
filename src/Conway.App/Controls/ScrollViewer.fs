@@ -2,10 +2,10 @@ namespace Conway.App.Controls
 
 open Conway.App.Math
 
-type Camera(x: float32<cells>, y: float32<cells>, zoomFactor: float32) =
+type ScrollViewer(x: float32<px>, y: float32<px>, zoomFactor: float32) =
     let mutable _position = Vec2.create x y
 
-    new(x: float32<cells>, y: float32<cells>) = Camera(x, y, 1.0f)
+    new(x: float32<px>, y: float32<px>) = ScrollViewer(x, y, 1.0f)
 
     member _.Position
         with get () = _position
@@ -17,13 +17,13 @@ type Camera(x: float32<cells>, y: float32<cells>, zoomFactor: float32) =
 
     member val MinZoomFactor = 0.2f with get
 
-    member _.MoveCameraRight(speed: float32<cells>) = _position.X <- _position.X + speed
+    member _.ScrollRight(speed: float32<px>) = _position.X <- _position.X + speed
 
-    member _.MoveCameraLeft(speed: float32<cells>) = _position.X <- _position.X - speed
+    member _.ScrollLeft(speed: float32<px>) = _position.X <- _position.X - speed
 
-    member _.MoveCameraUp(speed: float32<cells>) = _position.Y <- _position.Y - speed
+    member _.ScrollUp(speed: float32<px>) = _position.Y <- _position.Y - speed
 
-    member _.MoveCameraDown(speed: float32<cells>) = _position.Y <- _position.Y + speed
+    member _.ScrollDown(speed: float32<px>) = _position.Y <- _position.Y + speed
 
     member this.ZoomIn(speed: float32) =
         this.ZoomFactor <- min (this.ZoomFactor + speed) this.MaxZoomFactor

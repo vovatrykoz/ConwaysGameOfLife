@@ -1,6 +1,7 @@
 namespace Conway.App.Graphics
 
 open Conway.App.Controls
+open Conway.App.Math
 open Raylib_cs
 
 module Draw =
@@ -17,11 +18,16 @@ module Draw =
 
         Raylib.DrawRectangleLinesEx(rectangle, thickness, color)
 
-    let cell (x: float32) (y: float32) (width: float32) (height: float32) color =
-        Raylib.DrawRectanglePro(Rectangle(Vector2(x, y), Vector2(width, height)), Vector2.Zero, 0.0f, Color.Black)
+    let cell (x: float32<px>) (y: float32<px>) (width: float32<px>) (height: float32<px>) color =
+        Raylib.DrawRectanglePro(
+            Rectangle(Vector2(float32 x, float32 y), Vector2(float32 width, float32 height)),
+            Vector2.Zero,
+            0.0f,
+            Color.Black
+        )
 
         Raylib.DrawRectanglePro(
-            Rectangle(Vector2(x + 1.0f, y + 1.0f), Vector2(width - 2.0f, height - 2.0f)),
+            Rectangle(Vector2(float32 x + 1.0f, float32 y + 1.0f), Vector2(float32 width - 2.0f, float32 height - 2.0f)),
             Vector2.Zero,
             0.0f,
             color
@@ -48,8 +54,8 @@ module Draw =
             )
 
     let inline label
-        (x: float32)
-        (y: float32)
+        (x: float32<px>)
+        (y: float32<px>)
         (fontSize: int)
         (text: string)
         (width: int)
@@ -60,5 +66,5 @@ module Draw =
         Raylib.DrawRectangle(int x, int y, int width, int height, backgroundColor)
         Raylib.DrawText(text, int x, int y, fontSize, textColor)
 
-    let listBox (x: float32, y: float32, items: List<string>) =
+    let listBox (x: float32<px>, y: float32<px>, items: List<string>) =
         Raylib.DrawRectangle(int x, int y, 10, 10, Color.Black)

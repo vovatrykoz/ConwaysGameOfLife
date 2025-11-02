@@ -14,7 +14,7 @@ type BinaryCanvasFileLoader(gameDecoder: IConwayByteDecoder) =
         let posY = BitConverter.ToSingle(cameraInfoBytes.Slice(4, 4))
         let zoomFactor = BitConverter.ToSingle(cameraInfoBytes.Slice(8, 4))
 
-        Camera(posX, posY, zoomFactor)
+        Camera(LanguagePrimitives.Float32WithMeasure posX, LanguagePrimitives.Float32WithMeasure posY, zoomFactor)
 
     member this.Decode(byteEncoding: ReadOnlySpan<byte>) =
         let camera = this.DecodeCameraInfo(byteEncoding.Slice(0, 12))

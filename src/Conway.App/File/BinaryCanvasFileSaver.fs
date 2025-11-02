@@ -11,8 +11,8 @@ type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
     member val Encoder = gameEncoder with get
 
     member _.EncodeCameraData(camera: Camera) =
-        let encodedPositionX = BitConverter.GetBytes camera.Position.X
-        let encodedPositionY = BitConverter.GetBytes camera.Position.Y
+        let encodedPositionX = BitConverter.GetBytes(float32 camera.Position.X)
+        let encodedPositionY = BitConverter.GetBytes(float32 camera.Position.Y)
         let encodedZoomFactor = BitConverter.GetBytes camera.ZoomFactor
 
         encodedZoomFactor

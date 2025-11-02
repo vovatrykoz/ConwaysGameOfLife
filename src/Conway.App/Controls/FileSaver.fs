@@ -1,10 +1,18 @@
 namespace Conway.App.Controls
 
+open Conway.App.Math
 open Raylib_cs
 open System.Text
 
 type FileSaver
-    (x: float32, y: float32, width: float32, height: float32, fileEntryWidth: float32, fileEntryHeight: float32) =
+    (
+        x: float32<px>,
+        y: float32<px>,
+        width: float32<px>,
+        height: float32<px>,
+        fileEntryWidth: float32<px>,
+        fileEntryHeight: float32<px>
+    ) =
 
     let mutable _cancelled = false
 

@@ -1,15 +1,16 @@
 namespace Conway.App.Controls
 
+open Conway.App.Math
 open Raylib_cs
 
 type MessageBox
     (
-        x: float32,
-        y: float32,
-        width: float32,
-        height: float32,
-        messageLineWidth: float32,
-        messageLineHeight: float32,
+        x: float32<px>,
+        y: float32<px>,
+        width: float32<px>,
+        height: float32<px>,
+        messageLineWidth: float32<px>,
+        messageLineHeight: float32<px>,
         message: string,
         confirmText: string,
         abortText: string
