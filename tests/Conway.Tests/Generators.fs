@@ -1,7 +1,8 @@
 namespace Conway.Tests
 
-open Conway.Core
 open Conway.App
+open Conway.App.Math
+open Conway.Core
 open FsCheck.FSharp
 
 type Valid2dBoard(board: int<CellStatus> array2d) =
@@ -87,6 +88,41 @@ module internal Generators =
         let validUserInputArb () =
             validUserInputGen () |> Gen.map (fun x -> ValidUserInput x) |> Arb.fromGen
 
+    module Application =
+        open Conway.App.Controls
+
+        let cameraGen () =
+            ArbMap.defaults.ArbFor<float32<cells>>()
+            |> Arb.toGen
+            |> Gen.three
+            |> Gen.map (fun (x, y, zoomFactor) -> Camera(x, y, float32 zoomFactor))
+
+        let cameraArb () = cameraGen () |> Arb.fromGen
+
+        let floatGen () =
+            ArbMap.defaults.ArbFor<float32>() |> Arb.toGen
+
+        let cellCoordGen () =
+            ArbMap.defaults.ArbFor<float32<cells>>() |> Arb.toGen
+
+        let pixelCoordGen () =
+            ArbMap.defaults.ArbFor<float32<px>>() |> Arb.toGen
+
+        let canvasGen () =
+            gen {
+                let! x = pixelCoordGen ()
+                let! y = pixelCoordGen ()
+                let! width = pixelCoordGen ()
+                let! height = pixelCoordGen ()
+                let! camera = cameraGen ()
+                let! game = Game.validGameArb () |> Arb.toGen
+                let! cellSize = pixelCoordGen ()
+
+                return Canvas(x, y, width, height, camera, game, cellSize)
+            }
+
+        let canvasArb () = canvasGen () |> Arb.fromGen
+
 type ConwayGen =
     //
     static member ConwayGrid() =
@@ -99,3 +135,7 @@ type ConwayGen =
 
     static member ValidUserInput() =
         Generators.UserInput.validUserInputArb ()
+
+    static member Camera() = Generators.Application.cameraArb ()
+
+    static member Canvas() = Generators.Application.canvasArb ()

@@ -2,6 +2,7 @@ open Conway.App
 open Conway.App.Config
 open Conway.App.Controls
 open Conway.App.Graphics
+open Conway.App.Math
 open Conway.App.Utils.Alias
 open Conway.Core
 open Raylib_cs
@@ -9,7 +10,10 @@ open System
 open System.Diagnostics
 
 Display.init Default.windowWidth Default.windowHeight
-Display.loadingScreen (float32 (Default.windowWidth / 2)) (float32 (Default.windowHeight / 2))
+
+Display.loadingScreen
+    (LanguagePrimitives.Float32WithMeasure<px>(float32 (Default.windowWidth / 2)))
+    (LanguagePrimitives.Float32WithMeasure<px>(float32 (Default.windowHeight / 2)))
 
 let args = Environment.GetCommandLineArgs()
 
@@ -126,15 +130,23 @@ match userInput with
         Environment.Exit 1
     | Ok width, Ok height ->
         let sleepTime = Default.sleepTimeCalculator width height
-        let camera = new Camera(x = float32 (width / 2), y = float32 (height / 2))
+
+        let startingCameraPosX: float32<cells> =
+            LanguagePrimitives.Float32WithMeasure<cells>(float32 (width / 2))
+
+        let startingCameraPosY: float32<cells> =
+            LanguagePrimitives.Float32WithMeasure<cells>(float32 (width / 2))
+
+        let camera = new Camera(x = startingCameraPosX, y = startingCameraPosY)
+
         let startingState = ConwayGrid.createDead width height
 
         let canvas =
             new Canvas(
                 x = Default.canvasX,
                 y = Default.canvasY,
-                width = float32 Default.windowWidth - Default.widthOffset,
-                height = float32 Default.windowHeight - Default.heightOffset,
+                width = Default.canvasWidth,
+                height = Default.canvasHeight,
                 camera = camera,
                 game = new Game(startingState),
                 cellSize = Default.cellSize

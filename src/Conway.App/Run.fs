@@ -11,6 +11,7 @@ module Run =
     open Conway.App.Graphics
     open Conway.Encoding
     open Conway.App.File
+    open Conway.App.Math
     open Conway.Core
 
     let private saveGameState (ctx: ApplicationContext) (newFile: string) =
@@ -40,7 +41,8 @@ module Run =
         let mutable saveActionConfirmed = false
 
         while not saveActionConfirmed do
-            let fileSaver = new FileSaver(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
+            let fileSaver =
+                new FileSaver(10.0f<px>, 10.0f<px>, 1000.0f<px>, 480.0f<px>, 1000.0f<px>, 40.0f<px>)
 
             while not isCancelled
                   && not (raylibTrue (Raylib.WindowShouldClose()))
@@ -78,7 +80,17 @@ module Run =
                         $"{fileName} already exists.\nDo you want to overwrite the existing file?"
 
                     let fileOverwriteControl =
-                        new MessageBox(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f, message, "Yes", "No")
+                        new MessageBox(
+                            10.0f<px>,
+                            10.0f<px>,
+                            1000.0f<px>,
+                            480.0f<px>,
+                            1000.0f<px>,
+                            40.0f<px>,
+                            message,
+                            "Yes",
+                            "No"
+                        )
 
                     Raylib.SetExitKey KeyboardKey.Null
 
@@ -116,7 +128,9 @@ module Run =
 
         Raylib.SetExitKey KeyboardKey.Null
 
-        let filePicker = new FilePicker(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
+        let filePicker =
+            new FilePicker(10.0f<px>, 10.0f<px>, 1000.0f<px>, 480.0f<px>, 1000.0f<px>, 40.0f<px>)
+
         filePicker.Files.CollectionChanged.Add(fun _ -> filePicker.ClearSelection())
 
         while not isCancelled

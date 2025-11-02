@@ -2,6 +2,7 @@ namespace Conway.App.Controls
 
 open System
 open Conway.App.Input
+open Conway.App.Math
 open Raylib_cs
 open System.Collections.ObjectModel
 open System.Numerics
@@ -29,12 +30,12 @@ type FileData = {
 
 type FilePicker
     (
-        x: float32,
-        y: float32,
-        width: float32,
-        height: float32,
-        fileEntryWidth: float32,
-        fileEntryHeight: float32,
+        x: float32<px>,
+        y: float32<px>,
+        width: float32<px>,
+        height: float32<px>,
+        fileEntryWidth: float32<px>,
+        fileEntryHeight: float32<px>,
         files: seq<FileData>
     ) =
     let mutable _currentSelection: int option = None
@@ -73,7 +74,15 @@ type FilePicker
             Some KeyboardKey.Escape
         )
 
-    new(x: float32, y: float32, width: float32, height: float32, fileEntryWidth: float32, fileEntryHeight: float32) =
+    new
+        (
+            x: float32<px>,
+            y: float32<px>,
+            width: float32<px>,
+            height: float32<px>,
+            fileEntryWidth: float32<px>,
+            fileEntryHeight: float32<px>
+        ) =
         new FilePicker(x, y, width, height, fileEntryWidth, fileEntryHeight, Seq.empty)
 
     member val X = x with get, set
@@ -90,7 +99,7 @@ type FilePicker
 
     member val Files = new ObservableCollection<FileData>(files) with get
 
-    member val Camera = new Camera(x, y) with get
+    member val Camera = new ScrollViewer(x, y) with get
 
     member val private ActivatedButton: option<Button> = None with get, set
 
@@ -139,10 +148,10 @@ type FilePicker
 
     member this.ProcessMouseInput() =
         let mouseScroll = Mouse.getScrollAmount ()
-        this.Camera.MoveCameraDown(-mouseScroll.Y * this.FileEntryHeight)
+        this.Camera.ScrollDown(-mouseScroll.Y * this.FileEntryHeight)
 
-        if this.Camera.Position.Y < 0.0f then
-            this.Camera.MoveCameraUp(-mouseScroll.Y * this.FileEntryHeight)
+        if this.Camera.Position.Y < 0.0f<px> then
+            this.Camera.ScrollUp(-mouseScroll.Y * this.FileEntryHeight)
 
         let struct (startY, endY) = this.CalculateVisibleIndexRange()
 
@@ -150,7 +159,7 @@ type FilePicker
             float32 this.Files.Count * this.FileEntryHeight - this.Height
 
         if this.Camera.Position.Y > maxCameraPosition then
-            this.Camera.MoveCameraDown(mouseScroll.Y * this.FileEntryHeight)
+            this.Camera.ScrollDown(mouseScroll.Y * this.FileEntryHeight)
 
         if
             Mouse.buttonClicked MouseButton.Left
@@ -161,7 +170,11 @@ type FilePicker
                 || Button.isPressed this.CancelButton
             )
         then
-            let mousePos = Mouse.getPosition () + this.Camera.Position - Vector2(this.X, this.Y)
+            let posVec = Vec2.create this.X this.Y
+
+            let mousePos =
+                (Mouse.getPosition () |> Vec2.fromNumericVector) + this.Camera.Position - posVec
+
             this.ClearSelection()
 
             for index = startY to endY do
@@ -171,10 +184,10 @@ type FilePicker
                 let maxY = minY + this.FileEntryHeight
 
                 if
-                    mousePos.X >= float32 minX
-                    && mousePos.X <= float32 maxX
-                    && mousePos.Y >= float32 minY
-                    && mousePos.Y <= float32 maxY
+                    mousePos.X >= minX
+                    && mousePos.X <= maxX
+                    && mousePos.Y >= minY
+                    && mousePos.Y <= maxY
                 then
                     this.SelectAt index
         else if Mouse.buttonClicked MouseButton.Right then
@@ -191,14 +204,14 @@ type FilePicker
                 _currentSelection <- Some newIndex
 
                 if newIndex > endY then
-                    this.Camera.MoveCameraDown this.FileEntryHeight
+                    this.Camera.ScrollDown this.FileEntryHeight
 
             else if Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
                 let newIndex = max (selectedIndex - 1) 0
                 _currentSelection <- Some newIndex
 
                 if newIndex < startY then
-                    this.Camera.MoveCameraUp this.FileEntryHeight
+                    this.Camera.ScrollUp this.FileEntryHeight
 
     member private this.ProcessButton(button: Button) =
         match button.IsActive with

@@ -5,20 +5,20 @@ open Conway.Encoding
 open System
 open System.IO
 
-type BinaryCanvasFileLoader(decoder: IConwayByteDecoder) =
+type BinaryCanvasFileLoader(gameDecoder: IConwayByteDecoder) =
 
-    member val Decoder = decoder with get, set
+    member val Decoder = gameDecoder with get
 
     member _.DecodeCameraInfo(cameraInfoBytes: ReadOnlySpan<byte>) =
         let posX = BitConverter.ToSingle(cameraInfoBytes.Slice(0, 4))
         let posY = BitConverter.ToSingle(cameraInfoBytes.Slice(4, 4))
         let zoomFactor = BitConverter.ToSingle(cameraInfoBytes.Slice(8, 4))
 
-        Camera(posX, posY, zoomFactor)
+        Camera(LanguagePrimitives.Float32WithMeasure posX, LanguagePrimitives.Float32WithMeasure posY, zoomFactor)
 
     member this.Decode(byteEncoding: ReadOnlySpan<byte>) =
         let camera = this.DecodeCameraInfo(byteEncoding.Slice(0, 12))
-        let game = decoder.Decode(byteEncoding.Slice(12).ToArray())
+        let game = this.Decoder.Decode(byteEncoding.Slice(12).ToArray())
 
         game, camera
 
