@@ -69,7 +69,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         let rowAbove = (row - 1) * cols
         let rowCurrent = row * cols
         let rowBelow = (row + 1) * cols
-        let index = row * cols + col
+        let index = rowCurrent + col
 
         let livingNeighborsCount =
             ConwayGrid.countLivingNeighbors rowAbove rowCurrent rowBelow col activePtr

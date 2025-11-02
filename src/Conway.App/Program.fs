@@ -139,7 +139,7 @@ match userInput with
 
         let camera = new Camera(x = startingCameraPosX, y = startingCameraPosY)
 
-        let startingState = ConwayGrid.createDead width height
+        let startingState = ConwayGrid.createDead (int width) (int height)
 
         let canvas =
             new Canvas(
