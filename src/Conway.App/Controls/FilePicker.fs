@@ -45,11 +45,16 @@ type FilePicker
     let mutable _confirmed = false
 
     let _confirmButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px,
+            y_px,
+            200<px>,
+            40<px>,
             "Confirm",
             false,
             true,
@@ -60,11 +65,16 @@ type FilePicker
         )
 
     let _cancelButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x + 300,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px + 300<px>,
+            y_px,
+            200<px>,
+            40<px>,
             "Cancel",
             true,
             true,

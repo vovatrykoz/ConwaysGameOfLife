@@ -87,7 +87,7 @@ module Callbacks =
     let fullscreenUpdate () =
         if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Y) then
             if raylibTrue (Raylib.IsWindowFullscreen()) then
-                Raylib.SetWindowSize(Default.windowWidth, Default.windowHeight)
+                Raylib.SetWindowSize(int Default.windowWidth, int Default.windowHeight)
             else
                 let monitor = Raylib.GetCurrentMonitor()
                 let monitorWidth = Raylib.GetMonitorWidth monitor

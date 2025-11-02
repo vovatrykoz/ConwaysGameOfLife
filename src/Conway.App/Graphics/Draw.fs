@@ -8,7 +8,7 @@ module Draw =
     open System.Numerics
 
     let inline private buttonBorderRectangle x y width height =
-        Rectangle(float32 (x - 2), float32 (y - 2), float32 (width + 4), float32 (height + 4))
+        Rectangle(float32 (x - 2<px>), float32 (y - 2<px>), float32 (width + 4<px>), float32 (height + 4<px>))
 
     let inline private calculateBorderSize buttonSize = float32 buttonSize / 12.5f
 
@@ -39,10 +39,10 @@ module Draw =
 
     let button (button: Button) =
         match button.IsActive with
-        | true -> Raylib.DrawRectangle(button.X, button.Y, button.Width, button.Height, Color.Black)
-        | false -> Raylib.DrawRectangle(button.X, button.Y, button.Width, button.Height, Color.Gray)
+        | true -> Raylib.DrawRectangle(int button.X, int button.Y, int button.Width, int button.Height, Color.Black)
+        | false -> Raylib.DrawRectangle(int button.X, int button.Y, int button.Width, int button.Height, Color.Gray)
 
-        Raylib.DrawText(button.Text, button.X + 5, button.Y + 5, 15, Color.White)
+        Raylib.DrawText(button.Text, int (button.X + 5<px>), int (button.Y + 5<px>), 15, Color.White)
 
         match button.IsPressed with
         | false -> ()

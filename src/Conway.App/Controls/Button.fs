@@ -1,15 +1,15 @@
 namespace Conway.App.Controls
 
-open Raylib_cs
 open Conway.App.Input
+open Conway.App.Math
+open Raylib_cs
 
-[<Class>]
 type Button
     (
-        x: int,
-        y: int,
-        width: int,
-        height: int,
+        x: int<px>,
+        y: int<px>,
+        width: int<px>,
+        height: int<px>,
         text: string,
         isActive: bool,
         isVisible: bool,
@@ -150,7 +150,8 @@ type Button
             else
                 false
 
-    static member create = new Button(0, 0, 0, 0, "", true, true, None, None, None, None)
+    static member create =
+        new Button(0<px>, 0<px>, 0<px>, 0<px>, "", true, true, None, None, None, None)
 
     static member position x y (button: Button) =
         button.X <- x

@@ -19,26 +19,36 @@ type FileSaver
     let mutable _confirmed = false
 
     let _confirmButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
-            "Confirm",
-            false,
-            true,
-            Some(fun _ -> _confirmed <- true),
-            None,
-            None,
-            Some KeyboardKey.Enter
+            x = x_px,
+            y = y_px,
+            width = 200<px>,
+            height = 40<px>,
+            text = "Confirm",
+            isActive = false,
+            isVisible = true,
+            onClick = Some(fun _ -> _confirmed <- true),
+            onPressAndHold = None,
+            onUpdate = None,
+            shortcut = Some KeyboardKey.Enter
         )
 
     let _cancelButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x + 300,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px + 300<px>,
+            y_px,
+            200<px>,
+            40<px>,
             "Cancel",
             true,
             true,

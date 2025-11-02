@@ -4,9 +4,9 @@ open Conway.App.Math
 
 module Config =
     module Default =
-        let windowWidth = 1024
+        let windowWidth = 1024<px>
 
-        let windowHeight = 768
+        let windowHeight = 768<px>
 
         let gridWidthIndex = 1
         let gridHeightIndex = 2

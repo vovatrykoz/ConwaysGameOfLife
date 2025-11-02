@@ -155,7 +155,7 @@ match userInput with
         let controlManager = new ControlManager()
 
         let renderTexture =
-            Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+            Raylib.LoadRenderTexture(int Default.windowWidth, int Default.windowHeight)
 
         let currentContext =
             new ApplicationContext(gameState = GameState.Paused, canvas = canvas, texture = renderTexture)

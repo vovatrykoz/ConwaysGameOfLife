@@ -22,10 +22,10 @@ type MessageBox
 
     let _confirmButton =
         new Button(
-            int x,
-            int (y + messageLineHeight * 15.0f),
-            200,
-            40,
+            LanguagePrimitives.Int32WithMeasure(int x),
+            LanguagePrimitives.Int32WithMeasure(int (y + messageLineHeight * 15.0f)),
+            200<px>,
+            40<px>,
             confirmText,
             true,
             true,
@@ -37,10 +37,10 @@ type MessageBox
 
     let _cancelButton =
         new Button(
-            int x + 300,
-            int (y + messageLineHeight * 15.0f),
-            200,
-            40,
+            LanguagePrimitives.Int32WithMeasure(int x) + 300<px>,
+            LanguagePrimitives.Int32WithMeasure(int (y + messageLineHeight * 15.0f)),
+            200<px>,
+            40<px>,
             abortText,
             true,
             true,
