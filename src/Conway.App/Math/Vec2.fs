@@ -3,6 +3,14 @@ namespace Conway.App.Math
 open System.Numerics
 open System.Runtime.CompilerServices
 
+// Warning FS0042: This construct is deprecated: it is only for use in the F# library
+#nowarn "42"
+
+[<RequireQualifiedAccess>]
+module private UnsafeUtils =
+
+    let inline retype<'T, 'U> (x: 'T) : 'U = (# "" x: 'U #)
+
 [<Struct; StructuralEquality; StructuralComparison>]
 type Vec2<[<Measure>] 'u> = {
     mutable X: float32<'u>
@@ -35,8 +43,3 @@ type Vec2<[<Measure>] 'u> = {
         X = LanguagePrimitives.Float32WithMeasure<'u> v.X
         Y = LanguagePrimitives.Float32WithMeasure<'u> v.Y
     }
-
-    [<CompiledName("NumericVectorAsVec2")>]
-    static member inline numericVectorAsVec2<'u>(v: Vector2) =
-        let r = &Unsafe.AsRef &v
-        Unsafe.As<Vector2, Vec2<'u>>(&r)

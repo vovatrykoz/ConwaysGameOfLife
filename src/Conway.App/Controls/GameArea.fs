@@ -30,7 +30,7 @@ module internal GameArea =
              || Keyboard.keyIsDown KeyboardKey.RightShift)
             && Mouse.buttonIsPressed mouseButton
         then
-            let mousePos = Mouse.getPosition () |> Vec2.numericVectorAsVec2
+            let mousePos = Mouse.getPosition () |> Vec2.fromNumericVector
 
             if
                 mousePos.X >= startX
