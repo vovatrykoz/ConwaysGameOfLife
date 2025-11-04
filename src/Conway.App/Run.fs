@@ -42,7 +42,14 @@ module Run =
 
         while not saveActionConfirmed do
             let fileSaver =
-                new FileSaver(10.0f<px>, 10.0f<px>, 1000.0f<px>, 480.0f<px>, 1000.0f<px>, 40.0f<px>)
+                new FileSaver(
+                    x = 10.0f<px>,
+                    y = 10.0f<px>,
+                    width = 1000.0f<px>,
+                    height = 480.0f<px>,
+                    fileEntryWidth = 1000.0f<px>,
+                    fileEntryHeight = 40.0f<px>
+                )
 
             while not isCancelled
                   && not (raylibTrue (Raylib.WindowShouldClose()))
@@ -81,15 +88,15 @@ module Run =
 
                     let fileOverwriteControl =
                         new MessageBox(
-                            10.0f<px>,
-                            10.0f<px>,
-                            1000.0f<px>,
-                            480.0f<px>,
-                            1000.0f<px>,
-                            40.0f<px>,
-                            message,
-                            "Yes",
-                            "No"
+                            x = 10.0f<px>,
+                            y = 10.0f<px>,
+                            width = 1000.0f<px>,
+                            height = 480.0f<px>,
+                            messageLineWidth = 1000.0f<px>,
+                            messageLineHeight = 40.0f<px>,
+                            message = message,
+                            confirmText = "Yes",
+                            abortText = "No"
                         )
 
                     Raylib.SetExitKey KeyboardKey.Null
@@ -129,7 +136,14 @@ module Run =
         Raylib.SetExitKey KeyboardKey.Null
 
         let filePicker =
-            new FilePicker(10.0f<px>, 10.0f<px>, 1000.0f<px>, 480.0f<px>, 1000.0f<px>, 40.0f<px>)
+            new FilePicker(
+                x = 10.0f<px>,
+                y = 10.0f<px>,
+                width = 1000.0f<px>,
+                height = 480.0f<px>,
+                fileEntryWidth = 1000.0f<px>,
+                fileEntryHeight = 40.0f<px>
+            )
 
         filePicker.Files.CollectionChanged.Add(fun _ -> filePicker.ClearSelection())
 
@@ -145,19 +159,14 @@ module Run =
             else
                 let files =
                     Directory.GetFiles saveFilesPath
-                    |> Array.map (fun fullPath ->
+                    |> Array.choose (fun fullPath ->
                         let fileName = Path.GetFileName fullPath
                         let lastModified = File.GetLastWriteTime fullPath
                         let fileExtention = Path.GetExtension fullPath
 
-                        let fileType =
-                            match fileExtention with
-                            | ".gol" -> UncompressedSave
-                            | ".golz" -> CompressedSave
-                            | _ -> Other
-
-                        FileData.createRecord fileName fullPath fileType lastModified)
-                    |> Array.filter (fun fileRecord -> fileRecord.FileType = UncompressedSave)
+                        match fileExtention with
+                        | ".gol" -> Some(FileData.createRecord fileName fullPath UncompressedSave lastModified)
+                        | _ -> None)
 
                 files
                 |> Array.iter (fun fileData ->
