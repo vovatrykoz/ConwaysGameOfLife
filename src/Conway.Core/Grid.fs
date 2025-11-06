@@ -51,37 +51,14 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     static member inline private countLivingNeighbors topIndex index bottomIndex (ptr: nativeptr<int<CellStatus>>) =
-        if Avx.IsSupported then
-            let v1 =
-                Vector128.Create(
-                    int (NativePtr.get ptr (topIndex - 1)),
-                    int (NativePtr.get ptr topIndex),
-                    int (NativePtr.get ptr (topIndex + 1)),
-                    int (NativePtr.get ptr (index - 1))
-                )
-
-            let v2 =
-                Vector128.Create(
-                    int (NativePtr.get ptr (index + 1)),
-                    int (NativePtr.get ptr (bottomIndex - 1)),
-                    int (NativePtr.get ptr bottomIndex),
-                    int (NativePtr.get ptr (bottomIndex + 1))
-                )
-
-            let sumVec = Avx.Add(v1, v2)
-            let t1 = Avx.HorizontalAdd(sumVec, sumVec)
-            let t2 = Avx.HorizontalAdd(t1, t1)
-
-            t2.GetElement 0 |> LanguagePrimitives.Int32WithMeasure<CellStatus>
-        else
-            NativePtr.get ptr (topIndex - 1)
-            + NativePtr.get ptr topIndex
-            + NativePtr.get ptr (topIndex + 1)
-            + NativePtr.get ptr (index - 1)
-            + NativePtr.get ptr (index + 1)
-            + NativePtr.get ptr (bottomIndex - 1)
-            + NativePtr.get ptr bottomIndex
-            + NativePtr.get ptr (bottomIndex + 1)
+        NativePtr.get ptr (topIndex - 1)
+        + NativePtr.get ptr topIndex
+        + NativePtr.get ptr (topIndex + 1)
+        + NativePtr.get ptr (index - 1)
+        + NativePtr.get ptr (index + 1)
+        + NativePtr.get ptr (bottomIndex - 1)
+        + NativePtr.get ptr bottomIndex
+        + NativePtr.get ptr (bottomIndex + 1)
 
     [<CompiledName("EvolveCellAt"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     static member inline private evolveCellAt row col cols activePtr passivePtr =
