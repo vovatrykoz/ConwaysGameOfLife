@@ -1,7 +1,6 @@
 namespace Conway.App.Math
 
 open System.Numerics
-open System.Runtime.CompilerServices
 
 // Warning FS0042: This construct is deprecated: it is only for use in the F# library
 #nowarn "42"

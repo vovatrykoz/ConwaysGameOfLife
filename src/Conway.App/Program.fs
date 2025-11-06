@@ -158,7 +158,7 @@ match userInput with
             Raylib.LoadRenderTexture(int Default.windowWidth, int Default.windowHeight)
 
         let currentContext =
-            new ApplicationContext(gameState = GameState.Paused, canvas = canvas, texture = renderTexture)
+            new ApplicationContext(gameMode = GameState.Paused, canvas = canvas, texture = renderTexture)
 
         controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
         controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)

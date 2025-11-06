@@ -1,18 +1,19 @@
 namespace Conway.App
 
+open System
+open System.Collections.Generic
+open System.IO
+open Raylib_cs
+open Conway.App.Controls
+open Conway.App.Utils.Alias
+open Conway.App.Input
+open Conway.App.Graphics
+open Conway.Encoding
+open Conway.App.File
+open Conway.App.Math
+open Conway.Core
+
 module Run =
-    open System
-    open System.Collections.Generic
-    open System.IO
-    open Raylib_cs
-    open Conway.App.Controls
-    open Conway.App.Utils.Alias
-    open Conway.App.Input
-    open Conway.App.Graphics
-    open Conway.Encoding
-    open Conway.App.File
-    open Conway.App.Math
-    open Conway.Core
 
     let private saveGameState (ctx: ApplicationContext) (newFile: string) =
         let encoder = new ConwayByteEncoder()
@@ -165,7 +166,7 @@ module Run =
                         let fileExtention = Path.GetExtension fullPath
 
                         match fileExtention with
-                        | ".gol" -> Some(FileData.createRecord fileName fullPath UncompressedSave lastModified)
+                        | ".gol" -> Some(FileData.create fileName fullPath UncompressedSave lastModified)
                         | _ -> None)
 
                 files

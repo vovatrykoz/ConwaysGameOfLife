@@ -49,6 +49,16 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     member this.ActiveHeight = Array2D.length1 this.Board - 2
 
+    /// <summary>
+    /// Counts the number of living neighbor cells surrounding a given cell in the Conway grid.
+    /// </summary>
+    /// <param name="topIndex">The linear index of the cell directly above the current cell.</param>
+    /// <param name="index">The linear index of the current cell.</param>
+    /// <param name="bottomIndex">The linear index of the cell directly below the current cell.</param>
+    /// <param name="ptr">A native pointer to the contiguous memory block representing the grid, where each cell’s status is stored as an integer.</param>
+    /// <returns>
+    /// The number of living neighbors surrounding the given cell, as an integer sum of adjacent cell statuses.
+    /// </returns>
     [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     static member inline private countLivingNeighbors topIndex index bottomIndex (ptr: nativeptr<int<CellStatus>>) =
         NativePtr.get ptr (topIndex - 1)
@@ -60,6 +70,20 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         + NativePtr.get ptr bottomIndex
         + NativePtr.get ptr (bottomIndex + 1)
 
+    /// <summary>
+    /// Evolves a single cell in the grid according to the rules of Conway’s Game of Life.
+    /// </summary>
+    /// <param name="row">The row index of the cell to evolve.</param>
+    /// <param name="col">The column index of the cell to evolve.</param>
+    /// <param name="cols">The total number of columns in the grid.</param>
+    /// <param name="activePtr">A native pointer to the active grid buffer representing the current state.</param>
+    /// <param name="passivePtr">A native pointer to the passive grid buffer where the next generation state will be written.</param>
+    /// <remarks>
+    /// The function computes the number of living neighbors and applies Conway’s rules:
+    /// - A cell with 2 living neighbors remains in its current state.
+    /// - A cell with 3 living neighbors becomes (or remains) alive.
+    /// - All other cells become (or remain) dead.
+    /// </remarks>
     [<CompiledName("EvolveCellAt"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     static member inline private evolveCellAt row col cols activePtr passivePtr =
         let rowAbove = (row - 1) * cols

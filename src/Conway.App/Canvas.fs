@@ -5,7 +5,6 @@ open Conway.App.Input
 open Conway.App.Math
 open Conway.Core
 open Raylib_cs
-open System.Numerics
 
 type Canvas
     (

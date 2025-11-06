@@ -5,7 +5,6 @@ open Conway.App.Input
 open Conway.App.Math
 open Raylib_cs
 open System.Collections.ObjectModel
-open System.Numerics
 
 [<Struct>]
 type FileType =
@@ -21,7 +20,7 @@ type FileData = {
     Date: DateTime
 } with
 
-    static member createRecord name path fileType date = {
+    static member create name path fileType date = {
         Name = name
         Path = path
         FileType = fileType
