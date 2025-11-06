@@ -1,5 +1,7 @@
 namespace Conway.App
 
+open Conway.App.Math
+
 type ParsingStep =
     | ReadingSwitches
     | ReadingWidth
@@ -18,8 +20,8 @@ type IntCastingError =
     | ZeroNumber
 
 type UserDefinedValues = {
-    WidthResult: Result<int, IntCastingError> option
-    HeightResult: Result<int, IntCastingError> option
+    WidthResult: Result<int<cells>, IntCastingError> option
+    HeightResult: Result<int<cells>, IntCastingError> option
 } with
 
     static member create widthOption heigthOption = {
@@ -80,7 +82,7 @@ module UserInput =
                 | Ok result ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {
                         state with
-                            WidthResult = Some(Ok result)
+                            WidthResult = Some(Ok(LanguagePrimitives.Int32WithMeasure result))
                     }
                 | Error err ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {
@@ -94,7 +96,7 @@ module UserInput =
                 | Ok result ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {
                         state with
-                            HeightResult = Some(Ok result)
+                            HeightResult = Some(Ok(LanguagePrimitives.Int32WithMeasure result))
                     }
                 | Error err ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {

@@ -14,10 +14,10 @@ module Display =
     let inline textureFlipRec width height =
         Rectangle(posVec, Vector2(width, -height))
 
-    let init width height =
+    let init (width: int<px>) (height: int<px>) =
         // Raylib.SetConfigFlags ConfigFlags.ResizableWindow
         Raylib.SetTargetFPS 120
-        Raylib.InitWindow(width, height, "Conway's game of life")
+        Raylib.InitWindow(int width, int height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) =
         let board = canvas.Game.CurrentState.Board

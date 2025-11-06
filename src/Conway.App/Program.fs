@@ -139,7 +139,7 @@ match userInput with
 
         let camera = new Camera(x = startingCameraPosX, y = startingCameraPosY)
 
-        let startingState = ConwayGrid.createDead width height
+        let startingState = ConwayGrid.createDead (int width) (int height)
 
         let canvas =
             new Canvas(
@@ -155,10 +155,10 @@ match userInput with
         let controlManager = new ControlManager()
 
         let renderTexture =
-            Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+            Raylib.LoadRenderTexture(int Default.windowWidth, int Default.windowHeight)
 
         let currentContext =
-            new ApplicationContext(gameState = GameState.Paused, canvas = canvas, texture = renderTexture)
+            new ApplicationContext(gameMode = GameState.Paused, canvas = canvas, texture = renderTexture)
 
         controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
         controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)

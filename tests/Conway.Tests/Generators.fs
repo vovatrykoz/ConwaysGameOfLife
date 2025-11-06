@@ -123,6 +123,18 @@ module internal Generators =
 
         let canvasArb () = canvasGen () |> Arb.fromGen
 
+    module Math =
+        open System
+        open System.Numerics
+
+        let vector2Gen () =
+            ArbMap.defaults.ArbFor<float32>()
+            |> Arb.toGen
+            |> Gen.two
+            |> Gen.map (fun (x, y) -> Vector2(x, y))
+
+        let vector2Arb () = vector2Gen () |> Arb.fromGen
+
 type ConwayGen =
     //
     static member ConwayGrid() =
@@ -139,3 +151,5 @@ type ConwayGen =
     static member Camera() = Generators.Application.cameraArb ()
 
     static member Canvas() = Generators.Application.canvasArb ()
+
+    static member Vector2() = Generators.Math.vector2Arb ()

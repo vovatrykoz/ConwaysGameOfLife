@@ -4,14 +4,14 @@ open Conway.App.Math
 
 module Config =
     module Default =
-        let windowWidth = 1024
+        let windowWidth = 1024<px>
 
-        let windowHeight = 768
+        let windowHeight = 768<px>
 
         let gridWidthIndex = 1
         let gridHeightIndex = 2
-        let gridWidth = 1000
-        let gridHeight = 1000
+        let gridWidth = 1000<cells>
+        let gridHeight = 1000<cells>
 
         let canvasX = 25.0f<px>
         let canvasY = 25.0f<px>
@@ -38,10 +38,14 @@ module Config =
         // 1 in 5 odds that a cell is living
         let oddsOfGettingLivingCell = 5
 
-        let sleepTimeCalculator (gridWidth: int) (gridHeight: int) =
-            if gridHeight <= 2000 || gridWidth <= 2000 then 34
-            else if gridHeight <= 5000 || gridWidth <= 5000 then 16
-            else if gridHeight <= 8000 || gridWidth <= 8000 then 8
-            else 4
+        let sleepTimeCalculator (gridWidth: int<cells>) (gridHeight: int<cells>) =
+            if gridHeight <= 2000<cells> || gridWidth <= 2000<cells> then
+                34
+            else if gridHeight <= 5000<cells> || gridWidth <= 5000<cells> then
+                16
+            else if gridHeight <= 8000<cells> || gridWidth <= 8000<cells> then
+                8
+            else
+                4
 
         let maxFpsSamples = 60

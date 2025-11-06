@@ -5,7 +5,6 @@ open Conway.App.Input
 open Conway.App.Math
 open Raylib_cs
 open System.Collections.ObjectModel
-open System.Numerics
 
 [<Struct>]
 type FileType =
@@ -21,7 +20,7 @@ type FileData = {
     Date: DateTime
 } with
 
-    static member createRecord name path fileType date = {
+    static member create name path fileType date = {
         Name = name
         Path = path
         FileType = fileType
@@ -45,11 +44,16 @@ type FilePicker
     let mutable _confirmed = false
 
     let _confirmButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px,
+            y_px,
+            200<px>,
+            40<px>,
             "Confirm",
             false,
             true,
@@ -60,11 +64,16 @@ type FilePicker
         )
 
     let _cancelButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x + 300,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px + 300<px>,
+            y_px,
+            200<px>,
+            40<px>,
             "Cancel",
             true,
             true,
