@@ -52,5 +52,6 @@
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <OptimizationPreference>Speed</OptimizationPreference>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
   </PropertyGroup>
 </Project>

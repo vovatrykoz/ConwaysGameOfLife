@@ -16,6 +16,7 @@
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <OptimizationPreference>Speed</OptimizationPreference>
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
   </PropertyGroup>
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
