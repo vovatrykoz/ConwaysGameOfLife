@@ -5,9 +5,7 @@ open Conway.App.Controls
 open Conway.App.Math
 open Conway.Core
 open NUnit.Framework
-open FsCheck
 open FsCheck.NUnit
-open System.Numerics
 
 [<Properties(Arbitrary = [| typeof<ConwayGen> |])>]
 module ``Canvas Property Tests`` =

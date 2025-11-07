@@ -16,7 +16,7 @@ module Callbacks =
 
             Raylib.TraceLog(
                 TraceLogLevel.Error,
-                $"Failed to create a directory with the following error: {excepionMessage}"
+                $"Failed to create a new savefile with the following error: {excepionMessage}"
             )
 
     let openFile (ctx: ApplicationContext) =
