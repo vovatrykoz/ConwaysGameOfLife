@@ -14,7 +14,7 @@ module ``Binary Canvas File Saver Tests`` =
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =
         let game = new Game(ConwayGrid.createDead 4 4)
-        let camera = new Camera(0.0f<cells>, 0.0f<cells>)
+        let camera = new Camera<cells>(0.0f<cells>, 0.0f<cells>)
 
         let canvas =
             new Canvas(0.0f<px>, 0.0f<px>, 100.0f<px>, 100.0f<px>, camera, game, 25.0f<px>)

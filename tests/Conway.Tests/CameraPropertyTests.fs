@@ -14,7 +14,7 @@ module ``Camera Property Tests`` =
     let ``Camera constructor sets all the values correctly``
         (x: float32<cells>, y: float32<cells>, zoomFactor: float32)
         =
-        let camera = new Camera(x, y, zoomFactor)
+        let camera = new Camera<cells>(x, y, zoomFactor)
 
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo x)
@@ -22,9 +22,9 @@ module ``Camera Property Tests`` =
             Assert.That(camera.ZoomFactor, Is.EqualTo zoomFactor))
 
     [<Property>]
-    let ``Camera can be correctly moved to the right`` (camera: Camera) (speed: float32<cells>) =
+    let ``Camera can be correctly moved to the right`` (camera: Camera<cells>) (speed: float32<cells>) =
         let expected =
-            Camera(camera.Position.X + speed, camera.Position.Y, camera.ZoomFactor)
+            Camera<cells>(camera.Position.X + speed, camera.Position.Y, camera.ZoomFactor)
 
         camera.MoveCameraRight speed
 
@@ -34,7 +34,7 @@ module ``Camera Property Tests`` =
             Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
 
     [<Property>]
-    let ``Camera can be correctly moved to the left`` (camera: Camera) (speed: float32<cells>) =
+    let ``Camera can be correctly moved to the left`` (camera: Camera<cells>) (speed: float32<cells>) =
         let expected =
             Camera(camera.Position.X - speed, camera.Position.Y, camera.ZoomFactor)
 
@@ -46,7 +46,7 @@ module ``Camera Property Tests`` =
             Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
 
     [<Property>]
-    let ``Camera can be correctly moved up`` (camera: Camera) (speed: float32<cells>) =
+    let ``Camera can be correctly moved up`` (camera: Camera<cells>) (speed: float32<cells>) =
         let expected =
             Camera(camera.Position.X, camera.Position.Y - speed, camera.ZoomFactor)
 
@@ -58,7 +58,7 @@ module ``Camera Property Tests`` =
             Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
 
     [<Property>]
-    let ``Camera can be correctly moved down`` (camera: Camera) (speed: float32<cells>) =
+    let ``Camera can be correctly moved down`` (camera: Camera<cells>) (speed: float32<cells>) =
         let expected =
             Camera(camera.Position.X, camera.Position.Y + speed, camera.ZoomFactor)
 
@@ -70,7 +70,7 @@ module ``Camera Property Tests`` =
             Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
 
     [<Property>]
-    let ``Camera can be correctly zoomed in`` (camera: Camera) (zoomFactor: float32) =
+    let ``Camera can be correctly zoomed in`` (camera: Camera<cells>) (zoomFactor: float32) =
         let expected =
             Camera(camera.Position.X, camera.Position.Y, min (camera.ZoomFactor + zoomFactor) camera.MaxZoomFactor)
 
@@ -82,7 +82,7 @@ module ``Camera Property Tests`` =
             Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
 
     [<Property>]
-    let ``Camera can be correctly zoomed out`` (camera: Camera) (zoomFactor: float32) =
+    let ``Camera can be correctly zoomed out`` (camera: Camera<cells>) (zoomFactor: float32) =
         let expected =
             Camera(camera.Position.X, camera.Position.Y, max (camera.ZoomFactor - zoomFactor) camera.MinZoomFactor)
 

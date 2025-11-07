@@ -1,6 +1,7 @@
 namespace Conway.App.File
 
 open Conway.App
+open Conway.App.Math
 open Conway.App.Controls
 open Conway.Encoding
 open System
@@ -10,7 +11,7 @@ type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
 
     member val Encoder = gameEncoder with get
 
-    member _.EncodeCameraData(camera: Camera) =
+    member _.EncodeCameraData(camera: Camera<cells>) =
         let encodedPositionX = BitConverter.GetBytes(float32 camera.Position.X)
         let encodedPositionY = BitConverter.GetBytes(float32 camera.Position.Y)
         let encodedZoomFactor = BitConverter.GetBytes camera.ZoomFactor

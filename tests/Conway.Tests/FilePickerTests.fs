@@ -20,7 +20,7 @@ module ``File Picker Tests`` =
         let filePicker =
             new FilePicker(0.0f<px>, 0.0f<px>, 8.0f<px>, 4.0f<px>, 8.0f<px>, 2.0f<px>, randomFiles)
 
-        filePicker.Camera.ScrollDown 3.0f<px>
+        filePicker.Camera.MoveCameraDown 3.0f<px>
 
         let expectedStartIndex = 1
         let struct (actualStartIndex, _) = filePicker.CalculateVisibleIndexRange()
@@ -40,7 +40,7 @@ module ``File Picker Tests`` =
         let filePicker =
             new FilePicker(0.0f<px>, 0.0f<px>, 8.0f<px>, 4.0f<px>, 8.0f<px>, 2.0f<px>, randomFiles)
 
-        filePicker.Camera.ScrollDown 3.0f<px>
+        filePicker.Camera.MoveCameraDown 3.0f<px>
 
         let expectedEndIndex = 3
         let struct (_, actualEndIndex) = filePicker.CalculateVisibleIndexRange()

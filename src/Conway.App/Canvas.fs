@@ -12,7 +12,7 @@ type Canvas
         y: float32<px>,
         width: float32<px>,
         height: float32<px>,
-        camera: Camera,
+        camera: Camera<cells>,
         game: Game,
         cellSize: float32<px>
     ) =
