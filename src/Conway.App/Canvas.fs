@@ -30,30 +30,31 @@ type Canvas
     member val Camera = camera with get, set
 
     member this.CalculateVisibleRange() : struct (Vec2<cells> * Vec2<cells>) =
-        let visibleCellSize = this.CellSize * this.Camera.ZoomFactor
-        let visibleCellSizeReciprocal = 1.0f<cells> / visibleCellSize
-        let horizontalCellCount = this.Width * visibleCellSizeReciprocal
-        let verticalCellCount = this.Height * visibleCellSizeReciprocal
+        let zoomedCellSize = this.CellSize * this.Camera.ZoomFactor
+        let cellsPerPixel = 1.0f<cells> / zoomedCellSize
 
-        let camX = this.Camera.Position.X
-        let camY = this.Camera.Position.Y
+        let visibleCellsX = this.Width * cellsPerPixel
+        let visibleCellsY = this.Height * cellsPerPixel
 
-        let halfWidth = horizontalCellCount * 0.5f
-        let halfHeight = verticalCellCount * 0.5f
+        let camPosX = this.Camera.Position.X
+        let camPosY = this.Camera.Position.Y
 
-        let upperLeftCornerX = camX - halfWidth
-        let upperLeftCornerY = camY - halfHeight
+        let halfVisibleCellsX = visibleCellsX * 0.5f
+        let halfVisibleCellsY = visibleCellsY * 0.5f
 
-        let startX = max (1.0f<cells> + upperLeftCornerX) 1.0f<cells>
-        let startY = max (1.0f<cells> + upperLeftCornerY) 1.0f<cells>
+        let topLeftCellX = camPosX - halfVisibleCellsX
+        let topLeftCellY = camPosY - halfVisibleCellsY
 
-        let visibleWidth = min (halfWidth + camX) horizontalCellCount - 1.0f<cells>
-        let visibleHeigh = min (halfHeight + camY) verticalCellCount - 1.0f<cells>
+        let startCellX = max (1.0f<cells> + topLeftCellX) 1.0f<cells>
+        let startCellY = max (1.0f<cells> + topLeftCellY) 1.0f<cells>
 
-        let endX = startX + visibleWidth
-        let endY = startY + visibleHeigh
+        let visibleRangeX = min (camPosX + halfVisibleCellsX) visibleCellsX - 1.0f<cells>
+        let visibleRangeY = min (camPosY + halfVisibleCellsY) visibleCellsY - 1.0f<cells>
 
-        struct (Vec2.create startX startY, Vec2.create endX endY)
+        let endCellX = startCellX + visibleRangeX
+        let endCellY = startCellY + visibleRangeY
+
+        struct (Vec2.create startCellX startCellY, Vec2.create endCellX endCellY)
 
     member this.ProcessMouseDrag() =
         let mousePos = Mouse.position () |> Vec2.fromNumericVector
@@ -67,8 +68,8 @@ type Canvas
             && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
             && not (Keyboard.keyIsDown KeyboardKey.LeftShift)
         then
-            let mouseDelta = Mouse.getDelta () |> Vec2<px>.fromNumericVector
             let cellSizeInverse = 1.0f<cells> / (this.CellSize * this.Camera.ZoomFactor)
+            let mouseDelta = Mouse.getDelta () |> Vec2<px>.fromNumericVector
 
             this.Camera.Position <-
                 this.Camera.Position
@@ -112,12 +113,15 @@ type Canvas
             Vec2.create (this.Camera.Position.X - halfWidth) (this.Camera.Position.Y - halfHeight)
 
         let distanceToBorder =
-            (visibleEndPoint - upperLeftCorner) |> Vec2.scaleBy (float32 scaledCellSize)
+            visibleEndPoint - upperLeftCorner |> Vec2.scaleBy (float32 scaledCellSize)
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let baseX = LanguagePrimitives.Float32WithMeasure(float32 col) - upperLeftCorner.X
-                let baseY = LanguagePrimitives.Float32WithMeasure(float32 row) - upperLeftCorner.Y
+                let baseX =
+                    LanguagePrimitives.Float32WithMeasure<cells>(float32 col) - upperLeftCorner.X
+
+                let baseY =
+                    LanguagePrimitives.Float32WithMeasure<cells>(float32 row) - upperLeftCorner.Y
 
                 let trueStartX = this.CellSize + (baseX - 1.0f<cells>) * scaledCellSize
                 let trueStartY = this.CellSize + (baseY - 1.0f<cells>) * scaledCellSize
