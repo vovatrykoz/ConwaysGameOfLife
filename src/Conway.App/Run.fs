@@ -20,12 +20,12 @@ module Run =
         let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
 
         Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to '{newFile}' ...")
-        let result = (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
 
-        match result with
-        | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
-        | Error errorMessage ->
-            Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{errorMessage}")
+        try
+            (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
+            Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+        with ex ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{ex.Message}")
 
     let saveFileProgram (ctx: ApplicationContext) =
         let saveFilesPath = Environment.CurrentDirectory + "/Saves"
@@ -198,28 +198,25 @@ module Run =
                 let fileLoader = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
 
                 Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {fileData.Path} ...")
-                let result = (fileLoader :> ICanvasFileLoader).Load fileData.Path
 
-                match result with
-                | Ok canvasWrapper ->
+                try
+                    let result = (fileLoader :> ICanvasFileLoader).Load fileData.Path
+
                     Raylib.TraceLog(TraceLogLevel.Info, $"{fileData.Path} loaded successfully")
 
-                    match canvasWrapper.OptionalMessage with
+                    match result.OptionalMessage with
                     | None -> ()
                     | Some message -> Raylib.TraceLog(TraceLogLevel.Info, message)
 
                     Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
 
                     ctx.Canvas.Game <-
-                        Game.createFrom
-                            canvasWrapper.Game.CurrentState
-                            canvasWrapper.Game.InitialState
-                            canvasWrapper.Game.Generation
+                        Game.createFrom result.Game.CurrentState result.Game.InitialState result.Game.Generation
 
-                    ctx.Canvas.Camera <- canvasWrapper.Camera
+                    ctx.Canvas.Camera <- result.Camera
                     Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
-                | Error errorMessage ->
+                with ex ->
                     Raylib.TraceLog(
                         TraceLogLevel.Error,
-                        $"Could not load the file due to the following error: {errorMessage}"
+                        $"Could not load the file due to the following error: {ex.Message}"
                     )

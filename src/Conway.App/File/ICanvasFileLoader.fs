@@ -13,4 +13,4 @@ type CanvasWrapper = {
 
 [<Interface>]
 type ICanvasFileLoader =
-    abstract member Load: path: string -> Result<CanvasWrapper, string>
+    abstract member Load: path: string -> CanvasWrapper
