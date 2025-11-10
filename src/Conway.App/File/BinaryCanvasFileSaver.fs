@@ -29,9 +29,8 @@ type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
 
     interface ICanvasFileSaver with
         member this.Save (canvas: Canvas) (path: string) : unit =
-            let completeEncoding = this.EncodeCanvasData canvas
-
             try
+                let completeEncoding = this.EncodeCanvasData canvas
                 File.WriteAllBytes(path, completeEncoding)
                 Raylib.TraceLog(TraceLogLevel.Info, $"File saved at {path}")
             with
@@ -42,7 +41,6 @@ type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
                 )
 
                 reraise ()
-
             | :? ArgumentException ->
                 if String.IsNullOrEmpty path then
                     Raylib.TraceLog(TraceLogLevel.Error, $"{nameof path} was empty")

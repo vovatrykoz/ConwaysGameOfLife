@@ -1,15 +1,25 @@
 namespace Conway.Tests
 
+open Conway.App
 open Conway.App.Controls
 open Conway.App.File
 open Conway.App.Math
 open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
+open System
+open System.Collections
+
+type FaultyEncoder<'T when 'T :> Exception>(exceptionToRaise: 'T) =
+
+    member val ExceptionToRaise = exceptionToRaise with get
+
+    static member willRaise<'T>(exceptionToRaise: 'T) = new FaultyEncoder<'T>(exceptionToRaise)
+
+    interface ICanvasFileSaver with
+        member this.Save (_: Canvas) (_: string) : unit = raise this.ExceptionToRaise
 
 module ``Binary Canvas File Saver Tests`` =
-    open Conway.App
-    open System.Collections
 
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =
