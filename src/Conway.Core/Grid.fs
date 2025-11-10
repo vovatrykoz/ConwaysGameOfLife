@@ -14,11 +14,8 @@ open System.Runtime.Intrinsics.X86
 [<Measure>]
 type CellStatus
 
-// This is just to improve the readability of the match ... with expression in the evolveCellAt member
-// Shouldn't really be used outside of that part or similar match ... with expressions
-// CellStatus should always be preferred
 [<Measure>]
-type Neighbors = CellStatus
+type Neighbors
 
 module private Constants =
 
@@ -49,6 +46,9 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     member this.ActiveHeight = Array2D.length1 this.Board - 2
 
+    static member inline private asNeighbors(value: int<CellStatus>) =
+        value |> int |> LanguagePrimitives.Int32WithMeasure<Neighbors>
+
     /// <summary>
     /// Counts the number of living neighbor cells surrounding a given cell in the Conway grid.
     /// </summary>
@@ -69,6 +69,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         + NativePtr.get ptr (bottomIndex - 1)
         + NativePtr.get ptr bottomIndex
         + NativePtr.get ptr (bottomIndex + 1)
+        |> ConwayGrid.asNeighbors
 
     /// <summary>
     /// Evolves a single cell in the grid according to the rules of Conway’s Game of Life.
@@ -107,6 +108,7 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
     member this.AdvanceToNextState() =
         let activeIndex = this.ActiveBufferIndex
         let passiveIndex = (activeIndex + 1) % this.Buffers.Length
+
         let activeBuffer = this.Buffers[activeIndex]
         let passiveBuffer = this.Buffers[passiveIndex]
 

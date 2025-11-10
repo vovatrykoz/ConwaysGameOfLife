@@ -108,7 +108,7 @@ type FilePicker
 
     member val Files = new ObservableCollection<FileData>(files) with get
 
-    member val Camera = new ScrollViewer(x, y) with get
+    member val Camera = new Camera<px>(x, y) with get
 
     member val private ActivatedButton: option<Button> = None with get, set
 
@@ -157,10 +157,10 @@ type FilePicker
 
     member this.ProcessMouseInput() =
         let mouseScroll = Mouse.getScrollAmount ()
-        this.Camera.ScrollDown(-mouseScroll.Y * this.FileEntryHeight)
+        this.Camera.MoveCameraDown(-mouseScroll.Y * this.FileEntryHeight)
 
         if this.Camera.Position.Y < 0.0f<px> then
-            this.Camera.ScrollUp(-mouseScroll.Y * this.FileEntryHeight)
+            this.Camera.MoveCameraUp(-mouseScroll.Y * this.FileEntryHeight)
 
         let struct (startY, endY) = this.CalculateVisibleIndexRange()
 
@@ -168,7 +168,7 @@ type FilePicker
             float32 this.Files.Count * this.FileEntryHeight - this.Height
 
         if this.Camera.Position.Y > maxCameraPosition then
-            this.Camera.ScrollDown(mouseScroll.Y * this.FileEntryHeight)
+            this.Camera.MoveCameraDown(mouseScroll.Y * this.FileEntryHeight)
 
         if
             Mouse.buttonClicked MouseButton.Left
@@ -213,14 +213,14 @@ type FilePicker
                 _currentSelection <- Some newIndex
 
                 if newIndex > endY then
-                    this.Camera.ScrollDown this.FileEntryHeight
+                    this.Camera.MoveCameraDown this.FileEntryHeight
 
             else if Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
                 let newIndex = max (selectedIndex - 1) 0
                 _currentSelection <- Some newIndex
 
                 if newIndex < startY then
-                    this.Camera.ScrollUp this.FileEntryHeight
+                    this.Camera.MoveCameraUp this.FileEntryHeight
 
     member private this.ProcessButton(button: Button) =
         match button.IsActive with
