@@ -20,6 +20,8 @@ type FaultyEncoder<'T when 'T :> Exception>(exceptionToRaise: 'T) =
         member this.Save (_: Canvas) (_: string) : unit = raise this.ExceptionToRaise
 
 module ``Binary Canvas File Saver Tests`` =
+    open Conway.App
+    open NUnit.Framework.Legacy
 
     [<Test>]
     let ``Can correctly encode a simple canvas with default camera parameters`` () =

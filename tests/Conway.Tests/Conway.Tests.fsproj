@@ -20,6 +20,7 @@
     <Compile Include="CameraPropertyTests.fs" />
     <Compile Include="CanvasPropertyTests.fs" />
     <Compile Include="Vec2Tests.fs" />
+    <Compile Include="HuffmanNodeTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -35,6 +36,7 @@
     <ProjectReference Include="..\..\src\Conway.Core\Conway.Core.fsproj" />
     <ProjectReference Include="..\..\src\Conway.App\Conway.App.fsproj" />
     <ProjectReference Include="..\..\src\Conway.Encoding\Conway.Encoding.fsproj" />
+    <ProjectReference Include="..\..\src\Conway.Compression\Conway.Compression.fsproj" />
   </ItemGroup>
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>

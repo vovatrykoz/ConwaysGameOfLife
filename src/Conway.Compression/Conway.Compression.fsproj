@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="IByteCompressor.fs" />
+    <Compile Include="IByteDecompressor.fs" />
+    <Compile Include="Huffman\HuffmanNode.fs" />
+    <Compile Include="Huffman\WeightedHuffmanNode.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Conway.Encoding\Conway.Encoding.fsproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <WarningLevel>5</WarningLevel>
+    <AnalysisLevel>5</AnalysisLevel>
+  </PropertyGroup>
+
+</Project>

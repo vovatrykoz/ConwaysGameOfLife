@@ -5,6 +5,7 @@ open Conway.Core
 open NUnit.Framework
 
 module ``Conway Byte Decoder Tests`` =
+    open NUnit.Framework.Legacy
 
     [<Test>]
     let ``Can correctly decode grid dimensions`` () =
