@@ -4,10 +4,14 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BitVector8.fs" /><Compile Include="BitVector8Tracked.fs" />
+    <Compile Include="BitVector8.fs" />
+    <Compile Include="BitVector8Tracked.fs" />
     <Compile Include="IConwayByteEncoder.fs" />
     <Compile Include="IConwayByteDecoder.fs" />
-    <Compile Include="ConwayByteEncoder.fs" /><Compile Include="ConwayByteDecoder.fs" />
+    <Compile Include="IByteCompressor.fs" />
+    <Compile Include="IByteDecompressor.fs" />
+    <Compile Include="ConwayByteEncoder.fs" />
+    <Compile Include="ConwayByteDecoder.fs" /><Compile Include="CompressedConwayByteEncoder.fs" /><Compile Include="CompressedConwayByteDecoder.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Conway.Core\Conway.Core.fsproj" />

@@ -1,4 +1,4 @@
-namespace Conway.Compression
+namespace Conway.Encoding
 
 open System
 

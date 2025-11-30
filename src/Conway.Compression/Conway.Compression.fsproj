@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="IByteCompressor.fs" />
-    <Compile Include="IByteDecompressor.fs" />
+    <Compile Include="HuffmanTree.fs" />
+    
     <Compile Include="Huffman\HuffmanNode.fs" />
     <Compile Include="Huffman\WeightedHuffmanNode.fs" />
   </ItemGroup>
@@ -19,6 +19,7 @@
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>5</AnalysisLevel>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
 </Project>
