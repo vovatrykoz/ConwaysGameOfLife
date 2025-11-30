@@ -137,7 +137,7 @@ match userInput with
         let startingCameraPosY: float32<cells> =
             LanguagePrimitives.Float32WithMeasure<cells>(float32 (width / 2))
 
-        let camera = new Camera(x = startingCameraPosX, y = startingCameraPosY)
+        let camera = new Camera<cells>(x = startingCameraPosX, y = startingCameraPosY)
 
         let startingState = ConwayGrid.createDead (int width) (int height)
 

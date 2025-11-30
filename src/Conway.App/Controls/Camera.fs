@@ -8,11 +8,11 @@ open Conway.App.Math
 /// <param name="x">Initial x-coordinate of the camera in cells.</param>
 /// <param name="y">Initial y-coordinate of the camera in cells.</param>
 /// <param name="zoomFactor">Initial zoom factor of the camera.</param>
-type Camera(x: float32<cells>, y: float32<cells>, zoomFactor: float32) =
+type Camera<[<Measure>] 'u>(x: float32<'u>, y: float32<'u>, zoomFactor: float32) =
     let mutable _position = Vec2.create x y
 
     /// <summary>Secondary constructor with default zoom factor of 1.0.</summary>
-    new(x: float32<cells>, y: float32<cells>) = Camera(x, y, 1.0f)
+    new(x: float32<'u>, y: float32<'u>) = Camera(x, y, 1.0f)
 
     /// <summary>Current position of the camera in cells.</summary>
     member _.Position
@@ -29,16 +29,16 @@ type Camera(x: float32<cells>, y: float32<cells>, zoomFactor: float32) =
     member val MinZoomFactor = 0.2f with get
 
     /// <summary>Moves the camera to the right by the specified speed in cells.</summary>
-    member _.MoveCameraRight(speed: float32<cells>) = _position.X <- _position.X + speed
+    member _.MoveCameraRight(speed: float32<'u>) = _position.X <- _position.X + speed
 
     /// <summary>Moves the camera to the left by the specified speed in cells.</summary>
-    member _.MoveCameraLeft(speed: float32<cells>) = _position.X <- _position.X - speed
+    member _.MoveCameraLeft(speed: float32<'u>) = _position.X <- _position.X - speed
 
     /// <summary>Moves the camera up by the specified speed in cells.</summary>
-    member _.MoveCameraUp(speed: float32<cells>) = _position.Y <- _position.Y - speed
+    member _.MoveCameraUp(speed: float32<'u>) = _position.Y <- _position.Y - speed
 
     /// <summary>Moves the camera down by the specified speed in cells.</summary>
-    member _.MoveCameraDown(speed: float32<cells>) = _position.Y <- _position.Y + speed
+    member _.MoveCameraDown(speed: float32<'u>) = _position.Y <- _position.Y + speed
 
     /// <summary>Zooms the camera in by the specified speed, clamped to the maximum zoom factor.</summary>
     /// <param name="speed">Zoom increment value.</param>

@@ -12,7 +12,7 @@ module ``Binary Canvas File Loader Tests`` =
     [<Test>]
     let ``Can correctly load a simple canvas with default camera parameters`` () =
         let expectedGame = new Game(ConwayGrid.createDead 4 4)
-        let expectedCamera = new Camera(0.0f<cells>, 0.0f<cells>, 1.0f)
+        let expectedCamera = new Camera<cells>(0.0f<cells>, 0.0f<cells>, 1.0f)
 
         let encoding = [|
             0b0000_0000uy // camera X-coordinate (32-bit float)

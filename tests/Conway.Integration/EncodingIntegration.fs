@@ -81,9 +81,7 @@ module ``Encoding Integration Tests`` =
 
         File.Delete location
 
-        match savedCanvas with
-        | Ok wrapper -> Assert.That(wrapper.Game.CurrentState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
-        | Error err -> Assert.Fail $"Expected Ok, got {err}"
+        Assert.That(savedCanvas.Game.CurrentState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back, setting the loaded state as the initial board state``
@@ -102,9 +100,7 @@ module ``Encoding Integration Tests`` =
 
         File.Delete location
 
-        match savedCanvas with
-        | Ok wrapper -> Assert.That(wrapper.Game.InitialState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
-        | Error err -> Assert.Fail $"Expected Ok, got {err}"
+        Assert.That(savedCanvas.Game.InitialState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving counters``
@@ -123,12 +119,9 @@ module ``Encoding Integration Tests`` =
 
         File.Delete location
 
-        match savedCanvas with
-        | Ok wrapper ->
-            Assert.Multiple(fun _ ->
-                Assert.That(wrapper.Game.Generation, Is.EqualTo originalCanvas.Game.Generation)
-                Assert.That(wrapper.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.Generation))
-        | Error err -> Assert.Fail $"Expected Ok, got {err}"
+        Assert.Multiple(fun _ ->
+            Assert.That(savedCanvas.Game.Generation, Is.EqualTo originalCanvas.Game.Generation)
+            Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.Generation))
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving camera settings``
@@ -145,10 +138,7 @@ module ``Encoding Integration Tests`` =
         let _ = fileSaver.Save originalCanvas location
         let savedCanvas = fileLoader.Load location
 
-        match savedCanvas with
-        | Ok wrapper ->
-            Assert.Multiple(fun _ ->
-                Assert.That(wrapper.Camera.Position.X, Is.EqualTo originalCanvas.Camera.Position.X)
-                Assert.That(wrapper.Camera.Position.Y, Is.EqualTo originalCanvas.Camera.Position.Y)
-                Assert.That(wrapper.Camera.ZoomFactor, Is.EqualTo originalCanvas.Camera.ZoomFactor))
-        | Error err -> Assert.Fail $"Expected Ok, got {err}"
+        Assert.Multiple(fun _ ->
+            Assert.That(savedCanvas.Camera.Position.X, Is.EqualTo originalCanvas.Camera.Position.X)
+            Assert.That(savedCanvas.Camera.Position.Y, Is.EqualTo originalCanvas.Camera.Position.Y)
+            Assert.That(savedCanvas.Camera.ZoomFactor, Is.EqualTo originalCanvas.Camera.ZoomFactor))
