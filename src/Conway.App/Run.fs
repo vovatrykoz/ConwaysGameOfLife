@@ -1,29 +1,31 @@
 namespace Conway.App
 
+open System
+open System.Collections.Generic
+open System.IO
+open Raylib_cs
+open Conway.App.Controls
+open Conway.App.Utils.Alias
+open Conway.App.Input
+open Conway.App.Graphics
+open Conway.Encoding
+open Conway.App.File
+open Conway.App.Math
+open Conway.Core
+
 module Run =
-    open System
-    open System.Collections.Generic
-    open System.IO
-    open Raylib_cs
-    open Conway.App.Controls
-    open Conway.App.Utils.Alias
-    open Conway.App.Input
-    open Conway.App.Graphics
-    open Conway.Encoding
-    open Conway.App.File
-    open Conway.Core
 
     let private saveGameState (ctx: ApplicationContext) (newFile: string) =
         let encoder = new ConwayByteEncoder()
         let fileSaver = new BinaryCanvasFileSaver(encoder :> IConwayByteEncoder)
 
         Raylib.TraceLog(TraceLogLevel.Info, $"Saving the file to '{newFile}' ...")
-        let result = (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
 
-        match result with
-        | Ok _ -> Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
-        | Error errorMessage ->
-            Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{errorMessage}")
+        try
+            (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
+            Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+        with ex ->
+            Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{ex.Message}")
 
     let saveFileProgram (ctx: ApplicationContext) =
         let saveFilesPath = Environment.CurrentDirectory + "/Saves"
@@ -40,7 +42,15 @@ module Run =
         let mutable saveActionConfirmed = false
 
         while not saveActionConfirmed do
-            let fileSaver = new FileSaver(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
+            let fileSaver =
+                new FileSaver(
+                    x = 10.0f<px>,
+                    y = 10.0f<px>,
+                    width = 1000.0f<px>,
+                    height = 480.0f<px>,
+                    fileEntryWidth = 1000.0f<px>,
+                    fileEntryHeight = 40.0f<px>
+                )
 
             while not isCancelled
                   && not (raylibTrue (Raylib.WindowShouldClose()))
@@ -78,7 +88,17 @@ module Run =
                         $"{fileName} already exists.\nDo you want to overwrite the existing file?"
 
                     let fileOverwriteControl =
-                        new MessageBox(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f, message, "Yes", "No")
+                        new MessageBox(
+                            x = 10.0f<px>,
+                            y = 10.0f<px>,
+                            width = 1000.0f<px>,
+                            height = 480.0f<px>,
+                            messageLineWidth = 1000.0f<px>,
+                            messageLineHeight = 40.0f<px>,
+                            message = message,
+                            confirmText = "Yes",
+                            abortText = "No"
+                        )
 
                     Raylib.SetExitKey KeyboardKey.Null
 
@@ -116,7 +136,16 @@ module Run =
 
         Raylib.SetExitKey KeyboardKey.Null
 
-        let filePicker = new FilePicker(10.0f, 10.0f, 1000.0f, 480.0f, 1000.0f, 40.0f)
+        let filePicker =
+            new FilePicker(
+                x = 10.0f<px>,
+                y = 10.0f<px>,
+                width = 1000.0f<px>,
+                height = 480.0f<px>,
+                fileEntryWidth = 1000.0f<px>,
+                fileEntryHeight = 40.0f<px>
+            )
+
         filePicker.Files.CollectionChanged.Add(fun _ -> filePicker.ClearSelection())
 
         while not isCancelled
@@ -131,19 +160,14 @@ module Run =
             else
                 let files =
                     Directory.GetFiles saveFilesPath
-                    |> Array.map (fun fullPath ->
+                    |> Array.choose (fun fullPath ->
                         let fileName = Path.GetFileName fullPath
                         let lastModified = File.GetLastWriteTime fullPath
                         let fileExtention = Path.GetExtension fullPath
 
-                        let fileType =
-                            match fileExtention with
-                            | ".gol" -> UncompressedSave
-                            | ".golz" -> CompressedSave
-                            | _ -> Other
-
-                        FileData.createRecord fileName fullPath fileType lastModified)
-                    |> Array.filter (fun fileRecord -> fileRecord.FileType = UncompressedSave)
+                        match fileExtention with
+                        | ".gol" -> Some(FileData.create fileName fullPath UncompressedSave lastModified)
+                        | _ -> None)
 
                 files
                 |> Array.iter (fun fileData ->
@@ -174,28 +198,25 @@ module Run =
                 let fileLoader = new BinaryCanvasFileLoader(decoder :> IConwayByteDecoder)
 
                 Raylib.TraceLog(TraceLogLevel.Info, $"Loading the file from {fileData.Path} ...")
-                let result = (fileLoader :> ICanvasFileLoader).Load fileData.Path
 
-                match result with
-                | Ok canvasWrapper ->
+                try
+                    let result = (fileLoader :> ICanvasFileLoader).Load fileData.Path
+
                     Raylib.TraceLog(TraceLogLevel.Info, $"{fileData.Path} loaded successfully")
 
-                    match canvasWrapper.OptionalMessage with
+                    match result.OptionalMessage with
                     | None -> ()
                     | Some message -> Raylib.TraceLog(TraceLogLevel.Info, message)
 
                     Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
 
                     ctx.Canvas.Game <-
-                        Game.createFrom
-                            canvasWrapper.Game.CurrentState
-                            canvasWrapper.Game.InitialState
-                            canvasWrapper.Game.Generation
+                        Game.createFrom result.Game.CurrentState result.Game.InitialState result.Game.Generation
 
-                    ctx.Canvas.Camera <- canvasWrapper.Camera
+                    ctx.Canvas.Camera <- result.Camera
                     Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
-                | Error errorMessage ->
+                with ex ->
                     Raylib.TraceLog(
                         TraceLogLevel.Error,
-                        $"Could not load the file due to the following error: {errorMessage}"
+                        $"Could not load the file due to the following error: {ex.Message}"
                     )

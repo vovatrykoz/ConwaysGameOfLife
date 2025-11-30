@@ -2,6 +2,7 @@ namespace Conway.Tests
 
 open Conway.App.Controls
 open Conway.App.File
+open Conway.App.Math
 open Conway.Encoding
 open Conway.Core
 open NUnit.Framework
@@ -12,7 +13,7 @@ module ``Binary Canvas File Loader Tests`` =
     [<Test>]
     let ``Can correctly load a simple canvas with default camera parameters`` () =
         let expectedGame = new Game(ConwayGrid.createDead 4 4)
-        let expectedCamera = new Camera(0.0f, 0.0f, 1.0f)
+        let expectedCamera = new Camera<cells>(0.0f<cells>, 0.0f<cells>, 1.0f)
 
         let encoding = [|
             0b0000_0000uy // camera X-coordinate (32-bit float)
@@ -49,8 +50,9 @@ module ``Binary Canvas File Loader Tests`` =
         let fileLoader = BinaryCanvasFileLoader decoder
         let actualGame, actualCamera = fileLoader.Decode encoding
 
-        CollectionAssert.AreEqual(actualGame.CurrentState.Board, expectedGame.CurrentState.Board)
-        CollectionAssert.AreEqual(actualGame.InitialState.Board, expectedGame.InitialState.Board)
-        Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
-        Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
-        Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor)
+        Assert.Multiple(fun _ ->
+            Assert.That(actualGame.CurrentState.Board, Is.EqualTo expectedGame.CurrentState.Board)
+            Assert.That(actualGame.InitialState.Board, Is.EqualTo expectedGame.InitialState.Board)
+            Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
+            Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
+            Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor))

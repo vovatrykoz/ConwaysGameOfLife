@@ -2,6 +2,7 @@ open Conway.App
 open Conway.App.Config
 open Conway.App.Controls
 open Conway.App.Graphics
+open Conway.App.Math
 open Conway.App.Utils.Alias
 open Conway.Core
 open Raylib_cs
@@ -9,7 +10,10 @@ open System
 open System.Diagnostics
 
 Display.init Default.windowWidth Default.windowHeight
-Display.loadingScreen (float32 (Default.windowWidth / 2)) (float32 (Default.windowHeight / 2))
+
+Display.loadingScreen
+    (LanguagePrimitives.Float32WithMeasure<px>(float32 (Default.windowWidth / 2)))
+    (LanguagePrimitives.Float32WithMeasure<px>(float32 (Default.windowHeight / 2)))
 
 let args = Environment.GetCommandLineArgs()
 
@@ -45,8 +49,8 @@ match userInput with
                     Raylib.TraceLog(
                         TraceLogLevel.Error,
                         $"The width value was outside of the allowed range: {value}\n"
-                        + $"Largest allowed value {Int32.MaxValue}"
-                        + $"Smallest allowed value {Int32.MinValue}"
+                        + $"Largest allowed value: {Int32.MaxValue}"
+                        + $"Smallest allowed value: 1"
                     )
 
                     Error()
@@ -55,7 +59,18 @@ match userInput with
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was not a valid number: {value}")
                     Error()
                 | NegativeNumber value ->
-                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided width value was negative: {value}")
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided width value was negative: {value}. Only positive values are allowed"
+                    )
+
+                    Error()
+                | ZeroNumber ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided width value was zero. Only positive values are allowed"
+                    )
+
                     Error()
                 | NullInput ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided width string was null")
@@ -79,7 +94,7 @@ match userInput with
                         TraceLogLevel.Error,
                         $"The height value was outside of the allowed range: {value}\n"
                         + $"Largest allowed value {Int32.MaxValue}"
-                        + $"Smallest allowed value {Int32.MinValue}"
+                        + $"Smallest allowed value {1}"
                     )
 
                     Error()
@@ -88,7 +103,18 @@ match userInput with
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was not a valid number: {value}")
                     Error()
                 | NegativeNumber value ->
-                    Raylib.TraceLog(TraceLogLevel.Error, $"The provided height value was negative: {value}")
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided height value was negative: {value}. Only positive values are allowed"
+                    )
+
+                    Error()
+                | ZeroNumber ->
+                    Raylib.TraceLog(
+                        TraceLogLevel.Error,
+                        $"The provided width value was zero. Only positive values are allowed"
+                    )
+
                     Error()
                 | NullInput ->
                     Raylib.TraceLog(TraceLogLevel.Error, $"The provided height string was null")
@@ -100,57 +126,59 @@ match userInput with
     match gridWidth, gridHeight with
     | Error(), _
     | _, Error() ->
-        Raylib.TraceLog(TraceLogLevel.Error, $"Terminating the program")
+        Raylib.TraceLog(TraceLogLevel.Error, $"Terminating the program!")
         Environment.Exit 1
     | Ok width, Ok height ->
         let sleepTime = Default.sleepTimeCalculator width height
-        let camera = new Camera(float32 (width / 2), float32 (height / 2))
-        let startingState = ConwayGrid.createDead width height
+
+        let startingCameraPosX: float32<cells> =
+            LanguagePrimitives.Float32WithMeasure<cells>(float32 (width / 2))
+
+        let startingCameraPosY: float32<cells> =
+            LanguagePrimitives.Float32WithMeasure<cells>(float32 (width / 2))
+
+        let camera = new Camera<cells>(x = startingCameraPosX, y = startingCameraPosY)
+
+        let startingState = ConwayGrid.createDead (int width) (int height)
 
         let canvas =
             new Canvas(
-                Default.canvasX,
-                Default.canvasY,
-                float32 Default.windowWidth - Default.widthOffset,
-                float32 Default.windowHeight - Default.heightOffset,
-                camera,
-                new Game(startingState),
-                Default.cellSize
+                x = Default.canvasX,
+                y = Default.canvasY,
+                width = Default.canvasWidth,
+                height = Default.canvasHeight,
+                camera = camera,
+                game = new Game(startingState),
+                cellSize = Default.cellSize
             )
 
         let controlManager = new ControlManager()
 
         let renderTexture =
-            Raylib.LoadRenderTexture(Default.windowWidth, Default.windowHeight)
+            Raylib.LoadRenderTexture(int Default.windowWidth, int Default.windowHeight)
 
         let currentContext =
-            new ApplicationContext(GameRunMode.Paused, canvas, renderTexture)
+            new ApplicationContext(gameMode = GameState.Paused, canvas = canvas, texture = renderTexture)
 
         controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
         controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
         controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
 
         let gameUpdateLoop () =
-            let mutable shouldRun = false
-
-            async {
+            task {
                 while true do
                     do! Async.Sleep sleepTime
 
-                    shouldRun <-
-                        match currentContext.GameMode with
-                        | GameRunMode.Infinite -> true
-                        | GameRunMode.Step ->
-                            currentContext.GameMode <- GameRunMode.Paused
-                            true
-                        | GameRunMode.Paused
-                        | _ -> false
-
-                    if shouldRun then
+                    match currentContext.GameMode with
+                    | GameState.Infinite -> canvas.Game.RunOneStep()
+                    | GameState.Step ->
                         canvas.Game.RunOneStep()
+                        currentContext.GameMode <- GameState.Paused
+                    | GameState.Paused
+                    | _ -> ()
             }
 
-        gameUpdateLoop () |> Async.Start
+        gameUpdateLoop () |> ignore
 
         let mutable fps = 0.0
         let maxSamples = Default.maxFpsSamples
@@ -176,4 +204,5 @@ match userInput with
             fps <- 1.0 / (frameTimes |> Array.average)
 
         Raylib.UnloadRenderTexture renderTexture
-        Display.close ()
+
+Display.close ()

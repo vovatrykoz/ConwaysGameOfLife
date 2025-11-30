@@ -3,6 +3,7 @@ namespace Conway.App.Graphics
 open Conway.App
 open Conway.App.Controls
 open Conway.App.Input
+open Conway.App.Math
 open Conway.Core
 open Raylib_cs
 open System.Numerics
@@ -13,10 +14,10 @@ module Display =
     let inline textureFlipRec width height =
         Rectangle(posVec, Vector2(width, -height))
 
-    let init width height =
+    let init (width: int<px>) (height: int<px>) =
         // Raylib.SetConfigFlags ConfigFlags.ResizableWindow
         Raylib.SetTargetFPS 120
-        Raylib.InitWindow(width, height, "Conway's game of life")
+        Raylib.InitWindow(int width, int height, "Conway's game of life")
 
     let private renderBoardOnCanvas (canvas: Canvas) =
         let board = canvas.Game.CurrentState.Board
@@ -30,8 +31,9 @@ module Display =
         let endRow = max (min (int visibleEndPoint.Y) (rows - 2)) 1
         let endCol = max (min (int visibleEndPoint.X) (cols - 2)) 1
 
+        let cellSize = canvas.CellSize * canvas.Camera.ZoomFactor / 1.0f<cells>
         let scaledCellSize = canvas.CellSize * canvas.Camera.ZoomFactor
-        let scaledCellSizeReciprocal = 1.0f / scaledCellSize
+        let scaledCellSizeReciprocal = 1.0f / cellSize
 
         let halfWidth = canvas.Width * 0.5f * scaledCellSizeReciprocal
         let halfHeight = canvas.Height * 0.5f * scaledCellSizeReciprocal
@@ -41,19 +43,24 @@ module Display =
 
         for row = startRow to endRow do
             for col = startCol to endCol do
-                let baseX = max (float32 col) visibleStartPoint.X - upperLeftCornerX
-                let baseY = max (float32 row) visibleStartPoint.Y - upperLeftCornerY
+                let baseX =
+                    max (LanguagePrimitives.Float32WithMeasure(float32 col)) visibleStartPoint.X
+                    - upperLeftCornerX
 
-                let trueX = canvas.CellSize + (baseX - 1.0f) * scaledCellSize
-                let trueY = canvas.CellSize + (baseY - 1.0f) * scaledCellSize
+                let baseY =
+                    max (LanguagePrimitives.Float32WithMeasure(float32 row)) visibleStartPoint.Y
+                    - upperLeftCornerY
 
-                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * scaledCellSize
-                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * scaledCellSize
+                let trueX = canvas.CellSize + (baseX - 1.0f<cells>) * cellSize
+                let trueY = canvas.CellSize + (baseY - 1.0f<cells>) * cellSize
 
-                let trueWidth = max (min scaledCellSize (actualEndX - trueX)) 0.0f
-                let trueHeight = max (min scaledCellSize (actualEndY - trueY)) 0.0f
+                let actualEndX = (visibleEndPoint.X - upperLeftCornerX) * cellSize
+                let actualEndY = (visibleEndPoint.Y - upperLeftCornerY) * cellSize
 
-                if trueWidth = 0.0f || trueHeight = 0.0f then
+                let trueWidth = max (min scaledCellSize (actualEndX - trueX)) 0.0f<px>
+                let trueHeight = max (min scaledCellSize (actualEndY - trueY)) 0.0f<px>
+
+                if trueWidth = 0.0f<px> || trueHeight = 0.0f<px> then
                     ()
                 else
                     match board[row, col] with
@@ -68,7 +75,7 @@ module Display =
 
     let private renderGenerationCounter (canvas: Canvas) =
         Draw.label
-            (canvas.Position.X + canvas.Width + 5.0f)
+            (canvas.Position.X + canvas.Width + 5.0f<px>)
             canvas.Position.Y
             24
             $"Generation {canvas.Game.Generation}"
@@ -79,8 +86,8 @@ module Display =
 
     let private renderFpsCounter (canvas: Canvas) fps =
         Draw.label
-            (canvas.Position.X + canvas.Width + 5.0f)
-            (canvas.Position.Y + 50.0f)
+            (canvas.Position.X + canvas.Width + 5.0f<px>)
+            (canvas.Position.Y + 50.0f<px>)
             24
             $"FPS {fps}"
             30
@@ -90,8 +97,8 @@ module Display =
 
     let private renderMousePos (canvas: Canvas) (mousePos: Vector2) =
         Draw.label
-            (canvas.Position.X + canvas.Width + 5.0f)
-            (canvas.Position.Y + 170.0f)
+            (canvas.Position.X + canvas.Width + 5.0f<px>)
+            (canvas.Position.Y + 170.0f<px>)
             24
             $"Mouse:\nX {mousePos.X} Y {mousePos.Y}"
             30
@@ -101,8 +108,8 @@ module Display =
 
     let private renderCanvasFocusCoordinates (canvas: Canvas) =
         Draw.label
-            (canvas.Position.X + canvas.Width + 5.0f)
-            (canvas.Position.Y + 100.0f)
+            (canvas.Position.X + canvas.Width + 5.0f<px>)
+            (canvas.Position.Y + 100.0f<px>)
             24
             $"Camera:\nX: {canvas.Camera.Position.X:F2} Y: {canvas.Camera.Position.Y:F2}"
             30
@@ -120,15 +127,15 @@ module Display =
             Raylib.EndDrawing()
 
     let saveFileDialogue (texture: RenderTexture2D) (fileSaver: FileSaver) =
-        let baseOffsetY = 10.0f
+        let baseOffsetY = 10.0f<px>
 
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
         Draw.label
-            (float32 fileSaver.X)
+            fileSaver.X
             baseOffsetY
-            (int (fileSaver.FileEntryHeight - 10.0f))
+            (int (fileSaver.FileEntryHeight - 10.0f<px>))
             "Enter file name:"
             (int fileSaver.FileEntryWidth)
             (int fileSaver.FileEntryHeight)
@@ -136,9 +143,9 @@ module Display =
             Color.White
 
         Draw.label
-            (float32 fileSaver.X)
-            (baseOffsetY + float32 fileSaver.FileEntryHeight)
-            (int (fileSaver.FileEntryHeight - 10.0f))
+            fileSaver.X
+            (baseOffsetY + fileSaver.FileEntryHeight)
+            (int (fileSaver.FileEntryHeight - 10.0f<px>))
             (fileSaver.Buffer.ToString())
             (int fileSaver.FileEntryWidth)
             (int fileSaver.FileEntryHeight)
@@ -146,9 +153,9 @@ module Display =
             Color.Black
 
         Draw.label
-            (float32 fileSaver.X)
-            (baseOffsetY + float32 fileSaver.FileEntryHeight * 2.0f)
-            (int (fileSaver.FileEntryHeight - 10.0f))
+            fileSaver.X
+            (baseOffsetY + fileSaver.FileEntryHeight * 2.0f)
+            (int (fileSaver.FileEntryHeight - 10.0f<px>))
             $"{fileSaver.Buffer.Length}/50"
             (int fileSaver.FileEntryWidth)
             (int fileSaver.FileEntryHeight)
@@ -172,15 +179,15 @@ module Display =
         Raylib.EndDrawing()
 
     let messageBox (texture: RenderTexture2D) (messageBox: MessageBox) =
-        let baseOffsetY = 10.0f
+        let baseOffsetY = 10.0f<px>
 
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
         Draw.label
-            (float32 messageBox.X)
-            (baseOffsetY + float32 messageBox.MessageLineHeight)
-            (int (messageBox.MessageLineHeight - 10.0f))
+            messageBox.X
+            (baseOffsetY + messageBox.MessageLineHeight)
+            (int (messageBox.MessageLineHeight - 10.0f<px>))
             messageBox.Message
             (int messageBox.MessageLineWidth)
             (int messageBox.MessageLineHeight)
@@ -221,9 +228,11 @@ module Display =
 
             if currentItemIsSelected then
                 Draw.label
-                    (float32 filePicker.X)
-                    (float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
-                    (int (filePicker.FileEntryHeight - 10.0f))
+                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X))
+                    (LanguagePrimitives.Float32WithMeasure(
+                        float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex)
+                    ))
+                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)
@@ -237,9 +246,11 @@ module Display =
                     | Other -> "Selected file type:\nOther"
 
                 Draw.label
-                    (float32 filePicker.X + 600.0f)
-                    (float32 y + float32 filePicker.FileEntryHeight * float32 15.0f)
-                    (int (filePicker.FileEntryHeight - 10.0f))
+                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X + 600.0f))
+                    (LanguagePrimitives.Float32WithMeasure(
+                        float32 y + float32 filePicker.FileEntryHeight * float32 15.0f
+                    ))
+                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
                     currentFileTypeText
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)
@@ -247,9 +258,11 @@ module Display =
                     Color.White
             else
                 Draw.label
-                    (float32 filePicker.X)
-                    (float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex))
-                    (int (filePicker.FileEntryHeight - 10.0f))
+                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X))
+                    (LanguagePrimitives.Float32WithMeasure(
+                        float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex)
+                    ))
+                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)

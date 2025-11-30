@@ -1,6 +1,7 @@
 namespace Conway.App.Controls
 
 open Conway.App.Input
+open Conway.App.Math
 open Conway.Core
 open Raylib_cs
 
@@ -18,10 +19,10 @@ module internal GameArea =
         game.ResetGenerationCounter()
 
     let IsPressedWithShift
-        (startX: float32)
-        (startY: float32)
-        (endX: float32)
-        (endY: float32)
+        (startX: float32<px>)
+        (startY: float32<px>)
+        (endX: float32<px>)
+        (endY: float32<px>)
         (mouseButton: MouseButton)
         =
         if
@@ -29,7 +30,7 @@ module internal GameArea =
              || Keyboard.keyIsDown KeyboardKey.RightShift)
             && Mouse.buttonIsPressed mouseButton
         then
-            let mousePos = Mouse.getPosition ()
+            let mousePos = Mouse.getPosition () |> Vec2.fromNumericVector
 
             if
                 mousePos.X >= startX
@@ -43,8 +44,8 @@ module internal GameArea =
         else
             false
 
-    let IsLeftPressedWithShift (startX: float32) (startY: float32) (endX: float32) (endY: float32) =
+    let IsLeftPressedWithShift (startX: float32<px>) (startY: float32<px>) (endX: float32<px>) (endY: float32<px>) =
         IsPressedWithShift startX startY endX endY MouseButton.Left
 
-    let IsRightPressedWithShift (startX: float32) (startY: float32) (endX: float32) (endY: float32) =
+    let IsRightPressedWithShift (startX: float32<px>) (startY: float32<px>) (endX: float32<px>) (endY: float32<px>) =
         IsPressedWithShift startX startY endX endY MouseButton.Right

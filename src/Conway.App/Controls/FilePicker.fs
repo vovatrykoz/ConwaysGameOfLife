@@ -2,9 +2,9 @@ namespace Conway.App.Controls
 
 open System
 open Conway.App.Input
+open Conway.App.Math
 open Raylib_cs
 open System.Collections.ObjectModel
-open System.Numerics
 
 [<Struct>]
 type FileType =
@@ -20,7 +20,7 @@ type FileData = {
     Date: DateTime
 } with
 
-    static member createRecord name path fileType date = {
+    static member create name path fileType date = {
         Name = name
         Path = path
         FileType = fileType
@@ -29,12 +29,12 @@ type FileData = {
 
 type FilePicker
     (
-        x: float32,
-        y: float32,
-        width: float32,
-        height: float32,
-        fileEntryWidth: float32,
-        fileEntryHeight: float32,
+        x: float32<px>,
+        y: float32<px>,
+        width: float32<px>,
+        height: float32<px>,
+        fileEntryWidth: float32<px>,
+        fileEntryHeight: float32<px>,
         files: seq<FileData>
     ) =
     let mutable _currentSelection: int option = None
@@ -44,11 +44,16 @@ type FilePicker
     let mutable _confirmed = false
 
     let _confirmButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px,
+            y_px,
+            200<px>,
+            40<px>,
             "Confirm",
             false,
             true,
@@ -59,11 +64,16 @@ type FilePicker
         )
 
     let _cancelButton =
+        let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
+
+        let y_px: int<px> =
+            LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
+
         new Button(
-            int x + 300,
-            int (y + fileEntryHeight * 15.0f),
-            200,
-            40,
+            x_px + 300<px>,
+            y_px,
+            200<px>,
+            40<px>,
             "Cancel",
             true,
             true,
@@ -73,7 +83,15 @@ type FilePicker
             Some KeyboardKey.Escape
         )
 
-    new(x: float32, y: float32, width: float32, height: float32, fileEntryWidth: float32, fileEntryHeight: float32) =
+    new
+        (
+            x: float32<px>,
+            y: float32<px>,
+            width: float32<px>,
+            height: float32<px>,
+            fileEntryWidth: float32<px>,
+            fileEntryHeight: float32<px>
+        ) =
         new FilePicker(x, y, width, height, fileEntryWidth, fileEntryHeight, Seq.empty)
 
     member val X = x with get, set
@@ -90,7 +108,7 @@ type FilePicker
 
     member val Files = new ObservableCollection<FileData>(files) with get
 
-    member val Camera = new Camera(x, y) with get
+    member val Camera = new Camera<px>(x, y) with get
 
     member val private ActivatedButton: option<Button> = None with get, set
 
@@ -141,7 +159,7 @@ type FilePicker
         let mouseScroll = Mouse.getScrollAmount ()
         this.Camera.MoveCameraDown(-mouseScroll.Y * this.FileEntryHeight)
 
-        if this.Camera.Position.Y < 0.0f then
+        if this.Camera.Position.Y < 0.0f<px> then
             this.Camera.MoveCameraUp(-mouseScroll.Y * this.FileEntryHeight)
 
         let struct (startY, endY) = this.CalculateVisibleIndexRange()
@@ -161,7 +179,11 @@ type FilePicker
                 || Button.isPressed this.CancelButton
             )
         then
-            let mousePos = Mouse.getPosition () + this.Camera.Position - Vector2(this.X, this.Y)
+            let posVec = Vec2.create this.X this.Y
+
+            let mousePos =
+                (Mouse.getPosition () |> Vec2.fromNumericVector) + this.Camera.Position - posVec
+
             this.ClearSelection()
 
             for index = startY to endY do
@@ -171,10 +193,10 @@ type FilePicker
                 let maxY = minY + this.FileEntryHeight
 
                 if
-                    mousePos.X >= float32 minX
-                    && mousePos.X <= float32 maxX
-                    && mousePos.Y >= float32 minY
-                    && mousePos.Y <= float32 maxY
+                    mousePos.X >= minX
+                    && mousePos.X <= maxX
+                    && mousePos.Y >= minY
+                    && mousePos.Y <= maxY
                 then
                     this.SelectAt index
         else if Mouse.buttonClicked MouseButton.Right then

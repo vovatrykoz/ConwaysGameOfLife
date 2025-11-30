@@ -1,6 +1,6 @@
 namespace Conway.App
 
-open Raylib_cs
+open Conway.App.Math
 
 type ParsingStep =
     | ReadingSwitches
@@ -17,10 +17,11 @@ type IntCastingError =
     | InvalidNumber of string
     | NumberTooLarge of string
     | NegativeNumber of int
+    | ZeroNumber
 
 type UserDefinedValues = {
-    WidthResult: Result<int, IntCastingError> option
-    HeightResult: Result<int, IntCastingError> option
+    WidthResult: Result<int<cells>, IntCastingError> option
+    HeightResult: Result<int<cells>, IntCastingError> option
 } with
 
     static member create widthOption heigthOption = {
@@ -35,14 +36,23 @@ type UserDefinedValues = {
 
 module UserInput =
 
-    let widthShortSwitch, widthLongSwitch = "-w", "--width"
+    [<Literal>]
+    let widthShortSwitch = "-w"
 
-    let heightShortSwitch, heightLongSwitch = "-h", "--height"
+    [<Literal>]
+    let widthLongSwitch = "--width"
 
-    let tryReadInt (stringValue: string) =
+    [<Literal>]
+    let heightShortSwitch = "-h"
+
+    [<Literal>]
+    let heightLongSwitch = "--height"
+
+    let private tryReadInt (stringValue: string) =
         try
             match int stringValue with
-            | x when x <= 0 -> Error(NegativeNumber x)
+            | x when x < 0 -> Error(NegativeNumber x)
+            | x when x = 0 -> Error ZeroNumber
             | x -> Ok x
         with
         | :? System.OverflowException -> Error(NumberTooLarge stringValue)
@@ -72,7 +82,7 @@ module UserInput =
                 | Ok result ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {
                         state with
-                            WidthResult = Some(Ok result)
+                            WidthResult = Some(Ok(LanguagePrimitives.Int32WithMeasure result))
                     }
                 | Error err ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {
@@ -86,7 +96,7 @@ module UserInput =
                 | Ok result ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {
                         state with
-                            HeightResult = Some(Ok result)
+                            HeightResult = Some(Ok(LanguagePrimitives.Int32WithMeasure result))
                     }
                 | Error err ->
                     tryReadArgsRec args (index + 1) ReadingSwitches {

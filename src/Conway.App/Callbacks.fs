@@ -16,7 +16,7 @@ module Callbacks =
 
             Raylib.TraceLog(
                 TraceLogLevel.Error,
-                $"Failed to create a directory with the following error: {excepionMessage}"
+                $"Failed to create a new savefile with the following error: {excepionMessage}"
             )
 
     let openFile (ctx: ApplicationContext) =
@@ -35,7 +35,7 @@ module Callbacks =
         let currentGameMode = ctx.GameMode
 
         match currentGameMode with
-        | GameRunMode.Paused ->
+        | GameState.Paused ->
             ctx.Canvas.Game.CurrentState <-
                 ConwayGrid.createRandomWithOdds
                     ctx.Canvas.Game.CurrentState.ActiveWidth
@@ -48,22 +48,22 @@ module Callbacks =
 
         ctx.GameMode <-
             match currentGameMode with
-            | GameRunMode.Paused -> GameRunMode.Infinite
-            | _ -> GameRunMode.Paused
+            | GameState.Paused -> GameState.Infinite
+            | _ -> GameState.Paused
 
     let advanceOnce (ctx: ApplicationContext) =
         match ctx.GameMode with
-        | GameRunMode.Paused -> ctx.Canvas.Game.RunOneStep()
+        | GameState.Paused -> ctx.Canvas.Game.RunOneStep()
         | _ -> ()
 
     let update (ctx: ApplicationContext) (button: Button) =
         match ctx.GameMode with
-        | GameRunMode.Paused -> button.Text <- "Run"
+        | GameState.Paused -> button.Text <- "Run"
         | _ -> button.Text <- "Pause"
 
     let updateOnRun (ctx: ApplicationContext) (button: Button) =
         match ctx.GameMode with
-        | GameRunMode.Paused -> button.IsActive <- true
+        | GameState.Paused -> button.IsActive <- true
         | _ -> button.IsActive <- false
 
     let updateOnRunBack (ctx: ApplicationContext) (button: Button) =
@@ -74,20 +74,20 @@ module Callbacks =
 
     let resetCallback (ctx: ApplicationContext) =
         match ctx.GameMode with
-        | GameRunMode.Paused -> ctx.Canvas.Game.ResetState()
+        | GameState.Paused -> ctx.Canvas.Game.ResetState()
         | _ -> ()
 
     let clearCallback (ctx: ApplicationContext) =
         let grid = ctx.Canvas.Game.CurrentState
 
         match ctx.GameMode with
-        | GameRunMode.Paused -> ctx.Canvas.Game.CurrentState <- ConwayGrid.createDead grid.ActiveWidth grid.ActiveHeight
+        | GameState.Paused -> ctx.Canvas.Game.CurrentState <- ConwayGrid.createDead grid.ActiveWidth grid.ActiveHeight
         | _ -> ()
 
     let fullscreenUpdate () =
         if raylibTrue (Raylib.IsKeyPressed KeyboardKey.Y) then
             if raylibTrue (Raylib.IsWindowFullscreen()) then
-                Raylib.SetWindowSize(Default.windowWidth, Default.windowHeight)
+                Raylib.SetWindowSize(int Default.windowWidth, int Default.windowHeight)
             else
                 let monitor = Raylib.GetCurrentMonitor()
                 let monitorWidth = Raylib.GetMonitorWidth monitor
