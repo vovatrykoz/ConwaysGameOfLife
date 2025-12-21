@@ -11,7 +11,7 @@ type GameState =
 /// <summary>
 /// Represents the Game of Life engine, maintaining state and progression logic.
 /// </summary>
-[<Class>]
+[<Sealed; Class>]
 type Game =
     /// <summary>
     /// Initializes a new instance of the Game class with the given initial grid state.

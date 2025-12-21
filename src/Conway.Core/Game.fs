@@ -5,6 +5,7 @@ type GameState =
     | Step = 1
     | Infinite = 2
 
+[<Sealed>]
 type Game(initialState: ConwayGrid, generation: int) =
     let mutable _initialState = ConwayGrid.copyFrom initialState
 
