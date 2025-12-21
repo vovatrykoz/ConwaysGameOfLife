@@ -47,6 +47,7 @@
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>5</AnalysisLevel>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>IL3053;IL2104</WarningsNotAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <PublishAot>true</PublishAot>
