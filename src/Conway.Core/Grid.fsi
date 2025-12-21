@@ -7,7 +7,7 @@ type CellStatus
 /// Represents the 2D grid of cells used in Conway's Game of Life.
 /// Provides methods for initialization and advancing the simulation.
 /// </summary>
-[<Class>]
+[<Sealed; Class>]
 type ConwayGrid =
 
     /// <summary>

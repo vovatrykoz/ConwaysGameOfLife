@@ -4,8 +4,6 @@ open Microsoft.FSharp.NativeInterop
 open System
 open System.Runtime.CompilerServices
 open System.Threading.Tasks
-open System.Runtime.Intrinsics
-open System.Runtime.Intrinsics.X86
 
 // Uses of this construct may result in the generation of unverifiable .NET IL code.
 // This warning can be disabled using '--nowarn:9' or '#nowarn "9"'
@@ -25,6 +23,7 @@ module private Constants =
     [<Literal>]
     let livingCell = 1<CellStatus>
 
+[<Sealed>]
 type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
 
     private new(width: int, height: int) =
