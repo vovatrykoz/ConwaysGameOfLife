@@ -53,7 +53,7 @@
     <Company>Volodymyr Trykoz</Company>
     <Description>Conway's Game of Life</Description>
     <Product>Conway's Game of Life</Product>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
   </PropertyGroup>
   <PropertyGroup>
     <PublishAot>true</PublishAot>
