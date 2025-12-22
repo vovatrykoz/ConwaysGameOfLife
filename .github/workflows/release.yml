@@ -68,8 +68,8 @@ jobs:
       - name: Archive Linux build
         run: |
           cd ./linux-build
-          zip -r ../ConwaysGameOfLife-linux-x64.zip ./ConwaysGameOfLife
           cp ../Manual.pdf ./ConwaysGameOfLife
+          zip -r ../ConwaysGameOfLife-linux-x64.zip ./ConwaysGameOfLife
           cd ../
 
       - name: Upload Linux artifact
@@ -80,6 +80,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
+    needs: build-manual
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -111,8 +112,8 @@ jobs:
       - name: Archive Windows build
         run: |
             Set-Location ./windows-build
-            powershell Compress-Archive -Path ./ConwaysGameOfLife -DestinationPath ../ConwaysGameOfLife-win-x64.zip
             Copy-Item ../Manual.pdf ./ConwaysGameOfLife
+            powershell Compress-Archive -Path ./ConwaysGameOfLife -DestinationPath ../ConwaysGameOfLife-win-x64.zip
             Set-Location ../
 
       - name: Upload Windows artifact
