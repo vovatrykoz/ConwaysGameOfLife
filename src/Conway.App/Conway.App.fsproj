@@ -50,6 +50,12 @@
     <WarningsNotAsErrors>IL3053;IL2104</WarningsNotAsErrors>
   </PropertyGroup>
   <PropertyGroup>
+    <Company>Volodymyr Trykoz</Company>
+    <Description>Conway's Game of Life</Description>
+    <Product>Conway's Game of Life</Product>
+    <Version>0.0.5</Version>
+  </PropertyGroup>
+  <PropertyGroup>
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <SelfContained>true</SelfContained>
