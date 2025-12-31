@@ -6,8 +6,13 @@
   <ItemGroup>
     <Compile Include="Grid.fsi" />
     <Compile Include="Grid.fs" />
+    <Compile Include="AcceleratedGrid.fs" />
     <Compile Include="Game.fsi" />
     <Compile Include="Game.fs" />
+    <Compile Include="AcceleratedGame.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ILGPU" Version="1.5.3" />
   </ItemGroup>
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
@@ -15,7 +20,6 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
-    <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <SelfContained>true</SelfContained>
     <DebugType>embedded</DebugType>
