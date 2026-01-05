@@ -33,13 +33,15 @@ module internal Generators =
                 ConwayGrid.init width height initFunc)
             |> Arb.fromGen
 
+        let validConwayArrArb () = validConwayGridGen () |> Arb.fromGen
+
         let valid2dBoardArb () = validConwayGridGen () |> Arb.fromGen
 
     module Game =
         let validGameArb () =
             gen {
                 let! currentGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
-                let! initialGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
+                let! initialGridGen = ConwayGrid.validConwayArrArb () |> Arb.toGen
                 let! generationCounter = ArbMap.defaults.ArbFor<int>() |> Arb.toGen
 
                 return currentGridGen, initialGridGen, generationCounter

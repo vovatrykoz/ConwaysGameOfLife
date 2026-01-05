@@ -37,7 +37,7 @@ module ``Conway Byte Encoder Tests`` =
         |]
 
         let encoder = new ConwayByteEncoder()
-        let actualEncoding = encoder.EncodeGrid grid
+        let actualEncoding = encoder.EncodeBoard grid.Board
 
         Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
@@ -51,7 +51,7 @@ module ``Conway Byte Encoder Tests`` =
         |]
 
         let encoder = new ConwayByteEncoder()
-        let actualEncoding = encoder.EncodeGrid grid
+        let actualEncoding = encoder.EncodeBoard grid.Board
 
         Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 
@@ -68,7 +68,7 @@ module ``Conway Byte Encoder Tests`` =
         |]
 
         let encoder = new ConwayByteEncoder()
-        let actualEncoding = encoder.EncodeGrid grid
+        let actualEncoding = encoder.EncodeBoard grid.Board
 
         Assert.That(actualEncoding, Is.EqualTo<IEnumerable> expectedEncoding)
 

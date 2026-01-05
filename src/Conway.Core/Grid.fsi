@@ -10,6 +10,8 @@ type CellStatus
 [<Sealed; Class>]
 type ConwayGrid =
 
+    internal new: startingGrid: int<CellStatus> array2d -> ConwayGrid
+
     /// <summary>
     /// Returns a default dead cell value.
     /// </summary>

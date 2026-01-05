@@ -51,7 +51,7 @@ module ``Binary Canvas File Loader Tests`` =
 
         Assert.Multiple(fun _ ->
             Assert.That(actualGame.CurrentState.Board, Is.EqualTo expectedGame.CurrentState.Board)
-            Assert.That(actualGame.InitialState.Board, Is.EqualTo expectedGame.InitialState.Board)
+            Assert.That(actualGame.StartingGrid, Is.EqualTo expectedGame.StartingGrid)
             Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
             Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
             Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor))

@@ -7,7 +7,7 @@ type GameState =
 
 [<Sealed>]
 type Game(initialState: ConwayGrid, generation: int) =
-    let mutable _initialState = ConwayGrid.copyFrom initialState
+    let mutable _initialState = Array2D.copy initialState.Board
 
     let mutable _internalState = initialState
 
@@ -23,11 +23,11 @@ type Game(initialState: ConwayGrid, generation: int) =
         with get () = _internalState
         and set newState =
             _internalState <- newState
-            _initialState <- ConwayGrid.copyFrom newState
+            _initialState <- Array2D.copy newState.Board
             _generation <- 1
             _initialGeneration <- generation
 
-    member _.InitialState
+    member _.StartingGrid
         with get () = _initialState
         and private set newValue = _initialState <- newValue
 
@@ -44,18 +44,22 @@ type Game(initialState: ConwayGrid, generation: int) =
         this.Generation <- this.Generation + 1
 
     member _.ResetState() =
-        _internalState <- ConwayGrid.copyFrom _initialState
+        _internalState <- new ConwayGrid(_initialState)
         _generation <- _initialGeneration
 
     member this.ResetGenerationCounter() =
-        _initialState <- ConwayGrid.copyFrom this.CurrentState
+        _initialState <- Array2D.copy this.CurrentState.Board
         _generation <- 1
         _initialGeneration <- _generation
 
     [<CompiledName("CreateFrom")>]
-    static member createFrom (currentState: ConwayGrid) (initialState: ConwayGrid) (generationCounter: int) =
+    static member createFrom
+        (currentState: ConwayGrid)
+        (initialState: int<CellStatus> array2d)
+        (generationCounter: int)
+        =
         let newGame = new Game(ConwayGrid.copyFrom currentState)
-        newGame.InitialState <- ConwayGrid.copyFrom initialState
+        newGame.StartingGrid <- Array2D.copy initialState
         newGame.Generation <- generationCounter
         newGame.StartingGeneration <- generationCounter
         newGame

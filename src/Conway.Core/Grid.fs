@@ -24,7 +24,7 @@ module private Constants =
     let livingCell = 1<CellStatus>
 
 [<Sealed>]
-type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
+type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
 
     private new(width: int, height: int) =
         let initArr = Array2D.create (height + 2) (width + 2) 0<CellStatus>

@@ -11,9 +11,9 @@ type ConwayByteEncoder() =
 
         Array.append (BitConverter.GetBytes rows) (BitConverter.GetBytes cols)
 
-    member _.EncodeGrid(grid: ConwayGrid) =
-        let rows = Array2D.length1 grid.Board - 2
-        let cols = Array2D.length2 grid.Board - 2
+    member _.EncodeBoard(board: int<CellStatus> array2d) =
+        let rows = Array2D.length1 board - 2
+        let cols = Array2D.length2 board - 2
 
         let gridBytes = List<BitVector8>()
         gridBytes.Add BitVector8.zeroed
@@ -29,7 +29,7 @@ type ConwayByteEncoder() =
                 let currentIndex = gridBytes.Count - 1
                 let currentBitVector = gridBytes.[currentIndex]
 
-                match grid.Board.[row, col] with
+                match board.[row, col] with
                 | x when x = ConwayGrid.DeadCell -> ()
                 | _ -> gridBytes.[currentIndex] <- currentBitVector.SetBitAt bitCounter
 
@@ -40,8 +40,8 @@ type ConwayByteEncoder() =
     interface IConwayByteEncoder with
         member this.Encode(game: Game) =
             let dimensionsEncoded = this.EncodeDimensions game.CurrentState
-            let currentGridEncoded = this.EncodeGrid game.CurrentState
-            let initialGridEncoded = this.EncodeGrid game.InitialState
+            let currentGridEncoded = this.EncodeBoard game.CurrentState.Board
+            let initialGridEncoded = this.EncodeBoard game.StartingGrid
             let generationEncoded = BitConverter.GetBytes game.Generation
 
             initialGridEncoded

@@ -34,7 +34,7 @@ type Game =
     /// <summary>
     /// Gets the initial state of the grid.
     /// </summary>
-    member InitialState: ConwayGrid with get
+    member StartingGrid: int<CellStatus> array2d with get
 
     /// <summary>
     /// Gets the current generation number.
@@ -62,4 +62,5 @@ type Game =
     member ResetGenerationCounter: unit -> unit
 
     [<CompiledName("CreateFrom")>]
-    static member createFrom: currentState: ConwayGrid -> initialState: ConwayGrid -> generationCounter: int -> Game
+    static member createFrom:
+        currentState: ConwayGrid -> initialState: int<CellStatus> array2d -> generationCounter: int -> Game
