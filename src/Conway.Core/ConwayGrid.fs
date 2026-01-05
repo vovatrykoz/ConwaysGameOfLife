@@ -59,21 +59,15 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
     /// The number of living neighbors surrounding the given cell, as an integer sum of adjacent cell statuses.
     /// </returns>
     [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
-    static member inline private countLivingNeighbors
-        rowAbove
-        rowCurrent
-        rowBelow
-        col
-        (ptr: nativeptr<int<CellStatus>>)
-        =
-        NativePtr.get ptr (rowAbove + (col - 1))
-        + NativePtr.get ptr (rowAbove + col)
-        + NativePtr.get ptr (rowAbove + (col + 1))
-        + NativePtr.get ptr (rowCurrent + (col - 1))
-        + NativePtr.get ptr (rowCurrent + (col + 1))
-        + NativePtr.get ptr (rowBelow + (col - 1))
-        + NativePtr.get ptr (rowBelow + col)
-        + NativePtr.get ptr (rowBelow + (col + 1))
+    static member inline private countLivingNeighbors topIndex index bottomIndex (ptr: nativeptr<int<CellStatus>>) =
+        NativePtr.get ptr (topIndex - 1)
+        + NativePtr.get ptr topIndex
+        + NativePtr.get ptr (topIndex + 1)
+        + NativePtr.get ptr (index - 1)
+        + NativePtr.get ptr (index + 1)
+        + NativePtr.get ptr (bottomIndex - 1)
+        + NativePtr.get ptr bottomIndex
+        + NativePtr.get ptr (bottomIndex + 1)
         |> ConwayGrid.asNeighbors
 
     /// <summary>
@@ -91,14 +85,13 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
     /// - All other cells become (or remain) dead.
     /// </remarks>
     [<CompiledName("EvolveCellAt"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
-    static member inline private evolveCellAt row col cols activePtr passivePtr =
-        let rowAbove = (row - 1) * cols
-        let rowCurrent = row * cols
-        let rowBelow = (row + 1) * cols
-        let index = row * cols + col
+    static member inline private evolveCellAt rowAbove rowCurrent rowBelow col activePtr passivePtr =
+        let topIndex = rowAbove + col
+        let index = rowCurrent + col
+        let bottomIndex = rowBelow + col
 
         let livingNeighborsCount =
-            ConwayGrid.countLivingNeighbors rowAbove rowCurrent rowBelow col activePtr
+            ConwayGrid.countLivingNeighbors topIndex index bottomIndex activePtr
 
         match livingNeighborsCount with
         | 2<Neighbors> ->
@@ -126,8 +119,12 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
             1,
             rows - 1,
             fun row ->
+                let rowAbove = (row - 1) * cols
+                let rowCurrent = row * cols
+                let rowBelow = (row + 1) * cols
+
                 for col in 1..lastCol do
-                    ConwayGrid.evolveCellAt row col cols activePtr passivePtr
+                    ConwayGrid.evolveCellAt rowAbove rowCurrent rowBelow col activePtr passivePtr
         )
         |> ignore
 
