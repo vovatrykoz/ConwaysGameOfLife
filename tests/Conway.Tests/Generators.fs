@@ -41,7 +41,7 @@ module internal Generators =
         let validGameArb () =
             gen {
                 let! currentGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
-                let! initialGridGen = ConwayGrid.validConwayArrArb () |> Arb.toGen
+                let! initialGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
                 let! generationCounter = ArbMap.defaults.ArbFor<int>() |> Arb.toGen
 
                 return currentGridGen, initialGridGen, generationCounter

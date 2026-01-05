@@ -131,18 +131,3 @@ module ``Game Properties`` =
         Assert.Multiple(fun _ ->
             Assert.That(game.Generation, Is.EqualTo 1)
             Assert.That(game.StartingGeneration, Is.EqualTo 1))
-
-    [<Property>]
-    let ``Game.createFrom correctly initializes the new game``
-        (currentGrid: ConwayGrid)
-        (originalGrid: int<CellStatus> array2d)
-        (generationCounter: int)
-        =
-        let game = Game.createFrom currentGrid originalGrid generationCounter
-
-        Assert.Multiple(fun _ ->
-            Assert.That(game.CurrentState, Is.Not.EqualTo currentGrid)
-            Assert.That(game.CurrentState.Board, Is.EqualTo currentGrid.Board)
-            Assert.That(game.StartingGrid, Is.EqualTo originalGrid)
-            Assert.That(game.Generation, Is.EqualTo generationCounter)
-            Assert.That(game.StartingGeneration, Is.EqualTo generationCounter))

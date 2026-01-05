@@ -210,9 +210,7 @@ module Run =
 
                     Raylib.TraceLog(TraceLogLevel.Info, "Updating the grid...")
 
-                    ctx.Canvas.Game <-
-                        Game.createFrom result.Game.CurrentState result.Game.StartingGrid result.Game.Generation
-
+                    ctx.Canvas.Game <- result.Game
                     ctx.Canvas.Camera <- result.Camera
                     Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
                 with ex ->

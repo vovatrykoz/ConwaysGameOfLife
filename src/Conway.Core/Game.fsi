@@ -61,6 +61,12 @@ type Game =
     /// </summary>
     member ResetGenerationCounter: unit -> unit
 
+    /// <summary>
+    /// Creates a new Game instance from the provided current grid state, initial board state, and generation counter.
+    /// </summary>
+    /// <param name="currentState">The current ConwayGrid representing the game state.</param>
+    /// <param name="initialState">The initial 2D array of cells to store as the starting state.</param>
+    /// <param name="generationCounter">The current generation number of the game.</param>
+    /// <returns>A new Game instance initialized with the given state.</returns>
     [<CompiledName("CreateFrom")>]
-    static member createFrom:
-        currentState: ConwayGrid -> initialState: int<CellStatus> array2d -> generationCounter: int -> Game
+    static member createFrom: currentState: ConwayGrid -> initialState: ConwayGrid -> generationCounter: int -> Game
