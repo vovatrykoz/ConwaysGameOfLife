@@ -100,7 +100,7 @@ module ``Encoding Integration Tests`` =
 
         File.Delete location
 
-        Assert.That(savedCanvas.Game.StartingGrid, Is.EqualTo originalCanvas.Game.CurrentState.Board)
+        Assert.That(savedCanvas.Game.StartingGrid, Is.EqualTo originalCanvas.Game.StartingGrid)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving counters``
