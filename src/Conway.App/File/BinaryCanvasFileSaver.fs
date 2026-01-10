@@ -8,9 +8,14 @@ open Raylib_cs
 open System
 open System.IO
 
-type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
+type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder, ?verbose: bool) =
 
     member val Encoder = gameEncoder with get
+
+    member val Verbose =
+        match verbose with
+        | None -> false
+        | Some v -> v with get, set
 
     member _.EncodeCameraData(camera: Camera<cells>) =
         let encodedPositionX = BitConverter.GetBytes(float32 camera.Position.X)
@@ -32,7 +37,9 @@ type BinaryCanvasFileSaver(gameEncoder: IConwayByteEncoder) =
             try
                 let completeEncoding = this.EncodeCanvasData canvas
                 File.WriteAllBytes(path, completeEncoding)
-                Raylib.TraceLog(TraceLogLevel.Info, $"File saved at {path}")
+
+                if this.Verbose then
+                    Raylib.TraceLog(TraceLogLevel.Info, $"File saved at {path}")
             with
             | :? ArgumentNullException as argNullEx ->
                 Raylib.TraceLog(

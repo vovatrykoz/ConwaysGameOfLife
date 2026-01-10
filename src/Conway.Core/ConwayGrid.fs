@@ -24,7 +24,7 @@ module private Constants =
     let livingCell = 1<CellStatus>
 
 [<Sealed>]
-type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
+type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
 
     private new(width: int, height: int) =
         let initArr = Array2D.create (height + 2) (width + 2) 0<CellStatus>
@@ -85,12 +85,9 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
     /// - All other cells become (or remain) dead.
     /// </remarks>
     [<CompiledName("EvolveCellAt"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
-    static member inline private evolveCellAt row col cols activePtr passivePtr =
-        let rowAbove = (row - 1) * cols
-        let rowCurrent = row * cols
-        let rowBelow = (row + 1) * cols
-        let index = rowCurrent + col
+    static member inline private evolveCellAt rowAbove rowCurrent rowBelow col activePtr passivePtr =
         let topIndex = rowAbove + col
+        let index = rowCurrent + col
         let bottomIndex = rowBelow + col
 
         let livingNeighborsCount =
@@ -100,8 +97,8 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
         | 2<Neighbors> ->
             let currentValue = NativePtr.get activePtr index
             NativePtr.set passivePtr index currentValue
-        | 3<Neighbors> -> NativePtr.set passivePtr index Constants.livingCell
-        | _ -> NativePtr.set passivePtr index Constants.deadCell
+        | 3<Neighbors> -> NativePtr.set passivePtr index 1<CellStatus>
+        | _ -> NativePtr.set passivePtr index 0<CellStatus>
 
     [<MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     member this.AdvanceToNextState() =
@@ -122,8 +119,12 @@ type ConwayGrid private (startingGrid: int<CellStatus> array2d) =
             1,
             rows - 1,
             fun row ->
+                let rowAbove = (row - 1) * cols
+                let rowCurrent = row * cols
+                let rowBelow = (row + 1) * cols
+
                 for col in 1..lastCol do
-                    ConwayGrid.evolveCellAt row col cols activePtr passivePtr
+                    ConwayGrid.evolveCellAt rowAbove rowCurrent rowBelow col activePtr passivePtr
         )
         |> ignore
 

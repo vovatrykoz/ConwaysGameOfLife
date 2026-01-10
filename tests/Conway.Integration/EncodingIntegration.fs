@@ -29,7 +29,7 @@ module ``Encoding Integration Tests`` =
         Assert.That(decodedGame.CurrentState.Board, Is.EqualTo originalGame.CurrentState.Board)
 
     [<Property(MaxTest = 1000)>]
-    let ``Basic byte encoder and decoder can correctly encode and then restore a game while setting the initial state to the updated values``
+    let ``Basic byte encoder and decoder can correctly encode and then restore a game while setting the initial state correctly``
         (originalGame: Game)
         =
         let encoder = ConwayByteEncoder() :> IConwayByteEncoder
@@ -38,7 +38,7 @@ module ``Encoding Integration Tests`` =
         let encodedGame = encoder.Encode originalGame
         let decodedGame = decoder.Decode encodedGame
 
-        Assert.That(decodedGame.InitialState.Board, Is.EqualTo originalGame.CurrentState.Board)
+        Assert.That(decodedGame.StartingGrid, Is.EqualTo originalGame.StartingGrid)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic byte encoder and decoder can correctly encode and then restore a game while preserving the generation counter``
@@ -62,16 +62,16 @@ module ``Encoding Integration Tests`` =
         let encodedGame = encoder.Encode originalGame
         let decodedGame = decoder.Decode encodedGame
 
-        Assert.That(decodedGame.StartingGeneration, Is.EqualTo originalGame.Generation)
+        Assert.That(decodedGame.StartingGeneration, Is.EqualTo originalGame.StartingGeneration)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back, preserving the board state``
         (originalCanvas: Canvas)
         =
-        let encoder = ConwayByteEncoder() :> IConwayByteEncoder
-        let decoder = ConwayByteDecoder() :> IConwayByteDecoder
+        let encoder = ConwayByteEncoder()
+        let decoder = ConwayByteDecoder()
 
-        let fileSaver = BinaryCanvasFileSaver encoder :> ICanvasFileSaver
+        let fileSaver = BinaryCanvasFileSaver(encoder, verbose = false) :> ICanvasFileSaver
         let fileLoader = BinaryCanvasFileLoader decoder :> ICanvasFileLoader
 
         let location = Path.GetTempFileName()
@@ -87,10 +87,10 @@ module ``Encoding Integration Tests`` =
     let ``Basic file saver can correctly write a file with game data and then load it back, setting the loaded state as the initial board state``
         (originalCanvas: Canvas)
         =
-        let encoder = ConwayByteEncoder() :> IConwayByteEncoder
-        let decoder = ConwayByteDecoder() :> IConwayByteDecoder
+        let encoder = ConwayByteEncoder()
+        let decoder = ConwayByteDecoder()
 
-        let fileSaver = BinaryCanvasFileSaver encoder :> ICanvasFileSaver
+        let fileSaver = BinaryCanvasFileSaver(encoder, verbose = false) :> ICanvasFileSaver
         let fileLoader = BinaryCanvasFileLoader decoder :> ICanvasFileLoader
 
         let location = Path.GetTempFileName()
@@ -100,16 +100,16 @@ module ``Encoding Integration Tests`` =
 
         File.Delete location
 
-        Assert.That(savedCanvas.Game.InitialState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
+        Assert.That(savedCanvas.Game.StartingGrid, Is.EqualTo originalCanvas.Game.StartingGrid)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving counters``
         (originalCanvas: Canvas)
         =
-        let encoder = ConwayByteEncoder() :> IConwayByteEncoder
-        let decoder = ConwayByteDecoder() :> IConwayByteDecoder
+        let encoder = ConwayByteEncoder()
+        let decoder = ConwayByteDecoder()
 
-        let fileSaver = BinaryCanvasFileSaver encoder :> ICanvasFileSaver
+        let fileSaver = BinaryCanvasFileSaver(encoder, verbose = false) :> ICanvasFileSaver
         let fileLoader = BinaryCanvasFileLoader decoder :> ICanvasFileLoader
 
         let location = Path.GetTempFileName()
@@ -121,16 +121,16 @@ module ``Encoding Integration Tests`` =
 
         Assert.Multiple(fun _ ->
             Assert.That(savedCanvas.Game.Generation, Is.EqualTo originalCanvas.Game.Generation)
-            Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.Generation))
+            Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.StartingGeneration))
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving camera settings``
         (originalCanvas: Canvas)
         =
-        let encoder = ConwayByteEncoder() :> IConwayByteEncoder
-        let decoder = ConwayByteDecoder() :> IConwayByteDecoder
+        let encoder = ConwayByteEncoder()
+        let decoder = ConwayByteDecoder()
 
-        let fileSaver = BinaryCanvasFileSaver encoder :> ICanvasFileSaver
+        let fileSaver = BinaryCanvasFileSaver(encoder, verbose = false) :> ICanvasFileSaver
         let fileLoader = BinaryCanvasFileLoader decoder :> ICanvasFileLoader
 
         let location = Path.GetTempFileName()

@@ -11,6 +11,12 @@ type CellStatus
 type ConwayGrid =
 
     /// <summary>
+    /// Initializes a new Conway grid using the provided starting board state.
+    /// </summary>
+    /// <param name="startingGrid">Initial 2D array representing the grid state.</param>
+    internal new: startingGrid: int<CellStatus> array2d -> ConwayGrid
+
+    /// <summary>
     /// Returns a default dead cell value.
     /// </summary>
     static member DeadCell: int<CellStatus>
@@ -25,8 +31,14 @@ type ConwayGrid =
     /// </summary>
     member Board: int<CellStatus> array2d
 
+    /// <summary>
+    /// Gets the width of the active grid area, excluding the border cells.
+    /// </summary>
     member ActiveWidth: int
 
+    /// <summary>
+    /// Gets the height of the active grid area, excluding the border cells.
+    /// </summary>
     member ActiveHeight: int
 
     /// <summary>
