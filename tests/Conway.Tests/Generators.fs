@@ -33,6 +33,19 @@ module internal Generators =
                 ConwayGrid.init width height initFunc)
             |> Arb.fromGen
 
+        let validConwayGridWithDimensionsArb (rows: int) (cols: int) =
+            ArbMap.defaults.ArbFor<int<CellStatus>>()
+            |> Arb.toGen
+            |> Gen.arrayOfLength (rows * cols)
+            |> Gen.filter (fun xs ->
+                xs
+                |> Seq.cast<int<CellStatus>>
+                |> Seq.forall (fun x -> x = ConwayGrid.DeadCell || x = ConwayGrid.LivingCell))
+            |> Gen.map (fun xs ->
+                let initFunc i j = xs.[i * cols + j] // map 1D array to 2D
+                ConwayGrid.init cols rows initFunc) // initialize ConwayGrid with fixed size
+            |> Arb.fromGen
+
         let validConwayArrArb () = validConwayGridGen () |> Arb.fromGen
 
         let valid2dBoardArb () = validConwayGridGen () |> Arb.fromGen
@@ -41,12 +54,16 @@ module internal Generators =
         let validGameArb () =
             gen {
                 let! currentGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
-                let! initialGridGen = ConwayGrid.validConwayGridArb () |> Arb.toGen
-                let! generationCounter = ArbMap.defaults.ArbFor<int>() |> Arb.toGen
 
-                return currentGridGen, initialGridGen, generationCounter
+                let rows, cols = currentGridGen.ActiveHeight, currentGridGen.ActiveWidth
+
+                let! initialGridGen = ConwayGrid.validConwayGridWithDimensionsArb rows cols |> Arb.toGen
+                let! generationCounter = ArbMap.defaults.ArbFor<int>() |> Arb.toGen
+                let! startingGeneration = ArbMap.defaults.ArbFor<int>() |> Arb.toGen
+
+                return currentGridGen, initialGridGen, generationCounter, startingGeneration
             }
-            |> Gen.map (fun (cg, ig, gc) -> Game.createFrom cg ig gc)
+            |> Gen.map (fun (cg, ig, gc, sg) -> Game.createFrom cg ig gc sg)
             |> Arb.fromGen
 
     module UserInput =

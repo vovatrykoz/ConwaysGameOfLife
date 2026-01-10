@@ -43,8 +43,10 @@ type ConwayByteEncoder() =
             let currentGridEncoded = this.EncodeBoard game.CurrentState.Board
             let initialGridEncoded = this.EncodeBoard game.StartingGrid
             let generationEncoded = BitConverter.GetBytes game.Generation
+            let startingGenerationEncoded = BitConverter.GetBytes game.StartingGeneration
 
             initialGridEncoded
             |> Array.append currentGridEncoded
+            |> Array.append startingGenerationEncoded
             |> Array.append generationEncoded
             |> Array.append dimensionsEncoded

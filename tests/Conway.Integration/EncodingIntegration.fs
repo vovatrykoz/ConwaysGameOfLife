@@ -29,7 +29,7 @@ module ``Encoding Integration Tests`` =
         Assert.That(decodedGame.CurrentState.Board, Is.EqualTo originalGame.CurrentState.Board)
 
     [<Property(MaxTest = 1000)>]
-    let ``Basic byte encoder and decoder can correctly encode and then restore a game while setting the initial state to the updated values``
+    let ``Basic byte encoder and decoder can correctly encode and then restore a game while setting the initial state correctly``
         (originalGame: Game)
         =
         let encoder = ConwayByteEncoder() :> IConwayByteEncoder
@@ -38,7 +38,7 @@ module ``Encoding Integration Tests`` =
         let encodedGame = encoder.Encode originalGame
         let decodedGame = decoder.Decode encodedGame
 
-        Assert.That(decodedGame.StartingGrid, Is.EqualTo originalGame.CurrentState.Board)
+        Assert.That(decodedGame.StartingGrid, Is.EqualTo originalGame.StartingGrid)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic byte encoder and decoder can correctly encode and then restore a game while preserving the generation counter``
@@ -62,7 +62,7 @@ module ``Encoding Integration Tests`` =
         let encodedGame = encoder.Encode originalGame
         let decodedGame = decoder.Decode encodedGame
 
-        Assert.That(decodedGame.StartingGeneration, Is.EqualTo originalGame.Generation)
+        Assert.That(decodedGame.StartingGeneration, Is.EqualTo originalGame.StartingGeneration)
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back, preserving the board state``
@@ -121,7 +121,7 @@ module ``Encoding Integration Tests`` =
 
         Assert.Multiple(fun _ ->
             Assert.That(savedCanvas.Game.Generation, Is.EqualTo originalCanvas.Game.Generation)
-            Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.Generation))
+            Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.StartingGeneration))
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving camera settings``

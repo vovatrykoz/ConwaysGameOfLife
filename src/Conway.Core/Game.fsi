@@ -69,4 +69,9 @@ type Game =
     /// <param name="generationCounter">The current generation number of the game.</param>
     /// <returns>A new Game instance initialized with the given state.</returns>
     [<CompiledName("CreateFrom")>]
-    static member createFrom: currentState: ConwayGrid -> initialState: ConwayGrid -> generationCounter: int -> Game
+    static member createFrom:
+        currentState: ConwayGrid ->
+        initialState: ConwayGrid ->
+        generationCounter: int ->
+        startingGeneration: int ->
+            Game
