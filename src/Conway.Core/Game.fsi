@@ -70,8 +70,8 @@ type Game =
     /// <returns>A new Game instance initialized with the given state.</returns>
     [<CompiledName("CreateFrom")>]
     static member createFrom:
-        currentState: ConwayGrid ->
-        initialState: ConwayGrid ->
-        generationCounter: int ->
+        currentState: ConwayGrid *
+        initialState: int<CellStatus> array2d *
+        generationCounter: int *
         startingGeneration: int ->
             Game
