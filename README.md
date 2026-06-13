@@ -21,7 +21,7 @@ This guide is for those who want to build the project from source. If you just w
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later installed  
+- [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 
 ### Build and Run
 
