@@ -6,18 +6,20 @@ type GameState =
     | Infinite = 2
 
 [<Sealed>]
-type Game(initialState: ConwayGrid, generation: int) =
-    let mutable _initialState = Array2D.copy initialState.Board
+type Game
+    private (initialState: ConwayGrid, startingGrid: int<CellStatus> array2d, generation: int, startingGeneration: int)
+    =
 
     let mutable _internalState = initialState
-
-    let mutable _initialGeneration = generation
-
-    let mutable _initialGeneration = generation
-
+    let mutable _initialState = startingGrid
     let mutable _generation = generation
+    let mutable _initialGeneration = startingGeneration
 
-    new(initialState: ConwayGrid) = new Game(initialState, 1)
+    new(initialState: ConwayGrid, generation: int) =
+        let board = Array2D.copy initialState.Board
+        Game(initialState, board, generation, generation)
+
+    new(initialState: ConwayGrid) = Game(initialState, 1)
 
     member _.CurrentState
         with get () = _internalState
@@ -25,7 +27,7 @@ type Game(initialState: ConwayGrid, generation: int) =
             _internalState <- newState
             _initialState <- Array2D.copy newState.Board
             _generation <- 1
-            _initialGeneration <- generation
+            _initialGeneration <- _generation
 
     member _.StartingGrid
         with get () = _initialState
@@ -54,13 +56,31 @@ type Game(initialState: ConwayGrid, generation: int) =
 
     [<CompiledName("CreateFrom")>]
     static member createFrom
-        (currentState: ConwayGrid)
-        (initialState: ConwayGrid)
-        (generationCounter: int)
-        (startingGeneration: int)
-        =
-        let newGame = new Game(ConwayGrid.copyFrom currentState)
-        newGame.StartingGrid <- Array2D.copy initialState.Board
-        newGame.Generation <- generationCounter
-        newGame.StartingGeneration <- startingGeneration
-        newGame
+        (
+            currentState: ConwayGrid,
+            initialState: int<CellStatus> array2d,
+            generationCounter: int,
+            startingGeneration: int
+        ) =
+
+        let activeWidth = currentState.ActiveWidth
+        let activeHeight = currentState.ActiveHeight
+
+        let initWidth = Array2D.length2 initialState
+        let initHeight = Array2D.length1 initialState
+
+        if activeWidth <> initWidth || activeHeight <> initHeight then
+            invalidArg
+                (nameof initialState)
+                $"Expected (w:{activeWidth}, h:{activeHeight}), got (w:{initWidth}, h:{initHeight})"
+
+        let padded =
+            Array2D.init (activeHeight + 2) (activeWidth + 2) (fun i j ->
+                if i = 0 || j = 0 || i = activeHeight + 1 || j = activeWidth + 1 then
+                    ConwayGrid.DeadCell
+                else
+                    initialState.[i - 1, j - 1])
+
+        let stateCopy = ConwayGrid.copyFrom currentState
+
+        Game(stateCopy, padded, generationCounter, startingGeneration)

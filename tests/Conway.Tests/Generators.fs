@@ -20,10 +20,7 @@ module internal Generators =
         let validConwayGridGen () =
             ArbMap.defaults.ArbFor<int<CellStatus> array2d>()
             |> Arb.toGen
-            |> Gen.filter (fun xs ->
-                xs
-                |> Seq.cast<int<CellStatus>>
-                |> Seq.forall (fun x -> x = ConwayGrid.DeadCell || x = ConwayGrid.LivingCell))
+            |> Gen.map (fun xs -> xs |> Array2D.map (fun x -> abs x % 2<CellStatus>))
 
         let validConwayGridArb () =
             validConwayGridGen ()
@@ -37,13 +34,10 @@ module internal Generators =
             ArbMap.defaults.ArbFor<int<CellStatus>>()
             |> Arb.toGen
             |> Gen.arrayOfLength (rows * cols)
-            |> Gen.filter (fun xs ->
-                xs
-                |> Seq.cast<int<CellStatus>>
-                |> Seq.forall (fun x -> x = ConwayGrid.DeadCell || x = ConwayGrid.LivingCell))
+            |> Gen.map (fun xs -> xs |> Array.map (fun x -> abs x % 2<CellStatus>))
             |> Gen.map (fun xs ->
-                let initFunc i j = xs.[i * cols + j] // map 1D array to 2D
-                ConwayGrid.init cols rows initFunc) // initialize ConwayGrid with fixed size
+                let initFunc i j = xs.[i * cols + j]
+                Array2D.init rows cols initFunc)
             |> Arb.fromGen
 
         let validConwayArrArb () = validConwayGridGen () |> Arb.fromGen
@@ -63,7 +57,7 @@ module internal Generators =
 
                 return currentGridGen, initialGridGen, generationCounter, startingGeneration
             }
-            |> Gen.map (fun (cg, ig, gc, sg) -> Game.createFrom cg ig gc sg)
+            |> Gen.map (fun (cg, ig, gc, sg) -> Game.createFrom (cg, ig, gc, sg))
             |> Arb.fromGen
 
     module UserInput =

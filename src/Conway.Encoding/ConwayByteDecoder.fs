@@ -37,6 +37,32 @@ type ConwayByteDecoder() =
 
         BitConverter.ToInt32 generationCounterSlice, BitConverter.ToInt32 startingGenerationCounterSlice
 
+    member private _.DecodeGridSlice
+        (bytes: ReadOnlySpan<byte>, startIndex: int, rows: int, cols: int, totalCells: int, totalBytes: int)
+        =
+
+        let grid = Array2D.create rows cols ConwayGrid.DeadCell
+        let mutable remaining = totalCells
+
+        bytes.Slice(startIndex, totalBytes).ToArray()
+        |> Array.map BitVector8.createFromByte
+        |> Array.iteri (fun i bits ->
+            for j in 0 .. ConwayByteDecoder.BitsInByte - 1 do
+                if remaining > 0 then
+                    let idx = i * ConwayByteDecoder.BitsInByte + j
+                    let r = idx / cols
+                    let c = idx % cols
+
+                    grid.[r, c] <-
+                        if bits.ReadBitAt j then
+                            ConwayGrid.LivingCell
+                        else
+                            ConwayGrid.DeadCell
+
+                    remaining <- remaining - 1)
+
+        grid
+
     member this.DecodeGrid(bytes: ReadOnlySpan<byte>) =
         let rows, cols = this.DecodeDimensions bytes
         let totalCells = rows * cols
@@ -44,57 +70,26 @@ type ConwayByteDecoder() =
         let totalBytes =
             (totalCells + ConwayByteDecoder.BitsInByte - 1) / ConwayByteDecoder.BitsInByte
 
-        let initialGridStartingByteIndex = ConwayByteDecoder.GridFirstByteIndex + totalBytes
-        let cellArray = Array2D.create rows cols ConwayGrid.DeadCell
-        let initCellArray = Array2D.create rows cols ConwayGrid.DeadCell
+        let currentGrid =
+            this.DecodeGridSlice(bytes, ConwayByteDecoder.GridFirstByteIndex, rows, cols, totalCells, totalBytes)
 
-        let mutable remainingCells = totalCells
+        let startGrid =
+            this.DecodeGridSlice(
+                bytes,
+                ConwayByteDecoder.GridFirstByteIndex + totalBytes,
+                rows,
+                cols,
+                totalCells,
+                totalBytes
+            )
 
-        bytes.Slice(ConwayByteDecoder.GridFirstByteIndex, totalBytes).ToArray()
-        |> Array.map (fun b -> BitVector8.createFromByte b)
-        |> Array.iteri (fun i b ->
-            for j in 0..7 do
-                if remainingCells <= 0 then
-                    ()
-                else
-                    let actualIndex = i * ConwayByteDecoder.BitsInByte + j
-                    let row = actualIndex / cols
-                    let col = actualIndex % cols
+        let current i j = currentGrid.[i, j]
 
-                    match b.ReadBitAt j with
-                    | true -> cellArray.[row, col] <- ConwayGrid.LivingCell
-                    | false -> cellArray.[row, col] <- ConwayGrid.DeadCell
-
-                    remainingCells <- remainingCells - 1)
-
-        let initializer i j = cellArray.[i, j]
-
-        remainingCells <- totalCells
-
-        bytes.Slice(initialGridStartingByteIndex, totalBytes).ToArray()
-        |> Array.map (fun b -> BitVector8.createFromByte b)
-        |> Array.iteri (fun i b ->
-            for j in 0..7 do
-                if remainingCells <= 0 then
-                    ()
-                else
-                    let actualIndex = i * ConwayByteDecoder.BitsInByte + j
-                    let row = actualIndex / cols
-                    let col = actualIndex % cols
-
-                    match b.ReadBitAt j with
-                    | true -> initCellArray.[row, col] <- ConwayGrid.LivingCell
-                    | false -> initCellArray.[row, col] <- ConwayGrid.DeadCell
-
-                    remainingCells <- remainingCells - 1)
-
-        let startInitializer i j = initCellArray.[i, j]
-
-        ConwayGrid.init cols rows initializer, ConwayGrid.init cols rows startInitializer
+        ConwayGrid.init cols rows current, startGrid
 
     interface IConwayByteDecoder with
         member this.Decode(bytes: byte array) =
             let grid, initGrid = this.DecodeGrid(ReadOnlySpan bytes)
             let generation, startingGeneration = this.DecodeGeneration(ReadOnlySpan bytes)
 
-            Game.createFrom grid initGrid generation startingGeneration
+            Game.createFrom (grid, initGrid, generation, startingGeneration)

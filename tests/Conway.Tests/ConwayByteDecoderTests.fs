@@ -92,13 +92,13 @@ module ``Conway Byte Decoder Tests`` =
         |]
 
         let expectedGrid = ConwayGrid.createLiving 4 4
-        let expectedStartingGrid = ConwayGrid.createDead 4 4
+        let expectedStartingGrid = Array2D.init 4 4 (fun _ _ -> ConwayGrid.DeadCell)
 
         let encoder = new ConwayByteDecoder()
         let actualGrid, actualStartingGrid = encoder.DecodeGrid encoding
 
         Assert.That(actualGrid.Board, Is.EqualTo expectedGrid.Board)
-        Assert.That(actualStartingGrid.Board, Is.EqualTo expectedStartingGrid.Board)
+        Assert.That(actualStartingGrid, Is.EqualTo expectedStartingGrid)
 
     [<Test>]
     let ``Can correctly decode a non-square living grid`` () =
@@ -124,10 +124,10 @@ module ``Conway Byte Decoder Tests`` =
         |]
 
         let expectedGrid = ConwayGrid.createLiving 3 2
-        let expectedStartingGrid = ConwayGrid.createDead 3 2
+        let expectedStartingGrid = Array2D.init 2 3 (fun _ _ -> ConwayGrid.DeadCell)
 
         let encoder = new ConwayByteDecoder()
         let actualGrid, actualStartingGrid = encoder.DecodeGrid encoding
 
         Assert.That(actualGrid.Board, Is.EqualTo expectedGrid.Board)
-        Assert.That(actualStartingGrid.Board, Is.EqualTo expectedStartingGrid.Board)
+        Assert.That(actualStartingGrid, Is.EqualTo expectedStartingGrid)
