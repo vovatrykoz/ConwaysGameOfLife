@@ -12,6 +12,7 @@ module Run =
     open Conway.Encoding
     open Conway.App.File
     open Conway.App.Math
+    open Config
 
     let private saveGameState (ctx: ApplicationContext) (newFile: string) =
         let encoder = new ConwayByteEncoder()
@@ -211,6 +212,12 @@ module Run =
 
                     ctx.Canvas.Game <- result.Game
                     ctx.Canvas.Camera <- result.Camera
+
+                    ctx.SleepTime <-
+                        let width = (Array2D.length2 result.Game.CurrentState.Board) * 1<cells> - 2<cells>
+                        let height = Array2D.length1 result.Game.CurrentState.Board * 1<cells> - 2<cells>
+                        Default.sleepTimeCalculator width height
+
                     Raylib.TraceLog(TraceLogLevel.Info, "Grid updated")
                 with ex ->
                     Raylib.TraceLog(
