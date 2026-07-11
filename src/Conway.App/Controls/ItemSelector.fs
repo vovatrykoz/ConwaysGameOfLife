@@ -5,7 +5,7 @@ open System.Collections.Generic
 type ItemSelector<'T when 'T: equality>(items: seq<'T>) =
     let mutable _selectedIndex: int option = None
 
-    member val Items = new List<'T>(items) with get
+    member val Items = new ResizeArray<'T>(items) with get
 
     member this.SelectedItem =
         match _selectedIndex with

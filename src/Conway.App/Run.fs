@@ -168,6 +168,7 @@ module Run =
                         | _ -> None
                     )
                     |> Seq.toArray
+                    |> Array.sortBy (fun info -> info.Name)
 
                 let existing = filePicker.Files |> Seq.map (fun f -> f.Path) |> Set.ofSeq
                 let desired = files |> Array.map (fun f -> f.Path) |> Set.ofArray
@@ -178,8 +179,8 @@ module Run =
 
                 filePicker.Files
                 |> Seq.filter (fun f -> not (desired.Contains f.Path))
-                |> Seq.toList
-                |> List.iter (fun f -> filePicker.Files.Remove f |> ignore)
+                |> Seq.toArray
+                |> Array.iter (fun f -> filePicker.Files.Remove f |> ignore)
 
                 Display.openFileDialogue ctx.Texture filePicker
                 filePicker.ProcessInput()

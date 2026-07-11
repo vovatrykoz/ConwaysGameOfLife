@@ -15,7 +15,7 @@ type ConwayByteEncoder() =
         let rows = Array2D.length1 board - 2
         let cols = Array2D.length2 board - 2
 
-        let gridBytes = List<BitVector8>()
+        let gridBytes = ResizeArray<BitVector8>()
         gridBytes.Add BitVector8.zeroed
 
         let mutable bitCounter = 0

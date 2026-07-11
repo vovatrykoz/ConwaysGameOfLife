@@ -65,5 +65,5 @@ module Draw =
         Raylib.DrawRectangle(int x, int y, int width, int height, backgroundColor)
         Raylib.DrawText(text, int x, int y, fontSize, textColor)
 
-    let listBox (x: float32<px>, y: float32<px>, items: List<string>) =
+    let listBox (x: float32<px>, y: float32<px>, items: ResizeArray<string>) =
         Raylib.DrawRectangle(int x, int y, 10, 10, Color.Black)

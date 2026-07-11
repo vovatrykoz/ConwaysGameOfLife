@@ -216,6 +216,27 @@ module Display =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
+        let y = max filePicker.Y -filePicker.Camera.Position.Y
+
+        match filePicker.CurrentSelection with
+        | None -> ()
+        | Some file ->
+            let currentFileTypeText =
+                match file.FileType with
+                | CompressedSave -> "Selected file type:\nCompressed Savefile"
+                | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
+                | Other -> "Selected file type:\nOther"
+
+            Draw.label
+                (filePicker.X + 600.0f<px>)
+                (y + filePicker.FileEntryHeight * 15.0f)
+                (int (filePicker.FileEntryHeight - 10.0f<px>))
+                currentFileTypeText
+                (int filePicker.FileEntryWidth)
+                (int filePicker.FileEntryHeight)
+                Color.Black
+                Color.White
+
         for index = startIndex to endIndex do
             let currentFile = filePicker.Files.[index]
 
@@ -224,45 +245,21 @@ module Display =
                 | None -> false
                 | Some file -> file = currentFile
 
-            let y = max filePicker.Y -filePicker.Camera.Position.Y
-
             if currentItemIsSelected then
                 Draw.label
-                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X))
-                    (LanguagePrimitives.Float32WithMeasure(
-                        float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex)
-                    ))
-                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
+                    filePicker.X
+                    (y + filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f<px>))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)
                     Color.White
                     Color.Black
-
-                let currentFileTypeText =
-                    match currentFile.FileType with
-                    | CompressedSave -> "Selected file type:\nCompressed Savefile"
-                    | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
-                    | Other -> "Selected file type:\nOther"
-
-                Draw.label
-                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X + 600.0f))
-                    (LanguagePrimitives.Float32WithMeasure(
-                        float32 y + float32 filePicker.FileEntryHeight * float32 15.0f
-                    ))
-                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
-                    currentFileTypeText
-                    (int filePicker.FileEntryWidth)
-                    (int filePicker.FileEntryHeight)
-                    Color.Black
-                    Color.White
             else
                 Draw.label
-                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X))
-                    (LanguagePrimitives.Float32WithMeasure(
-                        float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex)
-                    ))
-                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
+                    filePicker.X
+                    (y + filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f<px>))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)

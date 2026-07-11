@@ -8,15 +8,16 @@ type ControlManager() =
 
     member val private ActivatedButton: option<Button> = None with get, set
 
-    member val Buttons: List<Button> = new List<Button>() with get, set
+    member val Buttons: ResizeArray<Button> = new ResizeArray<Button>() with get, set
 
-    member val KeyActions: List<KeyboardKey * (unit -> unit)> = new List<KeyboardKey * (unit -> unit)>() with get, set
+    member val KeyActions: ResizeArray<KeyboardKey * (unit -> unit)> =
+        new ResizeArray<KeyboardKey * (unit -> unit)>() with get, set
 
-    member val ShiftKeyActions: List<KeyboardKey * (unit -> unit)> =
-        new List<KeyboardKey * (unit -> unit)>() with get, set
+    member val ShiftKeyActions: ResizeArray<KeyboardKey * (unit -> unit)> =
+        new ResizeArray<KeyboardKey * (unit -> unit)>() with get, set
 
-    member val CtrlKeyActions: List<KeyboardKey * (unit -> unit)> =
-        new List<KeyboardKey * (unit -> unit)>() with get, set
+    member val CtrlKeyActions: ResizeArray<KeyboardKey * (unit -> unit)> =
+        new ResizeArray<KeyboardKey * (unit -> unit)>() with get, set
 
     member private this.ProcessButtons() =
         for button in this.Buttons do

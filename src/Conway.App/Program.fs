@@ -63,23 +63,24 @@ match UserInput.tryReadArgs args with
         let renderTexture =
             Raylib.LoadRenderTexture(int Default.windowWidth, int Default.windowHeight)
 
-        let currentContext =
+        let appContext =
             new ApplicationContext(gameMode = GameState.Paused, canvas = canvas, texture = renderTexture)
 
-        controlManager.Buttons.AddRange(Buttons.instantiate currentContext)
-        controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions currentContext)
-        controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions currentContext)
+        controlManager.Buttons.AddRange(Buttons.instantiate appContext)
+        controlManager.KeyActions.AddRange(Hotkeys.mapKeyboardActions appContext)
+        controlManager.ShiftKeyActions.AddRange(Hotkeys.mapKeyboardShiftActions appContext)
+        controlManager.CtrlKeyActions.AddRange(Hotkeys.mapKeyboardCtrlActions appContext)
 
         let gameUpdateLoop () =
             task {
                 while true do
                     do! Async.Sleep sleepTime
 
-                    match currentContext.GameMode with
+                    match appContext.GameMode with
                     | GameState.Infinite -> canvas.Game.RunOneStep()
                     | GameState.Step ->
                         canvas.Game.RunOneStep()
-                        currentContext.GameMode <- GameState.Paused
+                        appContext.GameMode <- GameState.Paused
                     | GameState.Paused
                     | _ -> ()
             }
