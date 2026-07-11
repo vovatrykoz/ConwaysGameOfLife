@@ -14,22 +14,22 @@ type ConwayGrid =
     /// Initializes a new Conway grid using the provided starting board state.
     /// </summary>
     /// <param name="startingGrid">Initial 2D array representing the grid state.</param>
-    internal new: startingGrid: int<CellStatus> array2d -> ConwayGrid
+    internal new: startingGrid: byte<CellStatus> array2d -> ConwayGrid
 
     /// <summary>
     /// Returns a default dead cell value.
     /// </summary>
-    static member DeadCell: int<CellStatus>
+    static member DeadCell: byte<CellStatus>
 
     /// <summary>
     /// Returns a default living cell value.
     /// </summary>
-    static member LivingCell: int<CellStatus>
+    static member LivingCell: byte<CellStatus>
 
     /// <summary>
     /// Gets the current state of the board as a 2D array of cells.
     /// </summary>
-    member Board: int<CellStatus> array2d
+    member Board: byte<CellStatus> array2d
 
     /// <summary>
     /// Gets the width of the active grid area, excluding the border cells.
@@ -78,7 +78,7 @@ type ConwayGrid =
     /// <param name="height">Grid height.</param>
     /// <param name="initializer">Function to determine the initial value of each cell.</param>
     [<CompiledName("Init")>]
-    static member init: width: int -> height: int -> initializer: (int -> int -> int<CellStatus>) -> ConwayGrid
+    static member init: width: int -> height: int -> initializer: (int -> int -> byte<CellStatus>) -> ConwayGrid
 
     /// <summary>
     /// Deep copies the state of the provided grid

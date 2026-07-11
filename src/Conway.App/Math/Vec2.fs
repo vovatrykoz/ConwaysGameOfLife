@@ -2,14 +2,6 @@ namespace Conway.App.Math
 
 open System.Numerics
 
-// Warning FS0042: This construct is deprecated: it is only for use in the F# library
-#nowarn "42"
-
-[<RequireQualifiedAccess>]
-module private UnsafeUtils =
-
-    let inline retype<'T, 'U> (x: 'T) : 'U = (# "" x: 'U #)
-
 [<Struct; StructuralEquality; StructuralComparison>]
 type Vec2<[<Measure>] 'u> = {
     mutable X: float32<'u>

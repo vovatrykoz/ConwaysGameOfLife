@@ -1,8 +1,6 @@
 namespace Conway.Tests
 
-open Conway.Core
 open NUnit.Framework
-open FsCheck
 open FsCheck.NUnit
 
 [<Properties(Arbitrary = [| typeof<ConwayGen> |])>]

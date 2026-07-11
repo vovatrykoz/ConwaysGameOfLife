@@ -11,7 +11,6 @@ open Conway.App.Graphics
 open Conway.Encoding
 open Conway.App.File
 open Conway.App.Math
-open Conway.Core
 
 module Run =
 
@@ -23,7 +22,7 @@ module Run =
 
         try
             (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
-            Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+            Raylib.TraceLog(TraceLogLevel.Info, $"{newFile} file saved successfully")
         with ex ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{ex.Message}")
 
@@ -167,19 +166,22 @@ module Run =
 
                         match fileExtention with
                         | ".gol" -> Some(FileData.create fileName fullPath UncompressedSave lastModified)
-                        | _ -> None)
+                        | _ -> None
+                    )
 
                 files
                 |> Array.iter (fun fileData ->
                     if not (filePicker.Files.Contains fileData) then
-                        filePicker.Files.Add fileData)
+                        filePicker.Files.Add fileData
+                )
 
                 let removalIndeces = new List<int>()
 
                 filePicker.Files
                 |> Seq.iteri (fun index fileData ->
                     if not (files |> Array.contains fileData) then
-                        removalIndeces.Add index)
+                        removalIndeces.Add index
+                )
 
                 removalIndeces.ForEach(fun index -> filePicker.Files.RemoveAt index)
 

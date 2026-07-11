@@ -11,7 +11,7 @@ type ConwayByteEncoder() =
 
         Array.append (BitConverter.GetBytes rows) (BitConverter.GetBytes cols)
 
-    member _.EncodeBoard(board: int<CellStatus> array2d) =
+    member _.EncodeBoard(board: byte<CellStatus> array2d) =
         let rows = Array2D.length1 board - 2
         let cols = Array2D.length2 board - 2
 

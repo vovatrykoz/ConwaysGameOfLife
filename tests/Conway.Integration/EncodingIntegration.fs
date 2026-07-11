@@ -76,12 +76,14 @@ module ``Encoding Integration Tests`` =
 
         let location = Path.GetTempFileName()
 
-        let _ = fileSaver.Save originalCanvas location
-        let savedCanvas = fileLoader.Load location
+        try
 
-        File.Delete location
+            let _ = fileSaver.Save originalCanvas location
+            let savedCanvas = fileLoader.Load location
 
-        Assert.That(savedCanvas.Game.CurrentState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
+            Assert.That(savedCanvas.Game.CurrentState.Board, Is.EqualTo originalCanvas.Game.CurrentState.Board)
+        finally
+            File.Delete location
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back, setting the loaded state as the initial board state``
@@ -95,12 +97,12 @@ module ``Encoding Integration Tests`` =
 
         let location = Path.GetTempFileName()
 
-        let _ = fileSaver.Save originalCanvas location
-        let savedCanvas = fileLoader.Load location
-
-        File.Delete location
-
-        Assert.That(savedCanvas.Game.StartingGrid, Is.EqualTo originalCanvas.Game.StartingGrid)
+        try
+            let _ = fileSaver.Save originalCanvas location
+            let savedCanvas = fileLoader.Load location
+            Assert.That(savedCanvas.Game.StartingGrid, Is.EqualTo originalCanvas.Game.StartingGrid)
+        finally
+            File.Delete location
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving counters``
@@ -114,14 +116,16 @@ module ``Encoding Integration Tests`` =
 
         let location = Path.GetTempFileName()
 
-        let _ = fileSaver.Save originalCanvas location
-        let savedCanvas = fileLoader.Load location
+        try
+            let _ = fileSaver.Save originalCanvas location
+            let savedCanvas = fileLoader.Load location
 
-        File.Delete location
-
-        Assert.Multiple(fun _ ->
-            Assert.That(savedCanvas.Game.Generation, Is.EqualTo originalCanvas.Game.Generation)
-            Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.StartingGeneration))
+            Assert.Multiple(fun _ ->
+                Assert.That(savedCanvas.Game.Generation, Is.EqualTo originalCanvas.Game.Generation)
+                Assert.That(savedCanvas.Game.StartingGeneration, Is.EqualTo originalCanvas.Game.StartingGeneration)
+            )
+        finally
+            File.Delete location
 
     [<Property(MaxTest = 1000)>]
     let ``Basic file saver can correctly write a file with game data and then load it back while preserving camera settings``
@@ -135,10 +139,15 @@ module ``Encoding Integration Tests`` =
 
         let location = Path.GetTempFileName()
 
-        let _ = fileSaver.Save originalCanvas location
-        let savedCanvas = fileLoader.Load location
+        try
 
-        Assert.Multiple(fun _ ->
-            Assert.That(savedCanvas.Camera.Position.X, Is.EqualTo originalCanvas.Camera.Position.X)
-            Assert.That(savedCanvas.Camera.Position.Y, Is.EqualTo originalCanvas.Camera.Position.Y)
-            Assert.That(savedCanvas.Camera.ZoomFactor, Is.EqualTo originalCanvas.Camera.ZoomFactor))
+            let _ = fileSaver.Save originalCanvas location
+            let savedCanvas = fileLoader.Load location
+
+            Assert.Multiple(fun _ ->
+                Assert.That(savedCanvas.Camera.Position.X, Is.EqualTo originalCanvas.Camera.Position.X)
+                Assert.That(savedCanvas.Camera.Position.Y, Is.EqualTo originalCanvas.Camera.Position.Y)
+                Assert.That(savedCanvas.Camera.ZoomFactor, Is.EqualTo originalCanvas.Camera.ZoomFactor)
+            )
+        finally
+            File.Delete location

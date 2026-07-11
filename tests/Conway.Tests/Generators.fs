@@ -5,7 +5,7 @@ open Conway.App.Math
 open Conway.Core
 open FsCheck.FSharp
 
-type Valid2dBoard(board: int<CellStatus> array2d) =
+type Valid2dBoard(board: byte<CellStatus> array2d) =
     member _.Get = board
 
 type ValidWidthValue(value: int) =
@@ -18,26 +18,28 @@ module internal Generators =
     //
     module ConwayGrid =
         let validConwayGridGen () =
-            ArbMap.defaults.ArbFor<int<CellStatus> array2d>()
+            ArbMap.defaults.ArbFor<byte<CellStatus> array2d>()
             |> Arb.toGen
-            |> Gen.map (fun xs -> xs |> Array2D.map (fun x -> abs x % 2<CellStatus>))
+            |> Gen.map (fun xs -> xs |> Array2D.map (fun x -> x % 2uy<CellStatus>))
 
         let validConwayGridArb () =
             validConwayGridGen ()
             |> Gen.map (fun xs ->
                 let width, height = Array2D.length2 xs, Array2D.length1 xs
                 let initFunc i j = xs.[i, j]
-                ConwayGrid.init width height initFunc)
+                ConwayGrid.init width height initFunc
+            )
             |> Arb.fromGen
 
         let validConwayGridWithDimensionsArb (rows: int) (cols: int) =
-            ArbMap.defaults.ArbFor<int<CellStatus>>()
+            ArbMap.defaults.ArbFor<byte<CellStatus>>()
             |> Arb.toGen
             |> Gen.arrayOfLength (rows * cols)
-            |> Gen.map (fun xs -> xs |> Array.map (fun x -> abs x % 2<CellStatus>))
+            |> Gen.map (fun xs -> xs |> Array.map (fun x -> x % 2uy<CellStatus>))
             |> Gen.map (fun xs ->
                 let initFunc i j = xs.[i * cols + j]
-                Array2D.init rows cols initFunc)
+                Array2D.init rows cols initFunc
+            )
             |> Arb.fromGen
 
         let validConwayArrArb () = validConwayGridGen () |> Arb.fromGen

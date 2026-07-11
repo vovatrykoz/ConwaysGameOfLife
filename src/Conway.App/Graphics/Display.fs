@@ -64,7 +64,7 @@ module Display =
                     ()
                 else
                     match board[row, col] with
-                    | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
+                    | 0uy<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
                     | _ -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =

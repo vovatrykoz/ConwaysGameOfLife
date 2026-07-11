@@ -58,7 +58,10 @@ module ``Conway Byte Encoder Tests`` =
     [<Test>]
     let ``Can correctly encode a mixed grid`` () =
         let initializer i j =
-            if (i * 4 + j) % 2 = 0 then 1<CellStatus> else 0<CellStatus>
+            if (i * 4 + j) % 2 = 0 then
+                1uy<CellStatus>
+            else
+                0uy<CellStatus>
 
         let grid = ConwayGrid.init 4 4 initializer
 
@@ -108,9 +111,9 @@ module ``Conway Byte Encoder Tests`` =
     let ``Can correctly encode a game that has been run`` () =
         let initializer i j =
             if i = 1 && (j = 0 || j = 1 || j = 2) then
-                1<CellStatus>
+                1uy<CellStatus>
             else
-                0<CellStatus>
+                0uy<CellStatus>
 
         let game = Game(ConwayGrid.init 4 4 initializer)
 

@@ -18,16 +18,16 @@ type Neighbors
 module private Constants =
 
     [<Literal>]
-    let deadCell = 0<CellStatus>
+    let deadCell = 0uy<CellStatus>
 
     [<Literal>]
-    let livingCell = 1<CellStatus>
+    let livingCell = 1uy<CellStatus>
 
 [<Sealed>]
-type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
+type ConwayGrid internal (startingGrid: byte<CellStatus> array2d) =
 
     private new(width: int, height: int) =
-        let initArr = Array2D.create (height + 2) (width + 2) 0<CellStatus>
+        let initArr = Array2D.create (height + 2) (width + 2) Constants.deadCell
 
         new ConwayGrid(initArr)
 
@@ -45,8 +45,8 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
 
     member this.ActiveHeight = Array2D.length1 this.Board - 2
 
-    static member inline private asNeighbors(value: int<CellStatus>) =
-        value |> int |> LanguagePrimitives.Int32WithMeasure<Neighbors>
+    static member inline private asNeighbors(value: byte<CellStatus>) =
+        value |> byte |> LanguagePrimitives.ByteWithMeasure<Neighbors>
 
     /// <summary>
     /// Counts the number of living neighbor cells surrounding a given cell in the Conway grid.
@@ -59,7 +59,7 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
     /// The number of living neighbors surrounding the given cell, as an integer sum of adjacent cell statuses.
     /// </returns>
     [<CompiledName("CountLivingNeighbors"); MethodImpl(MethodImplOptions.AggressiveOptimization)>]
-    static member inline private countLivingNeighbors topIndex index bottomIndex (ptr: nativeptr<int<CellStatus>>) =
+    static member inline private countLivingNeighbors topIndex index bottomIndex (ptr: nativeptr<byte<CellStatus>>) =
         NativePtr.get ptr (topIndex - 1)
         + NativePtr.get ptr topIndex
         + NativePtr.get ptr (topIndex + 1)
@@ -94,11 +94,11 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
             ConwayGrid.countLivingNeighbors topIndex index bottomIndex activePtr
 
         match livingNeighborsCount with
-        | 2<Neighbors> ->
+        | 2uy<Neighbors> ->
             let currentValue = NativePtr.get activePtr index
             NativePtr.set passivePtr index currentValue
-        | 3<Neighbors> -> NativePtr.set passivePtr index 1<CellStatus>
-        | _ -> NativePtr.set passivePtr index 0<CellStatus>
+        | 3uy<Neighbors> -> NativePtr.set passivePtr index Constants.livingCell
+        | _ -> NativePtr.set passivePtr index Constants.deadCell
 
     [<MethodImpl(MethodImplOptions.AggressiveOptimization)>]
     member this.AdvanceToNextState() =
@@ -136,11 +136,15 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
     [<CompiledName("CreateLiving")>]
     static member createLiving width height =
         let initArr =
-            Array2D.init (height + 2) (width + 2) (fun i j ->
-                if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Constants.deadCell
-                else
-                    Constants.livingCell)
+            Array2D.init
+                (height + 2)
+                (width + 2)
+                (fun i j ->
+                    if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
+                        Constants.deadCell
+                    else
+                        Constants.livingCell
+                )
 
         new ConwayGrid(initArr)
 
@@ -149,27 +153,35 @@ type ConwayGrid internal (startingGrid: int<CellStatus> array2d) =
         let random = new Random()
 
         let initArr =
-            Array2D.init (height + 2) (width + 2) (fun i j ->
-                if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Constants.deadCell
-                else
-                    let randomValue = random.Next(0, oddsOfLiving - 1)
-
-                    if randomValue = 0 then
-                        Constants.livingCell
+            Array2D.init
+                (height + 2)
+                (width + 2)
+                (fun i j ->
+                    if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
+                        Constants.deadCell
                     else
-                        Constants.deadCell)
+                        let randomValue = random.Next(0, oddsOfLiving - 1)
+
+                        if randomValue = 0 then
+                            Constants.livingCell
+                        else
+                            Constants.deadCell
+                )
 
         new ConwayGrid(initArr)
 
     [<CompiledName("Init")>]
     static member init width height initializer =
         let initArr =
-            Array2D.init (height + 2) (width + 2) (fun i j ->
-                if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
-                    Constants.deadCell
-                else
-                    initializer (i - 1) (j - 1))
+            Array2D.init
+                (height + 2)
+                (width + 2)
+                (fun i j ->
+                    if i = 0 || j = 0 || i = height + 1 || j = width + 1 then
+                        Constants.deadCell
+                    else
+                        initializer (i - 1) (j - 1)
+                )
 
         new ConwayGrid(initArr)
 

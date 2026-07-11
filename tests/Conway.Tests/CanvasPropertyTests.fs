@@ -30,4 +30,5 @@ module ``Canvas Property Tests`` =
             Assert.That(actual.Height, Is.EqualTo height)
             Assert.That(actual.CellSize, Is.EqualTo cellSize)
             Assert.That(actual.Game, Is.EqualTo game)
-            Assert.That(actual.Camera, Is.EqualTo camera))
+            Assert.That(actual.Camera, Is.EqualTo camera)
+        )
