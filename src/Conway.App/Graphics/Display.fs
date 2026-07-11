@@ -237,6 +237,24 @@ module Display =
                 Color.Black
                 Color.White
 
+        let visibleItems = endIndex - startIndex + 1
+        let totalItems = filePicker.Files.Count
+
+        if totalItems > visibleItems then
+            let scale =
+                (float32 visibleItems / float32 (totalItems - 1)) * filePicker.FileEntryHeight
+
+            let scrollStart = filePicker.Y + (float32 startIndex) * scale
+            let scrollEnd = scrollStart + (float32 (endIndex - startIndex)) * scale
+
+            Draw.line
+                (filePicker.X + filePicker.FileEntryWidth + 1.0f<px>)
+                scrollStart
+                (filePicker.X + filePicker.FileEntryWidth + 1.0f<px>)
+                scrollEnd
+                5<px>
+                Color.Gray
+
         for index = startIndex to endIndex do
             let currentFile = filePicker.Files.[index]
 

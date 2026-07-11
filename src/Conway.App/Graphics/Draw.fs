@@ -65,5 +65,17 @@ module Draw =
         Raylib.DrawRectangle(int x, int y, int width, int height, backgroundColor)
         Raylib.DrawText(text, int x, int y, fontSize, textColor)
 
+    let inline line
+        (startX: float32<px>)
+        (startY: float32<px>)
+        (endX: float32<px>)
+        (endY: float32<px>)
+        (thickness: int<px>)
+        (color: Color)
+        =
+        let startPos = Vector2(float32 startX, float32 startY)
+        let endPos = Vector2(float32 endX, float32 endY)
+        Raylib.DrawLineEx(startPos, endPos, float32 thickness, color)
+
     let listBox (x: float32<px>, y: float32<px>, items: ResizeArray<string>) =
         Raylib.DrawRectangle(int x, int y, 10, 10, Color.Black)
