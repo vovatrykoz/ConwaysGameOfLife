@@ -157,8 +157,8 @@ module Run =
                 isCancelled <- true
             else
                 let files =
-                    Directory.GetFiles saveFilesPath
-                    |> Array.choose (fun fullPath ->
+                    Directory.EnumerateFiles saveFilesPath
+                    |> Seq.choose (fun fullPath ->
                         let fileName = Path.GetFileName fullPath
                         let lastModified = File.GetLastWriteTime fullPath
                         let fileExtention = Path.GetExtension fullPath
@@ -167,22 +167,19 @@ module Run =
                         | ".gol" -> Some(FileData.create fileName fullPath UncompressedSave lastModified)
                         | _ -> None
                     )
+                    |> Seq.toArray
+
+                let existing = filePicker.Files |> Seq.map (fun f -> f.Path) |> Set.ofSeq
+                let desired = files |> Array.map (fun f -> f.Path) |> Set.ofArray
 
                 files
-                |> Array.iter (fun fileData ->
-                    if not (filePicker.Files.Contains fileData) then
-                        filePicker.Files.Add fileData
-                )
-
-                let removalIndeces = new List<int>()
+                |> Array.filter (fun f -> not (existing.Contains f.Path))
+                |> Array.iter filePicker.Files.Add
 
                 filePicker.Files
-                |> Seq.iteri (fun index fileData ->
-                    if not (files |> Array.contains fileData) then
-                        removalIndeces.Add index
-                )
-
-                removalIndeces.ForEach(fun index -> filePicker.Files.RemoveAt index)
+                |> Seq.filter (fun f -> not (desired.Contains f.Path))
+                |> Seq.toList
+                |> List.iter (fun f -> filePicker.Files.Remove f |> ignore)
 
                 Display.openFileDialogue ctx.Texture filePicker
                 filePicker.ProcessInput()

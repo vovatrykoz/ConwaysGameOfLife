@@ -12,7 +12,7 @@ type FileType =
     | CompressedSave
     | Other
 
-[<Struct; NoComparison>]
+[<Struct>]
 type FileData = {
     Name: string
     Path: string
@@ -203,21 +203,29 @@ type FilePicker
             this.ClearSelection()
 
     member this.ProcessKeyboardInput() =
+        let currentCount = this.Files.Count
+
         match _currentSelection with
-        | None -> ()
+        | None ->
+            if currentCount = 0 then
+                ()
+            elif Keyboard.keyHasBeenPressedOnce KeyboardKey.Down then
+                this.SelectAt 0
+            elif Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
+                this.SelectAt(currentCount - 1)
         | Some selectedIndex ->
             let struct (startY, endY) = this.CalculateVisibleIndexRange()
 
             if Keyboard.keyHasBeenPressedOnce KeyboardKey.Down then
-                let newIndex = min (selectedIndex + 1) (this.Files.Count - 1)
-                _currentSelection <- Some newIndex
+                let newIndex = (selectedIndex + 1) % currentCount
+                this.SelectAt newIndex
 
                 if newIndex > endY then
                     this.Camera.MoveCameraDown this.FileEntryHeight
 
             else if Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
-                let newIndex = max (selectedIndex - 1) 0
-                _currentSelection <- Some newIndex
+                let newIndex = (selectedIndex - 1 + currentCount) % currentCount
+                this.SelectAt newIndex
 
                 if newIndex < startY then
                     this.Camera.MoveCameraUp this.FileEntryHeight
