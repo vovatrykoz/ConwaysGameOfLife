@@ -19,7 +19,8 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo x)
             Assert.That(camera.Position.Y, Is.EqualTo y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo zoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo zoomFactor)
+        )
 
     [<Property>]
     let ``Camera can be correctly moved to the right`` (camera: Camera<cells>) (speed: float32<cells>) =
@@ -31,7 +32,8 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo expected.Position.X)
             Assert.That(camera.Position.Y, Is.EqualTo expected.Position.Y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor)
+        )
 
     [<Property>]
     let ``Camera can be correctly moved to the left`` (camera: Camera<cells>) (speed: float32<cells>) =
@@ -43,7 +45,8 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo expected.Position.X)
             Assert.That(camera.Position.Y, Is.EqualTo expected.Position.Y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor)
+        )
 
     [<Property>]
     let ``Camera can be correctly moved up`` (camera: Camera<cells>) (speed: float32<cells>) =
@@ -55,7 +58,8 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo expected.Position.X)
             Assert.That(camera.Position.Y, Is.EqualTo expected.Position.Y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor)
+        )
 
     [<Property>]
     let ``Camera can be correctly moved down`` (camera: Camera<cells>) (speed: float32<cells>) =
@@ -67,7 +71,8 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo expected.Position.X)
             Assert.That(camera.Position.Y, Is.EqualTo expected.Position.Y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor)
+        )
 
     [<Property>]
     let ``Camera can be correctly zoomed in`` (camera: Camera<cells>) (zoomFactor: float32) =
@@ -79,7 +84,8 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo expected.Position.X)
             Assert.That(camera.Position.Y, Is.EqualTo expected.Position.Y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor)
+        )
 
     [<Property>]
     let ``Camera can be correctly zoomed out`` (camera: Camera<cells>) (zoomFactor: float32) =
@@ -91,4 +97,5 @@ module ``Camera Property Tests`` =
         Assert.Multiple(fun _ ->
             Assert.That(camera.Position.X, Is.EqualTo expected.Position.X)
             Assert.That(camera.Position.Y, Is.EqualTo expected.Position.Y)
-            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor))
+            Assert.That(camera.ZoomFactor, Is.EqualTo expected.ZoomFactor)
+        )

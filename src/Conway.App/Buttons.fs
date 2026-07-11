@@ -1,11 +1,11 @@
 namespace Conway.App
 
-open Config
-open Conway.App.Controls
-open Conway.App.Math
-open Raylib_cs
-
 module Buttons =
+    open Config
+    open Conway.App.Controls
+    open Conway.App.Math
+    open Raylib_cs
+
     let createSaveButtonInstance (ctx: ApplicationContext) =
         Button.create
         |> Button.position (Default.windowWidth - 200<px>) (Default.windowHeight - 400<px>)

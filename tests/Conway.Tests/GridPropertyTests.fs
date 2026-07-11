@@ -76,35 +76,43 @@ module ``Grid Properties`` =
             let l1, l2 = board |> Array2D.length1, board |> Array2D.length2
 
             let boardWithBorders =
-                Array2D.init (l1 + 2) (l2 + 2) (fun i j ->
-                    if i = 0 || i = l1 + 1 || j = 0 || j = l2 + 1 then
-                        ConwayGrid.DeadCell
-                    else
-                        board.[i - 1, j - 1])
+                Array2D.init
+                    (l1 + 2)
+                    (l2 + 2)
+                    (fun i j ->
+                        if i = 0 || i = l1 + 1 || j = 0 || j = l2 + 1 then
+                            ConwayGrid.DeadCell
+                        else
+                            board.[i - 1, j - 1]
+                    )
 
             let expectedBoard =
                 let l1, l2 =
                     boardWithBorders |> Array2D.length1, boardWithBorders |> Array2D.length2
 
-                Array2D.init l1 l2 (fun i j ->
-                    if i = 0 || i = l1 - 1 || j = 0 || j = l2 - 1 then
-                        ConwayGrid.DeadCell
-                    else
-                        let ul = boardWithBorders.[i - 1, j - 1]
-                        let us = boardWithBorders.[i - 1, j]
-                        let ur = boardWithBorders.[i - 1, j + 1]
-                        let l = boardWithBorders.[i, j - 1]
-                        let r = boardWithBorders.[i, j + 1]
-                        let dl = boardWithBorders.[i + 1, j - 1]
-                        let ds = boardWithBorders.[i + 1, j]
-                        let dr = boardWithBorders.[i + 1, j + 1]
+                Array2D.init
+                    l1
+                    l2
+                    (fun i j ->
+                        if i = 0 || i = l1 - 1 || j = 0 || j = l2 - 1 then
+                            ConwayGrid.DeadCell
+                        else
+                            let ul = boardWithBorders.[i - 1, j - 1]
+                            let us = boardWithBorders.[i - 1, j]
+                            let ur = boardWithBorders.[i - 1, j + 1]
+                            let l = boardWithBorders.[i, j - 1]
+                            let r = boardWithBorders.[i, j + 1]
+                            let dl = boardWithBorders.[i + 1, j - 1]
+                            let ds = boardWithBorders.[i + 1, j]
+                            let dr = boardWithBorders.[i + 1, j + 1]
 
-                        let sum = ul + us + ur + l + r + dl + ds + dr
+                            let sum = ul + us + ur + l + r + dl + ds + dr
 
-                        match sum with
-                        | 2<CellStatus> -> boardWithBorders.[i, j]
-                        | 3<CellStatus> -> ConwayGrid.LivingCell
-                        | _ -> ConwayGrid.DeadCell)
+                            match sum with
+                            | 2uy<CellStatus> -> boardWithBorders.[i, j]
+                            | 3uy<CellStatus> -> ConwayGrid.LivingCell
+                            | _ -> ConwayGrid.DeadCell
+                    )
 
             let width = board |> Array2D.length2
             let height = board |> Array2D.length1

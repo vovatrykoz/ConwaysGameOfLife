@@ -59,7 +59,8 @@ type ConwayByteDecoder() =
                         else
                             ConwayGrid.DeadCell
 
-                    remaining <- remaining - 1)
+                    remaining <- remaining - 1
+        )
 
         grid
 

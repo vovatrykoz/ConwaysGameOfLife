@@ -7,7 +7,7 @@ type GameState =
 
 [<Sealed>]
 type Game
-    private (initialState: ConwayGrid, startingGrid: int<CellStatus> array2d, generation: int, startingGeneration: int)
+    private (initialState: ConwayGrid, startingGrid: byte<CellStatus> array2d, generation: int, startingGeneration: int)
     =
 
     let mutable _internalState = initialState
@@ -58,7 +58,7 @@ type Game
     static member createFrom
         (
             currentState: ConwayGrid,
-            initialState: int<CellStatus> array2d,
+            initialState: byte<CellStatus> array2d,
             generationCounter: int,
             startingGeneration: int
         ) =
@@ -75,11 +75,15 @@ type Game
                 $"Expected (w:{activeWidth}, h:{activeHeight}), got (w:{initWidth}, h:{initHeight})"
 
         let padded =
-            Array2D.init (activeHeight + 2) (activeWidth + 2) (fun i j ->
-                if i = 0 || j = 0 || i = activeHeight + 1 || j = activeWidth + 1 then
-                    ConwayGrid.DeadCell
-                else
-                    initialState.[i - 1, j - 1])
+            Array2D.init
+                (activeHeight + 2)
+                (activeWidth + 2)
+                (fun i j ->
+                    if i = 0 || j = 0 || i = activeHeight + 1 || j = activeWidth + 1 then
+                        ConwayGrid.DeadCell
+                    else
+                        initialState.[i - 1, j - 1]
+                )
 
         let stateCopy = ConwayGrid.copyFrom currentState
 

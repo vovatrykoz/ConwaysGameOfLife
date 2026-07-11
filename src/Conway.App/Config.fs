@@ -1,9 +1,9 @@
 namespace Conway.App
 
-open Conway.App.Math
-
 module Config =
     module Default =
+        open Conway.App.Math
+
         let windowWidth = 1024<px>
 
         let windowHeight = 768<px>

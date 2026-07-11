@@ -1,9 +1,9 @@
 namespace Conway.App
 
-open Conway.App.Math
-open Raylib_cs
-
 module Hotkeys =
+    open Conway.App.Math
+    open Raylib_cs
+
     let mapKeyboardActions (ctx: ApplicationContext) = [|
         KeyboardKey.W, (fun _ -> ctx.Canvas.Camera.MoveCameraUp 1.0f<cells>)
         KeyboardKey.A, (fun _ -> ctx.Canvas.Camera.MoveCameraLeft 1.0f<cells>)
@@ -18,4 +18,9 @@ module Hotkeys =
         KeyboardKey.A, (fun _ -> ctx.Canvas.Camera.MoveCameraLeft 5.0f<cells>)
         KeyboardKey.S, (fun _ -> ctx.Canvas.Camera.MoveCameraDown 5.0f<cells>)
         KeyboardKey.D, (fun _ -> ctx.Canvas.Camera.MoveCameraRight 5.0f<cells>)
+    |]
+
+    let mapKeyboardCtrlActions (ctx: ApplicationContext) = [|
+        KeyboardKey.O, (fun _ -> Callbacks.openFile ctx)
+        KeyboardKey.S, (fun _ -> Callbacks.saveFile ctx)
     |]

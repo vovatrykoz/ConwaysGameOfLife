@@ -1,9 +1,9 @@
 namespace Conway.App.Input
 
-open Conway.App.Utils.Alias
-open Raylib_cs
-
 module Mouse =
+    open Conway.App.Utils.Alias
+    open Raylib_cs
+
     let inline position () = Raylib.GetMousePosition()
 
     let inline getDelta () = Raylib.GetMouseDelta()

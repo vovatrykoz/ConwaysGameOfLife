@@ -1,19 +1,17 @@
 namespace Conway.App
 
-open System
-open System.Collections.Generic
-open System.IO
-open Raylib_cs
-open Conway.App.Controls
-open Conway.App.Utils.Alias
-open Conway.App.Input
-open Conway.App.Graphics
-open Conway.Encoding
-open Conway.App.File
-open Conway.App.Math
-open Conway.Core
-
 module Run =
+    open System
+    open System.Collections.Generic
+    open System.IO
+    open Raylib_cs
+    open Conway.App.Controls
+    open Conway.App.Utils.Alias
+    open Conway.App.Input
+    open Conway.App.Graphics
+    open Conway.Encoding
+    open Conway.App.File
+    open Conway.App.Math
 
     let private saveGameState (ctx: ApplicationContext) (newFile: string) =
         let encoder = new ConwayByteEncoder()
@@ -23,7 +21,7 @@ module Run =
 
         try
             (fileSaver :> ICanvasFileSaver).Save ctx.Canvas newFile
-            Raylib.TraceLog(TraceLogLevel.Info, "Test file saved successfully")
+            Raylib.TraceLog(TraceLogLevel.Info, $"{newFile} file saved successfully")
         with ex ->
             Raylib.TraceLog(TraceLogLevel.Error, $"Could not save the file due to the following error:\n{ex.Message}")
 
@@ -159,29 +157,30 @@ module Run =
                 isCancelled <- true
             else
                 let files =
-                    Directory.GetFiles saveFilesPath
-                    |> Array.choose (fun fullPath ->
+                    Directory.EnumerateFiles saveFilesPath
+                    |> Seq.choose (fun fullPath ->
                         let fileName = Path.GetFileName fullPath
                         let lastModified = File.GetLastWriteTime fullPath
                         let fileExtention = Path.GetExtension fullPath
 
                         match fileExtention with
                         | ".gol" -> Some(FileData.create fileName fullPath UncompressedSave lastModified)
-                        | _ -> None)
+                        | _ -> None
+                    )
+                    |> Seq.toArray
+                    |> Array.sortBy (fun info -> info.Name)
+
+                let existing = filePicker.Files |> Seq.map (fun f -> f.Path) |> Set.ofSeq
+                let desired = files |> Array.map (fun f -> f.Path) |> Set.ofArray
 
                 files
-                |> Array.iter (fun fileData ->
-                    if not (filePicker.Files.Contains fileData) then
-                        filePicker.Files.Add fileData)
-
-                let removalIndeces = new List<int>()
+                |> Array.filter (fun f -> not (existing.Contains f.Path))
+                |> Array.iter filePicker.Files.Add
 
                 filePicker.Files
-                |> Seq.iteri (fun index fileData ->
-                    if not (files |> Array.contains fileData) then
-                        removalIndeces.Add index)
-
-                removalIndeces.ForEach(fun index -> filePicker.Files.RemoveAt index)
+                |> Seq.filter (fun f -> not (desired.Contains f.Path))
+                |> Seq.toArray
+                |> Array.iter (fun f -> filePicker.Files.Remove f |> ignore)
 
                 Display.openFileDialogue ctx.Texture filePicker
                 filePicker.ProcessInput()

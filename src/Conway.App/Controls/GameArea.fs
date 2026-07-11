@@ -1,19 +1,19 @@
 namespace Conway.App.Controls
 
-open Conway.App.Input
-open Conway.App.Math
-open Conway.Core
-open Raylib_cs
-
 module internal GameArea =
+    open Conway.App.Input
+    open Conway.App.Math
+    open Conway.Core
+    open Raylib_cs
+
     let makeAlive row col (game: Game) =
-        game.CurrentState.Board[row, col] <- 1<CellStatus>
+        game.CurrentState.Board[row, col] <- 1uy<CellStatus>
 
         // erase the history since the player has altered the board
         game.ResetGenerationCounter()
 
     let makeDead row col (game: Game) =
-        game.CurrentState.Board[row, col] <- 0<CellStatus>
+        game.CurrentState.Board[row, col] <- 0uy<CellStatus>
 
         // erase the history since the player has altered the board
         game.ResetGenerationCounter()

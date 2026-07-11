@@ -64,7 +64,7 @@ module Display =
                     ()
                 else
                     match board[row, col] with
-                    | 0<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
+                    | 0uy<CellStatus> -> Draw.deadCell trueX trueY trueWidth trueHeight
                     | _ -> Draw.livingCell trueX trueY trueWidth trueHeight
 
     let private renderControls (controls: ControlManager) =
@@ -216,6 +216,45 @@ module Display =
         Raylib.BeginTextureMode texture
         Raylib.ClearBackground Color.White
 
+        let y = max filePicker.Y -filePicker.Camera.Position.Y
+
+        match filePicker.CurrentSelection with
+        | None -> ()
+        | Some file ->
+            let currentFileTypeText =
+                match file.FileType with
+                | CompressedSave -> "Selected file type:\nCompressed Savefile"
+                | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
+                | Other -> "Selected file type:\nOther"
+
+            Draw.label
+                (filePicker.X + 600.0f<px>)
+                (y + filePicker.FileEntryHeight * 15.0f)
+                (int (filePicker.FileEntryHeight - 10.0f<px>))
+                currentFileTypeText
+                (int filePicker.FileEntryWidth)
+                (int filePicker.FileEntryHeight)
+                Color.Black
+                Color.White
+
+        let visibleItems = endIndex - startIndex + 1
+        let totalItems = filePicker.Files.Count
+
+        if totalItems > visibleItems then
+            let scale =
+                (float32 visibleItems / float32 (totalItems - 1)) * filePicker.FileEntryHeight
+
+            let scrollStart = filePicker.Y + (float32 startIndex) * scale
+            let scrollEnd = scrollStart + (float32 (endIndex - startIndex)) * scale
+
+            Draw.line
+                (filePicker.X + filePicker.FileEntryWidth + 1.0f<px>)
+                scrollStart
+                (filePicker.X + filePicker.FileEntryWidth + 1.0f<px>)
+                scrollEnd
+                5<px>
+                Color.Gray
+
         for index = startIndex to endIndex do
             let currentFile = filePicker.Files.[index]
 
@@ -224,45 +263,21 @@ module Display =
                 | None -> false
                 | Some file -> file = currentFile
 
-            let y = max filePicker.Y -filePicker.Camera.Position.Y
-
             if currentItemIsSelected then
                 Draw.label
-                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X))
-                    (LanguagePrimitives.Float32WithMeasure(
-                        float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex)
-                    ))
-                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
+                    filePicker.X
+                    (y + filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f<px>))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)
                     Color.White
                     Color.Black
-
-                let currentFileTypeText =
-                    match currentFile.FileType with
-                    | CompressedSave -> "Selected file type:\nCompressed Savefile"
-                    | UncompressedSave -> "Selected file type:\nUncompressed Savefile"
-                    | Other -> "Selected file type:\nOther"
-
-                Draw.label
-                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X + 600.0f))
-                    (LanguagePrimitives.Float32WithMeasure(
-                        float32 y + float32 filePicker.FileEntryHeight * float32 15.0f
-                    ))
-                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
-                    currentFileTypeText
-                    (int filePicker.FileEntryWidth)
-                    (int filePicker.FileEntryHeight)
-                    Color.Black
-                    Color.White
             else
                 Draw.label
-                    (LanguagePrimitives.Float32WithMeasure(float32 filePicker.X))
-                    (LanguagePrimitives.Float32WithMeasure(
-                        float32 y + float32 filePicker.FileEntryHeight * float32 (index - startIndex)
-                    ))
-                    (int (filePicker.FileEntryHeight - LanguagePrimitives.Float32WithMeasure 10.0f))
+                    filePicker.X
+                    (y + filePicker.FileEntryHeight * float32 (index - startIndex))
+                    (int (filePicker.FileEntryHeight - 10.0f<px>))
                     currentFile.Name
                     (int filePicker.FileEntryWidth)
                     (int filePicker.FileEntryHeight)

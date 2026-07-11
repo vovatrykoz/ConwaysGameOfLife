@@ -58,7 +58,8 @@ module ``Binary Canvas File Loader Tests`` =
             Assert.That(actualGame.StartingGrid, Is.EqualTo expectedGame.StartingGrid)
             Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
             Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
-            Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor))
+            Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor)
+        )
 
     [<Test>]
     let ``Can correctly load a simple canvas with different initial starting and ending grid`` () =
@@ -113,4 +114,5 @@ module ``Binary Canvas File Loader Tests`` =
             Assert.That(actualGame.StartingGrid, Is.EqualTo expectedGame.StartingGrid)
             Assert.That(actualGame.Generation, Is.EqualTo expectedGame.Generation)
             Assert.That(actualCamera.Position, Is.EqualTo expectedCamera.Position)
-            Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor))
+            Assert.That(actualCamera.ZoomFactor, Is.EqualTo expectedCamera.ZoomFactor)
+        )

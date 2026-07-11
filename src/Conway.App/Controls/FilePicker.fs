@@ -12,7 +12,7 @@ type FileType =
     | CompressedSave
     | Other
 
-[<Struct; NoComparison>]
+[<Struct>]
 type FileData = {
     Name: string
     Path: string
@@ -43,6 +43,14 @@ type FilePicker
 
     let mutable _confirmed = false
 
+    let mutable _downHeld = false
+    let mutable _upHeld = false
+    let mutable _downNextRepeat = DateTime.MinValue
+    let mutable _upNextRepeat = DateTime.MinValue
+
+    let _initialDelay = TimeSpan.FromMilliseconds 250.0
+    let _repeatDelay = TimeSpan.FromMilliseconds 100.0
+
     let _confirmButton =
         let x_px: int<px> = LanguagePrimitives.Int32WithMeasure(int x)
 
@@ -50,17 +58,17 @@ type FilePicker
             LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
 
         new Button(
-            x_px,
-            y_px,
-            200<px>,
-            40<px>,
-            "Confirm",
-            false,
-            true,
-            Some(fun _ -> _confirmed <- true),
-            None,
-            None,
-            Some KeyboardKey.Enter
+            x = x_px,
+            y = y_px,
+            width = 200<px>,
+            height = 40<px>,
+            text = "Confirm",
+            isActive = false,
+            isVisible = true,
+            onClick = Some(fun _ -> _confirmed <- true),
+            onPressAndHold = None,
+            onUpdate = None,
+            shortcut = Some KeyboardKey.Enter
         )
 
     let _cancelButton =
@@ -70,17 +78,17 @@ type FilePicker
             LanguagePrimitives.Int32WithMeasure(int (y + fileEntryHeight * 15.0f))
 
         new Button(
-            x_px + 300<px>,
-            y_px,
-            200<px>,
-            40<px>,
-            "Cancel",
-            true,
-            true,
-            Some(fun _ -> _cancelled <- true),
-            None,
-            None,
-            Some KeyboardKey.Escape
+            x = x_px + 300<px>,
+            y = y_px,
+            width = 200<px>,
+            height = 40<px>,
+            text = "Cancel",
+            isActive = true,
+            isVisible = true,
+            onClick = Some(fun _ -> _cancelled <- true),
+            onPressAndHold = None,
+            onUpdate = None,
+            shortcut = Some KeyboardKey.Escape
         )
 
     new
@@ -203,24 +211,133 @@ type FilePicker
             this.ClearSelection()
 
     member this.ProcessKeyboardInput() =
-        match _currentSelection with
-        | None -> ()
-        | Some selectedIndex ->
+        let count = this.Files.Count
+
+        if count = 0 then
+            ()
+        else
             let struct (startY, endY) = this.CalculateVisibleIndexRange()
+            let now = DateTime.Now
 
-            if Keyboard.keyHasBeenPressedOnce KeyboardKey.Down then
-                let newIndex = min (selectedIndex + 1) (this.Files.Count - 1)
-                _currentSelection <- Some newIndex
+            let shift =
+                Keyboard.keyIsDown KeyboardKey.LeftShift
+                || Keyboard.keyIsDown KeyboardKey.RightShift
 
-                if newIndex > endY then
-                    this.Camera.MoveCameraDown this.FileEntryHeight
+            let down = Keyboard.keyIsDown KeyboardKey.Down
+            let up = Keyboard.keyIsDown KeyboardKey.Up
 
-            else if Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
-                let newIndex = max (selectedIndex - 1) 0
-                _currentSelection <- Some newIndex
+            match _currentSelection with
+            | None ->
+                if shift && down then
+                    this.SelectAt(count - 1)
 
-                if newIndex < startY then
-                    this.Camera.MoveCameraUp this.FileEntryHeight
+                    if endY < count - 1 then
+                        this.Camera.MoveCameraDown(float32 (count - 1 - endY) * this.FileEntryHeight)
+
+                elif shift && up then
+                    this.SelectAt 0
+
+                    if startY > 0 then
+                        this.Camera.MoveCameraUp(float32 startY * this.FileEntryHeight)
+
+                elif Keyboard.keyHasBeenPressedOnce KeyboardKey.Down then
+                    this.SelectAt 0
+                    _downHeld <- true
+                    _downNextRepeat <- now + _initialDelay
+
+                    if startY > 0 then
+                        this.Camera.MoveCameraUp(float32 startY * this.FileEntryHeight)
+
+                elif Keyboard.keyHasBeenPressedOnce KeyboardKey.Up then
+                    this.SelectAt(count - 1)
+                    _upHeld <- true
+                    _upNextRepeat <- now + _initialDelay
+
+                    if endY < count - 1 then
+                        this.Camera.MoveCameraDown(float32 (count - 1 - endY) * this.FileEntryHeight)
+
+            | Some selectedIndex ->
+                if shift && down then
+                    this.SelectAt(count - 1)
+
+                    if endY < count - 1 then
+                        this.Camera.MoveCameraDown(float32 (count - 1 - endY) * this.FileEntryHeight)
+
+                elif shift && up then
+                    this.SelectAt 0
+
+                    if startY > 0 then
+                        this.Camera.MoveCameraUp(float32 startY * this.FileEntryHeight)
+
+                elif down then
+                    if not _downHeld then
+                        _downHeld <- true
+                        _downNextRepeat <- now + _initialDelay
+
+                        let newIndex = (selectedIndex + 1) % count
+                        this.SelectAt newIndex
+
+                        if newIndex < startY then
+                            this.Camera.MoveCameraUp(float32 (startY - newIndex) * this.FileEntryHeight)
+                        elif newIndex > endY then
+                            this.Camera.MoveCameraDown(
+                                float32 (newIndex - (endY - startY) - startY) * this.FileEntryHeight
+                            )
+                        elif selectedIndex + 1 = count then
+                            this.Camera.MoveCameraUp(float32 startY * this.FileEntryHeight)
+                    elif now >= _downNextRepeat then
+                        _downNextRepeat <- now + _repeatDelay
+
+                        let newIndex = (selectedIndex + 1) % count
+                        this.SelectAt newIndex
+
+                        if newIndex < startY then
+                            this.Camera.MoveCameraUp(float32 (startY - newIndex) * this.FileEntryHeight)
+                        elif newIndex > endY then
+                            this.Camera.MoveCameraDown(
+                                float32 (newIndex - (endY - startY) - startY) * this.FileEntryHeight
+                            )
+                        elif selectedIndex + 1 = count then
+                            this.Camera.MoveCameraUp(float32 startY * this.FileEntryHeight)
+                elif up then
+                    if not _upHeld then
+                        _upHeld <- true
+                        _upNextRepeat <- now + _initialDelay
+
+                        let newIndex = (selectedIndex - 1 + count) % count
+                        this.SelectAt newIndex
+
+                        if newIndex > endY then
+                            let moveFactor =
+                                min
+                                    (float32 (count - 1 - endY) * this.FileEntryHeight)
+                                    (float32 (startY + newIndex) * this.FileEntryHeight)
+
+                            this.Camera.MoveCameraDown(moveFactor)
+                        elif newIndex < startY then
+                            this.Camera.MoveCameraUp(float32 (startY - newIndex) * this.FileEntryHeight)
+                        elif selectedIndex - 1 < 0 then
+                            this.Camera.MoveCameraDown(float32 (count - 1 - endY) * this.FileEntryHeight)
+                    elif now >= _upNextRepeat then
+                        _upNextRepeat <- now + _repeatDelay
+
+                        let newIndex = (selectedIndex - 1 + count) % count
+                        this.SelectAt newIndex
+
+                        if newIndex > endY then
+                            let moveFactor =
+                                min
+                                    (float32 (count - 1 - endY) * this.FileEntryHeight)
+                                    (float32 (startY + newIndex) * this.FileEntryHeight)
+
+                            this.Camera.MoveCameraDown(moveFactor)
+                        elif newIndex < startY then
+                            this.Camera.MoveCameraUp(float32 (startY - newIndex) * this.FileEntryHeight)
+                        elif selectedIndex - 1 < 0 then
+                            this.Camera.MoveCameraDown(float32 (count - 1 - endY) * this.FileEntryHeight)
+                else
+                    _downHeld <- false
+                    _upHeld <- false
 
     member private this.ProcessButton(button: Button) =
         match button.IsActive with

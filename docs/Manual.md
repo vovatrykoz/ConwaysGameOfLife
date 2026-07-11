@@ -2,14 +2,18 @@
 
 The following controls are available while interacting with the grid.
 
-### Keyboard
+### Mouse
 
-- `Click and drag` - move around the grid  
+- `Click and drag` — move around the grid  
+- `Mouse wheel` — zoom in/zoom out
 - `Shift + Left Mouse Button` — make a cell alive  
 - `Shift + Right Mouse Button` — make a cell dead  
+
+### Keyboard
 - `Space` — run the grid; press again to pause  
-- `Right arrow` — move to the next generation
-- `Mouse wheel` - zoom in/zoom out
+- `Right arrow` — advance to the next generation
+- `Ctrl + S` — Save current game state to file
+- `Ctrl + O` — Open a previously saved state from file
 
 ### Buttons
 

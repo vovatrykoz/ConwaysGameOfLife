@@ -20,7 +20,8 @@ module ``Game Properties`` =
             Assert.That(game.StartingGrid, Is.Not.EqualTo grid)
             Assert.That(game.StartingGrid, Is.EqualTo grid.Board)
             Assert.That(game.Generation, Is.EqualTo generation)
-            Assert.That(game.StartingGeneration, Is.EqualTo generation))
+            Assert.That(game.StartingGeneration, Is.EqualTo generation)
+        )
 
     [<Property>]
     let ``Creating a new game through a constructor that only takes in a grid results in correctly set states and generations``
@@ -33,7 +34,8 @@ module ``Game Properties`` =
             Assert.That(game.StartingGrid, Is.Not.EqualTo grid)
             Assert.That(game.StartingGrid, Is.EqualTo grid.Board)
             Assert.That(game.Generation, Is.EqualTo 1)
-            Assert.That(game.StartingGeneration, Is.EqualTo 1))
+            Assert.That(game.StartingGeneration, Is.EqualTo 1)
+        )
 
     [<Property>]
     let ``Game.CurrentState setter correctly sets all the values`` (oldState: ConwayGrid) (newState: ConwayGrid) =
@@ -46,7 +48,8 @@ module ``Game Properties`` =
             Assert.That(game.StartingGrid, Is.Not.EqualTo newState)
             Assert.That(game.StartingGrid, Is.EqualTo newState.Board)
             Assert.That(game.Generation, Is.EqualTo 1)
-            Assert.That(game.StartingGeneration, Is.EqualTo 1))
+            Assert.That(game.StartingGeneration, Is.EqualTo 1)
+        )
 
     [<Property>]
     let ``Running a game one step forward produces correct new grid`` (grid: ConwayGrid) (generation: int) =
@@ -81,7 +84,8 @@ module ``Game Properties`` =
 
         Assert.Multiple(fun _ ->
             Assert.That(game.CurrentState, Is.Not.EqualTo game.StartingGrid)
-            Assert.That(game.CurrentState.Board, Is.EqualTo game.StartingGrid))
+            Assert.That(game.CurrentState.Board, Is.EqualTo game.StartingGrid)
+        )
 
     [<Property>]
     let ``Resetting a game correctly resets the generation counter``
@@ -113,7 +117,8 @@ module ``Game Properties`` =
 
         Assert.Multiple(fun _ ->
             Assert.That(game.StartingGrid, Is.Not.EqualTo game.CurrentState)
-            Assert.That(game.StartingGrid, Is.EqualTo game.CurrentState.Board))
+            Assert.That(game.StartingGrid, Is.EqualTo game.CurrentState.Board)
+        )
 
     [<Property>]
     let ``Resetting a generation counter correctly resets it``
@@ -130,4 +135,5 @@ module ``Game Properties`` =
 
         Assert.Multiple(fun _ ->
             Assert.That(game.Generation, Is.EqualTo 1)
-            Assert.That(game.StartingGeneration, Is.EqualTo 1))
+            Assert.That(game.StartingGeneration, Is.EqualTo 1)
+        )
