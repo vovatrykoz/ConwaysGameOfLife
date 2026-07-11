@@ -1,10 +1,10 @@
 namespace Conway.App.Utils
 
-open Raylib_cs
-open System
+module Conversion =
+    open System
+    open Raylib_cs
 
-module Convert =
     let inline CBoolToFsBool (cbool: CBool) = Convert.ToBoolean(sbyte cbool)
 
 module Alias =
-    let inline raylibTrue expr = expr |> Convert.CBoolToFsBool
+    let inline raylibTrue expr = expr |> Conversion.CBoolToFsBool

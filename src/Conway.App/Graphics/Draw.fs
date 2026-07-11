@@ -1,10 +1,9 @@
 namespace Conway.App.Graphics
 
-open Conway.App.Controls
-open Conway.App.Math
-open Raylib_cs
-
 module Draw =
+    open Conway.App.Controls
+    open Conway.App.Math
+    open Raylib_cs
     open System.Numerics
 
     let inline private buttonBorderRectangle x y width height =

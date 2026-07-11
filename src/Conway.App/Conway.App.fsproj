@@ -34,6 +34,8 @@
     <Compile Include="Buttons.fs" />
     <Compile Include="Hotkeys.fs" />
     <Compile Include="UserInput.fs" />
+    <Compile Include="Log.fs" />
+    <Compile Include="Resolve.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

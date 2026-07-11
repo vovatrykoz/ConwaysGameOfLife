@@ -1,18 +1,17 @@
 namespace Conway.App
 
-open System
-open System.Collections.Generic
-open System.IO
-open Raylib_cs
-open Conway.App.Controls
-open Conway.App.Utils.Alias
-open Conway.App.Input
-open Conway.App.Graphics
-open Conway.Encoding
-open Conway.App.File
-open Conway.App.Math
-
 module Run =
+    open System
+    open System.Collections.Generic
+    open System.IO
+    open Raylib_cs
+    open Conway.App.Controls
+    open Conway.App.Utils.Alias
+    open Conway.App.Input
+    open Conway.App.Graphics
+    open Conway.Encoding
+    open Conway.App.File
+    open Conway.App.Math
 
     let private saveGameState (ctx: ApplicationContext) (newFile: string) =
         let encoder = new ConwayByteEncoder()

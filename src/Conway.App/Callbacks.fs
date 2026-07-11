@@ -1,12 +1,12 @@
 namespace Conway.App
 
-open Config
-open Conway.App.Controls
-open Conway.App.Utils.Alias
-open Conway.Core
-open Raylib_cs
-
 module Callbacks =
+    open Config
+    open Conway.App.Controls
+    open Conway.App.Utils.Alias
+    open Conway.Core
+    open Raylib_cs
+
     let saveFile (ctx: ApplicationContext) =
         try
             Run.saveFileProgram ctx
